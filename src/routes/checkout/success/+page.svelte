@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
-    import { cartItems } from '$lib/stores/cart';
+    import { cart } from '$lib/stores/cart';
     
     let orderId = '';
     let loading = true;
@@ -18,7 +18,7 @@
           orderId = `order_${Date.now()}`;
           
           // Clear the cart
-          cartItems.set([]);
+          cart.clearCart();
           
           loading = false;
         } catch (error) {
