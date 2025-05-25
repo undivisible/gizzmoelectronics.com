@@ -168,16 +168,8 @@ export const load: PageServerLoad = async () => {
     return { manuals: hardcodedManuals };
   }
   
-  // Verify we're in a server context
-  try {
-    // Import the verifyServerContext function dynamically to prevent it from being bundled
-    // in client-side code when not needed
-    const { verifyServerContext } = await import('$lib/server/index.js');
-    verifyServerContext('PageServer');
-  } catch (error) {
-    console.error('Server-only code was executed in a browser context');
-    return { manuals: hardcodedManuals };
-  }
+  // In development, check if we can access the filesystem
+  // This code only runs on the server side in SvelteKit
   
   // In development, use filesystem
   try {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { fade, fly } from 'svelte/transition';
-  import type { PageData } from './manuals/$types';
+  import type { PageData } from './$types';
   import type { Manual } from './+page.server';
   
   export let data: PageData;
