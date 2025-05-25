@@ -32,6 +32,7 @@
 	},
 	"dependencies": {
 		"@icons-pack/svelte-simple-icons": "^5.0.0",
+		"@sveltejs/adapter-static": "^3.0.8",
 		"lucide-svelte": "^0.511.0",
 		"stripe": "^18.1.0",
 		"svelte-routing": "^2.13.0",
