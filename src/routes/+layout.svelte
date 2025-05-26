@@ -3,8 +3,6 @@
     import { onMount, afterUpdate } from 'svelte';
     import Header from '$lib/components/Header.svelte';
     import Footer from '$lib/components/Footer.svelte';
-    import CartSidebar from '$lib/components/CartSidebar.svelte';
-    import CartButton from '$lib/components/CartButton.svelte';
     import { cart } from '$lib/stores/cart';
     import '../app.css';
     import { get } from 'svelte/store'; // Import get to access the value of cartOpen
@@ -15,8 +13,6 @@
     <Header />
     <main>
       <slot />
-      <CartButton />
-      <CartSidebar />
     </main>
     <div class="gradient"></div>
     <Footer />
