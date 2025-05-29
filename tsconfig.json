@@ -9,7 +9,13 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
-		"moduleResolution": "bundler"
+		"module": "es2022",
+		"moduleResolution": "bundler",
+		"typeRoots": ["./node_modules/@types", "./src"],
+		"types": ["node"],
+		"paths": {
+			"browserify-fs": ["./src/app.d.ts"]
+		}
 	}
 	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias
 	// except $lib which is handled by https://svelte.dev/docs/kit/configuration#files

@@ -1,7 +1,8 @@
 import type { PageServerLoad } from './$types';
-import fs from 'fs';
-import path from 'path';
+import fs from 'browserify-fs';
+import path from 'path-browserify';
 import { dev } from '$app/environment';
+import type { Dirent } from 'fs';
 
 export interface Manual {
   id: string;
@@ -161,15 +162,11 @@ const hardcodedManuals: Manual[] = [
   }
 ];
 
-
 export const load: PageServerLoad = async () => {
   // In production (Netlify), use hardcoded data
   if (!dev) {
     return { manuals: hardcodedManuals };
   }
-  
-  // In development, check if we can access the filesystem
-  // This code only runs on the server side in SvelteKit
   
   // In development, use filesystem
   try {
@@ -183,8 +180,8 @@ export const load: PageServerLoad = async () => {
     
     // Get all category directories (top level)
     const categories = fs.readdirSync(manualsDir, { withFileTypes: true })
-      .filter(dirent => dirent.isDirectory())
-      .map(dirent => dirent.name);
+      .filter((dirent: Dirent) => dirent.isDirectory())
+      .map((dirent: Dirent) => dirent.name);
     
     const manuals: Manual[] = [];
     
@@ -194,8 +191,8 @@ export const load: PageServerLoad = async () => {
       
       // Get all product directories within this category
       const products = fs.readdirSync(categoryPath, { withFileTypes: true })
-        .filter(dirent => dirent.isDirectory())
-        .map(dirent => dirent.name);
+        .filter((dirent: Dirent) => dirent.isDirectory())
+        .map((dirent: Dirent) => dirent.name);
       
       // Process each product
       for (const product of products) {
@@ -205,12 +202,12 @@ export const load: PageServerLoad = async () => {
         // Format the product name (replace underscores with spaces and capitalize)
         const title = product
           .replace(/_/g, ' ')
-          .replace(/\b\w/g, char => char.toUpperCase());
+          .replace(/\b\w/g, (char: string) => char.toUpperCase());
         
         // Format the category name (replace underscores with spaces and capitalize)
         const categoryFormatted = category
           .replace(/_/g, ' ')
-          .replace(/\b\w/g, char => char.toUpperCase());
+          .replace(/\b\w/g, (char: string) => char.toUpperCase());
         
         // Check for PDF files
         const hasQuickstart = files.includes('quickstart.pdf');

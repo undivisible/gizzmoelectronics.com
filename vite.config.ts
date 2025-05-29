@@ -15,18 +15,12 @@ export default defineConfig({
 		// Improve compatibility with Netlify
 		target: 'esnext',
 		ssrEmitAssets: true,
-		// Ensure Node.js modules are not bundled for client
-		rollupOptions: {
-			external: ['fs', 'path', 'crypto', 'stream', 'util', 'os']
-		}
 	},
 	resolve: {
 		alias: {}
 	},
 	// Configure SSR for Netlify deployment
 	ssr: {
-		// Externalize Node.js built-ins for server-side rendering
-		external: ['fs', 'path', 'crypto', 'stream', 'util', 'os'],
 		// Don't externalize these packages - they should be bundled
 		noExternal: ['@icons-pack/svelte-simple-icons', 'lucide-svelte']
 	},

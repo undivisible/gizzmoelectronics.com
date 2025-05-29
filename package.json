@@ -20,6 +20,7 @@
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
 		"@types/node": "^22.15.18",
+		"@types/path-browserify": "^1.0.3",
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
 		"typescript": "^5.0.0",
@@ -33,7 +34,9 @@
 	"dependencies": {
 		"@icons-pack/svelte-simple-icons": "^5.0.0",
 		"@sveltejs/adapter-static": "^3.0.8",
+		"browserify-fs": "^1.0.0",
 		"lucide-svelte": "^0.511.0",
+		"path-browserify": "^1.0.1",
 		"stripe": "^18.1.0",
 		"svelte-routing": "^2.13.0",
 		"tslib": "^2.8.1"

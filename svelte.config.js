@@ -15,7 +15,10 @@ const config = {
       assets: 'build',
       precompress: false,
       strict: true
-    })
+    }),
+    alias: {
+      $lib: './src/lib'
+    }
   }
 };
 
