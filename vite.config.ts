@@ -25,15 +25,7 @@ export default defineConfig({
 		},
 		// Improve compatibility with Netlify
 		target: 'esnext',
-		ssrEmitAssets: true,
-		rollupOptions: {
-			external: ['browserify-fs'],
-		}
-	},
-	resolve: {
-		alias: {
-			'browserify-fs': 'browserify-fs/index.js'
-		}
+		ssrEmitAssets: true
 	},
 	// Configure SSR for Netlify deployment
 	ssr: {

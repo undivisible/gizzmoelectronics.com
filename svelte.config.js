@@ -18,6 +18,15 @@ const config = {
     }),
     alias: {
       $lib: './src/lib'
+    },
+    prerender: {
+      entries: ['/'],
+      handleHttpError: ({ path, referrer, message }) => {
+        // Ignore all 404s
+        if (message.includes('404')) return;
+        // Otherwise fail the build
+        throw new Error(message);
+      }
     }
   }
 };
