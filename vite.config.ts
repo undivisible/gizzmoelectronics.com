@@ -1,8 +1,19 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig({
-	plugins: [sveltekit()],
+	plugins: [
+		sveltekit(),
+		nodePolyfills({
+			include: ['path', 'fs', 'util', 'process'],
+			globals: {
+				Buffer: true,
+				global: true,
+				process: true,
+			},
+		}),
+	],
 	server: {
 		fs: {
 			allow: ['static']
@@ -15,9 +26,14 @@ export default defineConfig({
 		// Improve compatibility with Netlify
 		target: 'esnext',
 		ssrEmitAssets: true,
+		rollupOptions: {
+			external: ['browserify-fs'],
+		}
 	},
 	resolve: {
-		alias: {}
+		alias: {
+			'browserify-fs': 'browserify-fs/index.js'
+		}
 	},
 	// Configure SSR for Netlify deployment
 	ssr: {
