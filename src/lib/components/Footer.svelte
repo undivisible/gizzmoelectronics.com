@@ -12,50 +12,13 @@
     }
   </script>
   
-  <footer>
-    <div class="footer-links">
-      <a href="/support" class:active={isActive('/support')}>Contact</a>
-      <a href="/" class:active={isActive('/')}>Downloads</a>
-      <div>New products and store under development</div>
+  <footer class="relative z-10 px-8 py-10 border-t border-white/10">
+    <div class="flex flex-col lg:flex-row gap-10 lg:items-start justify-between">
+      <div class="flex flex-wrap gap-2 min-w-[200px] text-lg">
+        <h2 class="text-[1vw] font-bold tracking-wide m-0">Gizzmo Electronics</h2>
+        <a href="/support" class="px-2.5 py-1.5 rounded-md bg-white/0 hover:bg-white/10 text-neutral-300 hover:text-white transition-colors" class:!text-white={isActive('/support')} class:font-semibold={isActive('/support')}>Contact</a>
+        <a href="/" class="px-2.5 py-1.5 rounded-md bg-white/0 hover:bg-white/10 text-neutral-300 hover:text-white transition-colors"class:!text-white={isActive('/')} class:font-semibold={isActive('/')}>Downloads</a>
+        <!--<a href="/b1" class="px-2.5 py-1.5 rounded-md bg-white/0 hover:bg-white/10 text-neutral-300 hover:text-white transition-colors" class:!text-white={isActive('/b1')} class:font-semibold={isActive('/b1')}>B1 Controller</a>-->
+      </div>
     </div>
   </footer>
-    
-  <style>
-    footer {
-      padding: 2rem;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      z-index: 10;
-    }
-  
-    .footer-links {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-  
-    .footer-links a {
-      color: #aaa;
-      text-decoration: none;
-      transition: color 0.2s, font-weight 0.2s;
-      cursor: pointer;
-    }
-
-    .footer-links div {
-      color: rgb(129, 129, 129);
-      text-decoration: none;
-      transition: color 0.2s, font-weight 0.2s;
-      cursor: not-allowed;
-    }
-  
-    .footer-links a:hover {
-      color: #fff;
-    }
-    
-    /* Active link styling */
-    .footer-links a.active {
-      color: #fff;
-      font-weight: bold;
-    }
-  </style>

@@ -80,31 +80,30 @@
   }
 </script>
 
-<head><title>Gizzmo Electronics</title></head>
+<svelte:head><title>Gizzmo Electronics</title></svelte:head>
 
-<div class="product-page">
+<div class="flex justify-center items-center py-4">
   {#if visible}
-    <div class="product-container" in:fade={{ duration: 800 }}>
-      <div class="in-case">        
-        <div class="product-image">
-          <img src={mainProduct.image || "/placeholder.svg"} alt={mainProduct.name} />
+    <div class="flex flex-col items-center max-w-xl w-full" in:fade={{ duration: 800 }}>
+      <div class="flex flex-col md:flex-row md:items-center md:text-left text-center">
+        <div class="w-full max-w-md mb-8 md:mb-0 md:mr-6">
+          <img class="w-full h-auto" src={mainProduct.image || '/placeholder.svg'} alt={mainProduct.name} />
         </div>
-        <div class="in-case-text">
-          <div class="product-info">
-            <h2 class="product-name">{mainProduct.name}</h2>
-            <p class="product-description">{mainProduct.description}</p>
+        <div class="flex flex-col items-center md:items-start md:justify-center mt-2">
+          <div class="text-center md:text-left mb-4">
+            <h2 class="text-4xl md:text-5xl font-bold mb-2 m-0">{mainProduct.name}</h2>
+            <p class="text-lg md:text-xl m-0">{mainProduct.description}</p>
           </div>
-          <div class="product-price">${mainProduct.price}</div>
+          <div class="text-4xl md:text-5xl font-bold mb-8">${mainProduct.price}</div>
         </div>
       </div>
-      
-      <div class="additional-products">
-        <h3>you might also want</h3>
-        
-        <div class="additional-products-grid">
+
+      <div class="w-full mb-8 relative">
+        <h3 class="text-base italic font-normal mb-4">you might also want</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
           {#each additionalProducts as product, i}
-            <div 
-              class="additional-product" 
+            <div
+              class="group flex items-center p-3 rounded-lg bg-white/5 cursor-pointer transition-all relative overflow-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-white hover:bg-white/10 hover:-translate-y-0.5 active:translate-y-0"
               in:fly={{ y: 20, delay: 300 + (i * 200), duration: 500 }}
               on:click={() => handleAddAdditionalProduct(product)}
               on:keydown={(e) => e.key === 'Enter' && handleAddAdditionalProduct(product)}
@@ -112,316 +111,34 @@
               role="button"
               aria-label={`Add ${product.name} to cart`}
             >
-              <div class="additional-product-image">
-                <img src={product.image || "/placeholder.svg?height=100&width=100"} alt={product.name} />
+              <div class="w-20 h-20 mr-4 shrink-0">
+                <img class="w-full h-full object-cover" src={product.image || '/placeholder.svg?height=100&width=100'} alt={product.name} />
               </div>
-              <div class="additional-product-info">
-                <p class="additional-product-name">{product.name}</p>
-                <p class="additional-product-price">${product.price}</p>
+              <div class="flex-1">
+                <p class="m-0 mb-1 leading-tight">{product.name}</p>
+                <p class="text-2xl font-bold m-0 group-hover:scale-[1.02] transition-transform">${product.price}</p>
               </div>
-              <div class="add-icon">+</div>
+              <div class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/20 flex items-center justify-center font-bold group-hover:bg-white/30 transition-colors">+</div>
             </div>
           {/each}
         </div>
       </div>
-      
+
       {#if error}
-        <div class="error-message">
-          {error}
-        </div>
+        <div class="text-red-400 mb-4 text-center">{error}</div>
       {/if}
-      
-      <div class="product-actions">
-        <button class="buy-now" on:click={handleBuyNow} disabled={isProcessing}>
+
+      <div class="flex gap-4">
+        <button on:click={handleBuyNow} disabled={isProcessing} class="inline-flex items-center rounded-full bg-white text-black font-medium px-6 py-3 text-sm hover:bg-neutral-200 transition disabled:opacity-70 disabled:cursor-not-allowed gap-2">
           {#if isProcessing}
-            <Loader2 size={20} class="spinner" />
+            <Loader2 size={20} class="animate-spin" />
             Processing...
           {:else}
             buy now
           {/if}
         </button>
-        <button class="add-to-cart" on:click={() => addToCart(mainProduct)} disabled={isProcessing}>
-          add to cart
-        </button>
+        <button on:click={() => addToCart(mainProduct)} disabled={isProcessing} class="inline-flex items-center rounded-full border border-white text-white font-medium px-6 py-3 text-sm hover:bg-white/10 transition disabled:opacity-70 disabled:cursor-not-allowed">add to cart</button>
       </div>
     </div>
   {/if}
 </div>
-
-<style>
-  .product-page {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem 0;
-  }
-  
-  .product-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 600px;
-    width: 100%;
-  }
-  
-  .product-image {
-    margin-bottom: 2rem;
-    width: 100%;
-    max-width: 400px;
-  }
-  
-  .product-image img {
-    width: 100%;
-    height: auto;
-  }
-  
-  .product-info {
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-  
-  .product-name {
-    font-size: 2.5rem;
-    margin: 0 0 0.5rem 0;
-  }
-  
-  .product-description {
-    font-size: 1.25rem;
-    margin: 0;
-  }
-  
-  .product-price {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 2rem;
-  }
-  
-  .additional-products {
-    width: 100%;
-    margin-bottom: 2rem;
-    position: relative;
-  }
-  
-  .additional-products h3 {
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
-    font-weight: normal;
-    font-style: italic;
-  }
-  
-  .additional-products-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-  }
-  
-  .additional-product {
-    display: flex;
-    align-items: center;
-    padding: 0.75rem;
-    border-radius: 8px;
-    background-color: rgba(255, 255, 255, 0.05);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .additional-product:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
-  }
-  
-  .additional-product:active {
-    transform: translateY(0);
-  }
-  
-  .additional-product:focus-visible {
-    outline: 2px solid white;
-    outline-offset: 2px;
-  }
-  
-  .additional-product-image {
-    width: 80px;
-    height: 80px;
-    margin-right: 1rem;
-    flex-shrink: 0;
-  }
-  
-  .additional-product-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .additional-product-info {
-    flex: 1;
-  }
-  
-  .additional-product-name {
-    margin: 0 0 0.25rem 0;
-  }
-  
-  .additional-product-price {
-    font-size: 2rem;
-    font-weight: 700;
-    margin: 0;
-  }
-  
-  .add-icon {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    width: 24px;
-    height: 24px;
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    transition: background-color 0.2s;
-  }
-  
-  .additional-product:hover .add-icon {
-    background-color: rgba(255, 255, 255, 0.3);
-  }
-  
-  .error-message {
-    color: #ff4d4d;
-    margin-bottom: 1rem;
-    text-align: center;
-  }
-  
-  .product-actions {
-    display: flex;
-    gap: 1rem;
-  }
-  
-  .buy-now, .add-to-cart {
-    padding: 0.75rem 1.5rem;
-    border-radius: 2rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    border: 1px solid #fff;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .buy-now {
-    background-color: #fff;
-    color: #000;
-  }
-  
-  .buy-now:hover:not(:disabled) {
-    background-color: #eee;
-  }
-  
-  .add-to-cart {
-    background-color: transparent;
-    color: #fff;
-  }
-  
-  .add-to-cart:hover:not(:disabled) {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-  
-  .buy-now:disabled, .add-to-cart:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
-  
-  .spinner {
-    animation: spin 1s linear infinite;
-  }
-
-  .in-case {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .in-case-text {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-top: 1rem;
-  }
-  
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  @media (max-width: 768px) {
-    .additional-products-grid {
-      grid-template-columns: 1fr;
-    }
-    
-    .product-image {
-      width: 75%;
-    }
-
-    .in-case {
-      flex-direction: row;
-    }
-
-    .in-case-text {
-      margin-left: 1rem;
-      align-items: flex-start;
-    }
-
-    .product-info {
-      text-align: left;
-    }
-
-    .product-page {
-      padding: 0;
-      height: auto;
-      justify-content: flex-start;
-      align-items: flex-start;
-    }
-
-    .additional-products-grid {
-        gap: 0;
-    }
-
-    h3 {
-      margin-block-start: 0;
-    }
-  }
-
-  @media (max-height: 900px) {
-    .product-name {
-      font-size: 2rem;
-    }
-
-   .product-description {
-      font-size: 1rem;
-    }
-
-   .product-price {
-      font-size: 2rem;
-    }
-
-    .additional-product-price {
-      font-size: 1.5rem;
-    }
-
-    .additional-products h3 {
-      font-size: 1rem;
-    }
-
-    .additional-products {
-      margin-bottom: 1rem;
-    }
-  }
-</style>

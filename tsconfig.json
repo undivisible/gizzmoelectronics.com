@@ -14,7 +14,8 @@
 		"typeRoots": ["./node_modules/@types", "./src"],
 		"types": ["node"],
 		"paths": {
-			"browserify-fs": ["./src/app.d.ts"]
+			"browserify-fs": ["./src/app.d.ts"],
+			"$lib/*": ["./src/lib/*"]
 		}
 	}
 	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias

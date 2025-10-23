@@ -1,6 +1,8 @@
 import { json } from '@sveltejs/kit';
 import { stripe } from '$lib/server/stripe';
-import { PUBLIC_BASE_URL } from '$env/static/public';
+import { env as dynamicPublicEnv } from '$env/dynamic/public';
+
+const PUBLIC_BASE_URL = dynamicPublicEnv.PUBLIC_BASE_URL || process.env.PUBLIC_BASE_URL || '';
 
 export async function POST({ request }) {
   try {

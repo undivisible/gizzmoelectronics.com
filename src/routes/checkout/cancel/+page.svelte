@@ -7,73 +7,14 @@
     }
   </script>
   
-  <div class="cancel-page">
-    <div class="cancel-container">
-      <h1>Order Cancelled</h1>
-      <p>Your order has been cancelled and no payment has been processed.</p>
-      <p>If you experienced any issues during checkout, please contact our support team.</p>
-      
-      <div class="actions">
-        <button class="button" on:click={goToCart}>Return to Cart</button>
-        <a href="/" class="button secondary">Continue Shopping</a>
+  <div class="flex items-center justify-center min-h-[80vh] p-8">
+    <div class="text-center max-w-xl">
+      <h1 class="text-4xl font-bold mb-4">Order Cancelled</h1>
+      <p class="mb-4 text-lg">Your order has been cancelled and no payment has been processed.</p>
+      <p class="mb-4 text-lg">If you experienced any issues during checkout, please contact our support team.</p>
+      <div class="mt-8 flex flex-wrap gap-4 justify-center">
+        <button on:click={goToCart} class="inline-flex items-center rounded-full bg-white text-black font-medium px-6 py-3 text-sm hover:bg-neutral-200 transition disabled:opacity-70 disabled:cursor-not-allowed">Return to Cart</button>
+        <a href="/" class="inline-flex items-center rounded-full border border-white text-white font-medium px-6 py-3 text-sm hover:bg-white/10 transition">Continue Shopping</a>
       </div>
     </div>
   </div>
-  
-  <style>
-    .cancel-page {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 80vh;
-      padding: 2rem;
-    }
-    
-    .cancel-container {
-      text-align: center;
-      max-width: 600px;
-    }
-    
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-    
-    p {
-      margin-bottom: 1rem;
-      font-size: 1.1rem;
-    }
-    
-    .actions {
-      margin-top: 2rem;
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-    }
-    
-    .button {
-      padding: 0.75rem 1.5rem;
-      background-color: #fff;
-      color: #000;
-      text-decoration: none;
-      border-radius: 2rem;
-      font-weight: 500;
-      transition: background-color 0.2s;
-      border: none;
-      cursor: pointer;
-    }
-    
-    .button:hover {
-      background-color: #eee;
-    }
-    
-    .button.secondary {
-      background-color: transparent;
-      border: 1px solid #fff;
-      color: #fff;
-    }
-    
-    .button.secondary:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-  </style>

@@ -14,17 +14,15 @@ const config = {
       pages: 'build',
       assets: 'build',
       precompress: false,
-      strict: true
+      strict: false
     }),
     alias: {
       $lib: './src/lib'
     },
     prerender: {
-      entries: ['/'],
+      entries: ['*', '/b1'],
       handleHttpError: ({ path, referrer, message }) => {
-        // Ignore all 404s
         if (message.includes('404')) return;
-        // Otherwise fail the build
         throw new Error(message);
       }
     }
