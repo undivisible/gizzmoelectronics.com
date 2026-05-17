@@ -1,9 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { stripe } from '$lib/server/stripe';
-import { isCheckoutConfigured } from '$lib/server/checkout';
+import { getPublicBaseUrl, isCheckoutConfigured } from '$lib/server/checkout';
 import { getCatalogProduct, type CheckoutItemRequest } from '$lib/server/products';
-
-const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || '';
 
 export const prerender = false;
 
@@ -12,8 +10,9 @@ export async function POST({ request }) {
 		return json({ error: 'Checkout is not configured' }, { status: 503 });
 	}
 
-	if (!PUBLIC_BASE_URL) {
-		return json({ error: 'PUBLIC_BASE_URL is not configured' }, { status: 503 });
+	const publicBaseUrl = getPublicBaseUrl();
+	if (!publicBaseUrl) {
+		return json({ error: 'Site URL is not configured' }, { status: 503 });
 	}
 
 	try {
@@ -42,7 +41,7 @@ export async function POST({ request }) {
 					product_data: {
 						name: product.name,
 						description: product.description,
-						images: product.image ? [`${PUBLIC_BASE_URL}${product.image}`] : []
+						images: product.image ? [`${publicBaseUrl}${product.image}`] : []
 					},
 					unit_amount: product.priceCents
 				},
@@ -54,8 +53,8 @@ export async function POST({ request }) {
 			payment_method_types: ['card'],
 			line_items: lineItems,
 			mode: 'payment',
-			success_url: `${PUBLIC_BASE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-			cancel_url: `${PUBLIC_BASE_URL}/checkout/cancel`,
+			success_url: `${publicBaseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+			cancel_url: `${publicBaseUrl}/checkout/cancel`,
 			customer_email: customerEmail || undefined
 		});
 

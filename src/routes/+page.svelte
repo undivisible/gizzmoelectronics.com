@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import type { PageData } from './$types';
 
-	let checkoutAvailable = false;
+	export let data: PageData;
+
+	let checkoutAvailable = data.checkoutAvailable;
 	let isCheckoutProcessing = false;
 	let checkoutError = '';
 
@@ -300,15 +303,21 @@ function onFeaturesScroll() {
 			if(node) io.observe(node); 
 		});
 	}
+	async function refreshCheckoutAvailability() {
+		try {
+			const res = await fetch('/api/checkout-available');
+			if (!res.ok) return;
+			const payload = await res.json();
+			if (typeof payload?.available === 'boolean') {
+				checkoutAvailable = payload.available;
+			}
+		} catch {
+			// Keep server-rendered or build-time value when the API is unreachable.
+		}
+	}
+
 	onMount(() => {
-		fetch('/api/checkout-available')
-			.then((res) => (res.ok ? res.json() : null))
-			.then((payload) => {
-				if (payload && typeof payload.available === 'boolean') {
-					checkoutAvailable = payload.available;
-				}
-			})
-			.catch(() => {});
+		void refreshCheckoutAvailability();
 
 		if (scroller) {
 			scroller.scrollTop = 0;

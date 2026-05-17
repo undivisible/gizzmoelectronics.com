@@ -3,7 +3,7 @@
   import Header from '$lib/components/Header.svelte';
   import '../app.css';
   import { page } from '$app/stores';
-  import { sidebarOpen, handleScroll, toggleSidebar } from '$lib/stores/ui';
+  import { handleScroll } from '$lib/stores/ui';
 
   const MOBILE_MQ = '(max-width: 900px)';
 
@@ -18,47 +18,29 @@
 
   $: pageTitle = ROUTE_TITLES[$page.url.pathname] ?? 'Gizzmo Electronics';
   $: isB1 = $page.url.pathname === '/';
-  $: sidebarVisible = revealChrome || $sidebarOpen;
 
   let revealChrome = false;
   let hideTimer: ReturnType<typeof setTimeout> | undefined;
   let isMobile = false;
 
-  function openSidebar() {
-    clearTimeout(hideTimer);
-    revealChrome = true;
-    toggleSidebar(true);
-  }
-
-  function closeSidebar() {
-    clearTimeout(hideTimer);
-    revealChrome = false;
-    toggleSidebar(false);
-  }
-
-  function toggleSidebarPanel() {
-    if (sidebarVisible) {
-      closeSidebar();
-    } else {
-      openSidebar();
-    }
-  }
-
   function showChrome() {
-    if (isMobile) return;
     clearTimeout(hideTimer);
     revealChrome = true;
   }
 
   function scheduleHide() {
-    if ($sidebarOpen || isMobile) return;
     hideTimer = setTimeout(() => {
+      const active = document.activeElement;
+      if (active instanceof HTMLElement && active.closest('.reveal-group')) {
+        active.blur();
+      }
       revealChrome = false;
     }, 320);
   }
 
-  function handleNavClick() {
-    if (isMobile) closeSidebar();
+  function toggleReveal() {
+    clearTimeout(hideTimer);
+    revealChrome = !revealChrome;
   }
 
   onMount(() => {
@@ -75,13 +57,8 @@
     return () => {
       mq.removeEventListener('change', updateMobile);
       window.removeEventListener('scroll', onScroll);
-      document.body.style.overflow = '';
     };
   });
-
-  $: if (typeof document !== 'undefined') {
-    document.body.style.overflow = isMobile && sidebarVisible ? 'hidden' : '';
-  }
 </script>
 
 <svelte:head>
@@ -89,85 +66,69 @@
   <link rel="icon" type="image/x-icon" href="https://upload.wikimedia.org/wikipedia/commons/5/59/Empty.png" />
 </svelte:head>
 
-<div
-  class="app bg-black text-white min-h-screen flex"
-  data-sidebar={$sidebarOpen}
-  data-reveal={revealChrome}
-  data-b1={isB1}
-  class:sidebar-open={sidebarVisible}
->
-  {#if sidebarVisible}
-    <button
-      type="button"
-      class="sidebar-backdrop"
-      aria-label="Close menu"
-      on:click={closeSidebar}
-    ></button>
-  {/if}
-
-  <button
-    type="button"
-    class="sidebar-tip"
-    class:sidebar-tip-hidden={sidebarVisible}
-    aria-label="Open menu"
-    aria-expanded={sidebarVisible}
-    on:click={toggleSidebarPanel}
-  >
-    <span class="sidebar-tip-chevron" aria-hidden="true">›</span>
-    <span class="sidebar-tip-text">Menu</span>
-  </button>
-
-  <div
-    class="sidebar-edge-hotspot"
-    role="presentation"
-    aria-hidden="true"
-    on:mouseenter={showChrome}
-    on:mousemove={showChrome}
-    on:mouseleave={scheduleHide}
-  ></div>
-
-  <aside
-    class="site-sidebar"
-    class:visible={sidebarVisible}
-    on:mouseleave={scheduleHide}
-    on:mouseenter={showChrome}
-    aria-hidden={!sidebarVisible}
-  >
-    <div class="sidebar-panel-header">
-      <div class="sidebar-brand">
+<div class="app bg-black text-white min-h-screen flex" data-reveal={revealChrome} data-b1={isB1}>
+  {#if !isB1}
+    <aside class="site-sidebar-persistent hidden md:flex flex-col justify-between w-60 shrink-0 p-6 sticky top-0 h-screen z-[260]">
+      <div class="mb-6">
         <Header />
       </div>
-      <button
-        type="button"
-        class="sidebar-close"
-        aria-label="Close menu"
-        on:click={closeSidebar}
-      >
-        <span aria-hidden="true">×</span>
-      </button>
-    </div>
+      <nav class="flex flex-col gap-1 text-[11px] leading-relaxed" aria-label="Quick links">
+        <a
+          href="/"
+          class="nav-link"
+          class:nav-link-active={$page.url.pathname === '/'}>B1 Controller</a>
+        <a
+          href="/support"
+          class="nav-link"
+          class:nav-link-active={$page.url.pathname === '/support'}>Contact</a>
+        <a
+          href="/downloads"
+          class="nav-link"
+          class:nav-link-active={$page.url.pathname === '/downloads'}>Downloads</a>
+      </nav>
+    </aside>
+  {/if}
 
-    <nav class="sidebar-nav" aria-label="Quick links">
-      <a
-        href="/"
-        class="sidebar-link"
-        class:sidebar-link-active={$page.url.pathname === '/'}
-        on:click={handleNavClick}>B1 Controller</a>
-      <a
-        href="/support"
-        class="sidebar-link"
-        class:sidebar-link-active={$page.url.pathname === '/support'}
-        on:click={handleNavClick}>Contact</a>
-      <a
-        href="/downloads"
-        class="sidebar-link"
-        class:sidebar-link-active={$page.url.pathname === '/downloads'}
-        on:click={handleNavClick}>Downloads</a>
-    </nav>
-  </aside>
+  {#if isB1}
+    <div
+      class="edge-hotspot"
+      role="presentation"
+      tabindex={isMobile ? 0 : -1}
+      on:mouseenter={showChrome}
+      on:mousemove={showChrome}
+      on:mouseleave={scheduleHide}
+      on:click={() => isMobile && toggleReveal()}
+      on:keydown={(e) => isMobile && (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleReveal())}
+    ></div>
+
+    <div
+      class="reveal-group"
+      class:visible={revealChrome}
+      role="navigation"
+      aria-label="Site navigation"
+      inert={!revealChrome}
+      on:mouseleave={scheduleHide}
+      on:mouseenter={showChrome}
+    >
+      <div class="reveal-brand">
+        <Header />
+      </div>
+      <nav class="reveal-nav flex flex-col gap-1 text-[11px] leading-relaxed" aria-label="Quick links">
+        <a
+          href="/support"
+          class="nav-link"
+          class:nav-link-active={$page.url.pathname === '/support'}>Contact</a>
+        <a
+          href="/downloads"
+          class="nav-link"
+          class:nav-link-active={$page.url.pathname === '/downloads'}>Downloads</a>
+        <a href="/" class="nav-link nav-link-active">B1 Controller</a>
+      </nav>
+    </div>
+  {/if}
 
   <div class="flex-1 flex flex-col min-h-screen min-w-0">
-    <main class:is-b1={isB1} class:shift-panel={sidebarVisible && !isMobile}>
+    <main class:is-b1={isB1} class:shift-panel={revealChrome && isB1}>
       <slot />
     </main>
   </div>
@@ -200,224 +161,115 @@
   }
 
   main.shift-panel {
-    transform: translateX(var(--sidebar-width));
+    transform: translateX(var(--reveal-width));
   }
 
-  :root {
-    --sidebar-width: 15rem;
-    --sidebar-tip-width: 2.25rem;
-  }
-
-  .sidebar-backdrop {
-    display: none;
-  }
-
-  .sidebar-tip {
-    position: fixed;
-    left: 0;
-    top: 50%;
-    z-index: 265;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.35rem;
-    width: var(--sidebar-tip-width);
-    padding: 0.85rem 0.35rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-left: none;
-    border-radius: 0 0.65rem 0.65rem 0;
-    background: rgba(10, 13, 17, 0.92);
-    color: white;
-    cursor: pointer;
-    transform: translateY(-50%);
-    backdrop-filter: blur(10px);
-    box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.04),
-      4px 0 24px rgba(0, 0, 0, 0.45);
+  .nav-link {
+    opacity: 0.7;
+    border-radius: 0.375rem;
+    padding: 0.25rem 0.5rem;
     transition:
-      opacity 0.25s ease,
-      transform 0.25s ease,
-      background 0.2s ease;
+      background 0.15s ease,
+      opacity 0.15s ease,
+      color 0.15s ease;
   }
 
-  .sidebar-tip:hover {
-    background: rgba(24, 28, 34, 0.98);
-    border-color: rgba(255, 255, 255, 0.35);
-  }
-
-  .sidebar-tip-hidden {
-    opacity: 0;
-    pointer-events: none;
-    transform: translate(-0.5rem, -50%);
-  }
-
-  .sidebar-tip-chevron {
-    font-size: 1.1rem;
-    line-height: 1;
-    font-weight: 700;
-  }
-
-  .sidebar-tip-text {
-    font-size: 0.6rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    opacity: 0.85;
-  }
-
-  .sidebar-edge-hotspot {
-    position: fixed;
-    inset: 0 auto 0 0;
-    width: 1.5rem;
-    z-index: 255;
-    cursor: ew-resize;
-  }
-
-  .site-sidebar {
-    position: fixed;
-    inset: 0 auto 0 0;
-    z-index: 270;
-    display: flex;
-    flex-direction: column;
-    width: var(--sidebar-width);
-    padding: 1rem 1rem 1.5rem;
-    background: rgba(10, 13, 17, 0.97);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(14px);
-    transform: translateX(-100%);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition:
-      transform 0.5s cubic-bezier(0.22, 0.8, 0.32, 1),
-      opacity 0.3s ease,
-      visibility 0.5s;
-  }
-
-  .site-sidebar.visible {
-    transform: translateX(0);
+  .nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
     opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
   }
 
-  .sidebar-panel-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
+  .nav-link-active {
+    opacity: 1;
   }
 
-  .sidebar-brand :global(header) {
+  .site-sidebar-persistent :global(header) {
     position: relative;
     padding: 0;
     z-index: auto;
   }
 
-  .sidebar-close {
-    flex-shrink: 0;
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.06);
-    color: white;
-    font-size: 1.35rem;
-    line-height: 1;
-    cursor: pointer;
+  :root {
+    --reveal-width: 25rem;
   }
 
-  .sidebar-close:hover {
-    background: rgba(255, 255, 255, 0.12);
+  .edge-hotspot {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 2.5rem;
+    z-index: 250;
+    cursor: ew-resize;
+    background: transparent;
   }
 
-  .sidebar-nav {
+  .reveal-group {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 240;
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 1.25rem;
+    width: var(--reveal-width);
+    padding: 1.5rem;
+    pointer-events: none;
+    transform: translateX(calc(-1 * var(--reveal-width) + 8px));
+    opacity: 0.35;
+    transition:
+      transform 0.55s cubic-bezier(0.22, 0.8, 0.32, 1),
+      opacity 0.55s ease;
   }
 
-  .sidebar-link {
-    display: block;
-    padding: 0.65rem 0.75rem;
-    border-radius: 0.5rem;
-    font-size: 0.8125rem;
-    line-height: 1.35;
-    color: rgba(255, 255, 255, 0.72);
-    transition: background 0.15s ease, color 0.15s ease;
+  .reveal-group > * {
+    pointer-events: auto;
   }
 
-  .sidebar-link:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: white;
+  .reveal-group.visible {
+    transform: translateX(0);
+    opacity: 1;
   }
 
-  .sidebar-link-active {
-    background: rgba(255, 255, 255, 0.12);
-    color: white;
-    font-weight: 600;
+  .reveal-group::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: -1.5rem;
+    width: 1.5rem;
+    pointer-events: none;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.55), transparent);
+    opacity: 0.45;
+  }
+
+  .reveal-brand :global(header) {
+    position: relative;
+    padding: 0;
+    z-index: auto;
+  }
+
+  .reveal-nav {
+    margin-top: auto;
   }
 
   @media (max-width: 900px) {
     :root {
-      --sidebar-width: min(18rem, 88vw);
+      --reveal-width: 13.75rem;
     }
 
-    .sidebar-edge-hotspot {
-      display: none;
+    .reveal-group {
+      width: var(--reveal-width);
     }
 
     main.shift-panel {
       transform: none;
     }
 
-    .sidebar-backdrop {
-      display: block;
-      position: fixed;
-      inset: 0;
-      z-index: 260;
-      border: none;
-      padding: 0;
-      margin: 0;
-      background: rgba(0, 0, 0, 0.62);
+    .edge-hotspot {
+      width: 1.25rem;
       cursor: pointer;
     }
 
-    .sidebar-tip {
-      top: auto;
-      bottom: 1.25rem;
-      transform: none;
-      width: auto;
-      min-width: 3.25rem;
-      flex-direction: row;
-      padding: 0.65rem 0.85rem;
-      border-left: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 0 0.75rem 0.75rem 0;
-      box-shadow: 4px 4px 24px rgba(0, 0, 0, 0.5);
-    }
-
-    .sidebar-tip-hidden {
-      transform: translateX(-120%);
-    }
-
-    .sidebar-tip-text {
-      writing-mode: horizontal-tb;
-      text-orientation: mixed;
-      letter-spacing: 0.08em;
-    }
-
-    .sidebar-link {
-      padding: 0.85rem 0.9rem;
-      font-size: 0.9375rem;
-    }
-
-    .site-sidebar {
-      padding-top: max(1rem, env(safe-area-inset-top));
-      padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+    .reveal-group {
+      transform: translateX(calc(-1 * var(--reveal-width) + 6px));
     }
   }
 
@@ -426,9 +278,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .site-sidebar,
-    main,
-    .sidebar-tip {
+    .reveal-group,
+    main {
       transition: none;
     }
   }
