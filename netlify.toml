@@ -1,6 +1,9 @@
 [build]
-  command = "pnpm build"
+  command = "bun run build"
   publish = "build"
+
+[functions]
+  node_bundler = "esbuild"
 
 [[headers]]
   for = "/*.(css|js)"
@@ -11,9 +14,3 @@
   for = "/*.html"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  force = false

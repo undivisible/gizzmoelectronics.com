@@ -1,47 +1,70 @@
 import { json } from '@sveltejs/kit';
 import { stripe } from '$lib/server/stripe';
-import { env as dynamicPublicEnv } from '$env/dynamic/public';
+import { isCheckoutConfigured } from '$lib/server/checkout';
+import { getCatalogProduct, type CheckoutItemRequest } from '$lib/server/products';
 
-const PUBLIC_BASE_URL = dynamicPublicEnv.PUBLIC_BASE_URL || process.env.PUBLIC_BASE_URL || '';
+const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || '';
+
+export const prerender = false;
 
 export async function POST({ request }) {
-  try {
-    const { items, customerEmail } = await request.json();
-    
-    if (!items || !Array.isArray(items) || items.length === 0) {
-      return json({ error: 'No items provided' }, { status: 400 });
-    }
-    
-    // Create line items for Stripe
-    const lineItems = items.map(item => ({
-      price_data: {
-        currency: 'usd',
-        product_data: {
-          name: item.name,
-          description: item.description || '',
-          images: item.image ? [PUBLIC_BASE_URL + item.image] : [],
-        },
-        unit_amount: Math.round(item.price * 100), // Convert to cents
-      },
-      quantity: item.quantity || 1,
-    }));
-    
-    // Create checkout session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: lineItems,
-      mode: 'payment',
-      success_url: `${PUBLIC_BASE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${PUBLIC_BASE_URL}/checkout/cancel`,
-      customer_email: customerEmail || undefined,
-    });
-    
-    return json({ url: session.url });
-  } catch (error) {
-    console.error('Error creating checkout session:', error);
-    return json(
-      { error: error instanceof Error ? error.message : 'An error occurred' },
-      { status: 500 }
-    );
-  }
+	if (!isCheckoutConfigured()) {
+		return json({ error: 'Checkout is not configured' }, { status: 503 });
+	}
+
+	if (!PUBLIC_BASE_URL) {
+		return json({ error: 'PUBLIC_BASE_URL is not configured' }, { status: 503 });
+	}
+
+	try {
+		const body = await request.json();
+		const items = body?.items as CheckoutItemRequest[] | undefined;
+		const customerEmail = typeof body?.customerEmail === 'string' ? body.customerEmail : '';
+
+		if (!items || !Array.isArray(items) || items.length === 0) {
+			return json({ error: 'No items provided' }, { status: 400 });
+		}
+
+		const lineItems = [];
+
+		for (const item of items) {
+			const product = getCatalogProduct(item.id);
+
+			if (!product) {
+				return json({ error: `Unknown product: ${item.id}` }, { status: 400 });
+			}
+
+			const quantity = Math.max(1, Math.min(99, Number(item.quantity) || 1));
+
+			lineItems.push({
+				price_data: {
+					currency: 'usd',
+					product_data: {
+						name: product.name,
+						description: product.description,
+						images: product.image ? [`${PUBLIC_BASE_URL}${product.image}`] : []
+					},
+					unit_amount: product.priceCents
+				},
+				quantity
+			});
+		}
+
+		const session = await stripe.checkout.sessions.create({
+			payment_method_types: ['card'],
+			line_items: lineItems,
+			mode: 'payment',
+			success_url: `${PUBLIC_BASE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+			cancel_url: `${PUBLIC_BASE_URL}/checkout/cancel`,
+			customer_email: customerEmail || undefined
+		});
+
+		return json({ url: session.url });
+	} catch (error) {
+		console.error('Error creating checkout session:', error);
+		return json(
+			{ error: error instanceof Error ? error.message : 'An error occurred' },
+			{ status: 500 }
+		);
+	}
 }

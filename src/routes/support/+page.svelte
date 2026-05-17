@@ -17,7 +17,6 @@
     });
   </script>
 
-  <svelte:head><title>Support | Gizzmo Electronics</title></svelte:head>
   
   <div class="flex justify-center py-4 md:py-6">
     {#if visible}

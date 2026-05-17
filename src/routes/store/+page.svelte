@@ -50,7 +50,7 @@
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          items: [{ ...mainProduct, quantity: 1 }],
+          items: [{ id: 'v4', quantity: 1 }],
           customerEmail: '', // You could add an email input field to collect this
         }),
       });
@@ -80,7 +80,6 @@
   }
 </script>
 
-<svelte:head><title>Gizzmo Electronics</title></svelte:head>
 
 <div class="flex justify-center items-center py-4">
   {#if visible}

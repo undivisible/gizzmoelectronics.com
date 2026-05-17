@@ -28,7 +28,7 @@
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            items: $cartItems,
+            items: $cartItems.map(({ id, quantity }) => ({ id, quantity })),
             customerEmail: '', // You could add an email input field to collect this
           }),
         });

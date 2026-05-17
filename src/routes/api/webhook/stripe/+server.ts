@@ -1,8 +1,9 @@
 import { stripe } from '$lib/server/stripe';
-import { env as dynamicEnv } from '$env/dynamic/private';
 import { json } from '@sveltejs/kit';
 
-const STRIPE_WEBHOOK_SECRET = dynamicEnv.STRIPE_WEBHOOK_SECRET || process.env.STRIPE_WEBHOOK_SECRET || '';
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
+
+export const prerender = false;
 
 export async function POST({ request }) {
   const body = await request.text();

@@ -1,32 +1,22 @@
-import adapter from '@sveltejs/adapter-static';
+import adapter from '@sveltejs/adapter-netlify';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-  // Consult https://kit.svelte.dev/docs/integrations#preprocessors
-  // for more information about preprocessors
-  preprocess: vitePreprocess(),
+	preprocess: vitePreprocess(),
 
-  kit: {
-    // Using Netlify adapter for deployment
-    adapter: adapter({
-      fallback: 'index.html',
-      pages: 'build',
-      assets: 'build',
-      precompress: false,
-      strict: false
-    }),
-    alias: {
-      $lib: './src/lib'
-    },
-    prerender: {
-      entries: ['*', '/b1'],
-      handleHttpError: ({ path, referrer, message }) => {
-        if (message.includes('404')) return;
-        throw new Error(message);
-      }
-    }
-  }
+	kit: {
+		adapter: adapter(),
+		alias: {
+			$lib: './src/lib'
+		},
+		prerender: {
+			handleHttpError: ({ message }) => {
+				if (message.includes('404')) return;
+				throw new Error(message);
+			}
+		}
+	}
 };
 
 export default config;

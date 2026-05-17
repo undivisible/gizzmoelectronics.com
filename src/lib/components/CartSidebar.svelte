@@ -21,7 +21,7 @@
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          items: $cart.items,
+          items: $cart.items.map(({ id, quantity }) => ({ id, quantity })),
         }),
       });
       
