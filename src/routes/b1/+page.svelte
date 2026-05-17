@@ -3,7 +3,7 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import type { PageData } from './$types';
 
-	export let data: PageData;
+	export let data: PageData = { checkoutAvailable: false };
 
 	const b1Product = {
 		id: 'b1',

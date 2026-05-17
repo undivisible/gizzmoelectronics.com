@@ -18,7 +18,7 @@
         <h2 class="text-[1vw] font-bold tracking-wide m-0">Gizzmo Electronics</h2>
         <a href="/support" class="px-2.5 py-1.5 rounded-md bg-white/0 hover:bg-white/10 text-neutral-300 hover:text-white transition-colors" class:!text-white={isActive('/support')} class:font-semibold={isActive('/support')}>Contact</a>
         <a href="/" class="px-2.5 py-1.5 rounded-md bg-white/0 hover:bg-white/10 text-neutral-300 hover:text-white transition-colors"class:!text-white={isActive('/')} class:font-semibold={isActive('/')}>Downloads</a>
-        <!--<a href="/b1" class="px-2.5 py-1.5 rounded-md bg-white/0 hover:bg-white/10 text-neutral-300 hover:text-white transition-colors" class:!text-white={isActive('/b1')} class:font-semibold={isActive('/b1')}>B1 Controller</a>-->
+        <a href="/b1" class="px-2.5 py-1.5 rounded-md bg-white/0 hover:bg-white/10 text-neutral-300 hover:text-white transition-colors" class:!text-white={isActive('/b1')} class:font-semibold={isActive('/b1')}>B1 Controller</a>
       </div>
     </div>
   </footer>
