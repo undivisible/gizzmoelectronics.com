@@ -24,14 +24,16 @@
   let isMobile = false;
 
   function showChrome() {
+    if (isMobile) return;
     clearTimeout(hideTimer);
     revealChrome = true;
   }
 
   function scheduleHide() {
+    if (isMobile) return;
     hideTimer = setTimeout(() => {
       const active = document.activeElement;
-      if (active instanceof HTMLElement && active.closest('.reveal-group')) {
+      if (active instanceof HTMLElement && active.closest('.hover-nav')) {
         active.blur();
       }
       revealChrome = false;
@@ -47,6 +49,7 @@
     const mq = window.matchMedia(MOBILE_MQ);
     const updateMobile = () => {
       isMobile = mq.matches;
+      if (!mq.matches) revealChrome = false;
     };
     updateMobile();
     mq.addEventListener('change', updateMobile);
@@ -73,10 +76,7 @@
         <Header />
       </div>
       <nav class="flex flex-col gap-1 text-[11px] leading-relaxed" aria-label="Quick links">
-        <a
-          href="/"
-          class="nav-link"
-          class:nav-link-active={$page.url.pathname === '/'}>B1 Controller</a>
+        <a href="/" class="nav-link" class:nav-link-active={$page.url.pathname === '/'}>B1 Controller</a>
         <a
           href="/support"
           class="nav-link"
@@ -91,44 +91,44 @@
 
   {#if isB1}
     <div
-      class="edge-hotspot"
-      role="presentation"
-      tabindex={isMobile ? 0 : -1}
+      class="hover-nav"
+      class:open={revealChrome}
       on:mouseenter={showChrome}
-      on:mousemove={showChrome}
       on:mouseleave={scheduleHide}
-      on:click={() => isMobile && toggleReveal()}
-      on:keydown={(e) => isMobile && (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleReveal())}
-    ></div>
-
-    <div
-      class="reveal-group"
-      class:visible={revealChrome}
-      role="navigation"
-      aria-label="Site navigation"
-      inert={!revealChrome}
-      on:mouseleave={scheduleHide}
-      on:mouseenter={showChrome}
     >
-      <div class="reveal-brand">
-        <Header />
+      <button
+        type="button"
+        class="nav-tip"
+        class:nav-tip-hidden={revealChrome}
+        aria-label={revealChrome ? 'Navigation open' : 'Open navigation'}
+        aria-expanded={revealChrome}
+        on:click={toggleReveal}
+      >
+        <span class="nav-tip-chevron" aria-hidden="true">›</span>
+        <span class="nav-tip-label">Menu</span>
+      </button>
+
+      <div class="reveal-group" class:visible={revealChrome} inert={!revealChrome}>
+        <div class="reveal-brand">
+          <Header />
+        </div>
+        <nav class="reveal-nav flex flex-col gap-1 text-[11px] leading-relaxed" aria-label="Quick links">
+          <a
+            href="/support"
+            class="nav-link"
+            class:nav-link-active={$page.url.pathname === '/support'}>Contact</a>
+          <a
+            href="/downloads"
+            class="nav-link"
+            class:nav-link-active={$page.url.pathname === '/downloads'}>Downloads</a>
+          <a href="/" class="nav-link nav-link-active">B1 Controller</a>
+        </nav>
       </div>
-      <nav class="reveal-nav flex flex-col gap-1 text-[11px] leading-relaxed" aria-label="Quick links">
-        <a
-          href="/support"
-          class="nav-link"
-          class:nav-link-active={$page.url.pathname === '/support'}>Contact</a>
-        <a
-          href="/downloads"
-          class="nav-link"
-          class:nav-link-active={$page.url.pathname === '/downloads'}>Downloads</a>
-        <a href="/" class="nav-link nav-link-active">B1 Controller</a>
-      </nav>
     </div>
   {/if}
 
   <div class="flex-1 flex flex-col min-h-screen min-w-0">
-    <main class:is-b1={isB1} class:shift-panel={revealChrome && isB1}>
+    <main class:is-b1={isB1} class:shift-panel={revealChrome && isB1 && !isMobile}>
       <slot />
     </main>
   </div>
@@ -158,6 +158,7 @@
     max-width: none;
     padding: 0;
     margin: 0;
+    background: transparent;
   }
 
   main.shift-panel {
@@ -190,57 +191,97 @@
   }
 
   :root {
-    --reveal-width: 25rem;
+    --reveal-width: 16rem;
+    --nav-peek: 0.75rem;
   }
 
-  .edge-hotspot {
+  .hover-nav {
     position: fixed;
     inset: 0 auto 0 0;
-    width: 2.5rem;
     z-index: 250;
-    cursor: ew-resize;
+    display: flex;
+    flex-direction: column;
+    width: var(--nav-peek);
+    padding: 1.5rem 0.75rem;
     background: transparent;
+    overflow: visible;
+    transition: width 0.55s cubic-bezier(0.22, 0.8, 0.32, 1);
+  }
+
+  .hover-nav.open {
+    width: var(--reveal-width);
+    padding: 1.5rem;
+  }
+
+  .nav-tip {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    width: 2rem;
+    padding: 0.65rem 0.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-left: none;
+    border-radius: 0 0.5rem 0.5rem 0;
+    background: rgba(0, 0, 0, 0.35);
+    color: white;
+    cursor: pointer;
+    transform: translateY(-50%);
+    backdrop-filter: blur(6px);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .nav-tip:hover {
+    border-color: rgba(255, 255, 255, 0.35);
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .nav-tip-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-0.35rem, -50%);
+  }
+
+  .nav-tip-chevron {
+    font-size: 1rem;
+    line-height: 1;
+    font-weight: 700;
+  }
+
+  .nav-tip-label {
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    opacity: 0.85;
   }
 
   .reveal-group {
-    position: fixed;
-    inset: 0 auto 0 0;
-    z-index: 240;
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
-    width: var(--reveal-width);
-    padding: 1.5rem;
+    width: 100%;
+    min-height: 100%;
+    padding-left: 1.35rem;
+    opacity: 0.4;
     pointer-events: none;
-    transform: translateX(calc(-1 * var(--reveal-width) + 8px));
-    opacity: 0.35;
-    transition:
-      transform 0.55s cubic-bezier(0.22, 0.8, 0.32, 1),
-      opacity 0.55s ease;
-  }
-
-  .reveal-group > * {
-    pointer-events: auto;
+    transition: opacity 0.35s ease;
   }
 
   .reveal-group.visible {
-    transform: translateX(0);
     opacity: 1;
+    pointer-events: auto;
   }
 
-  .reveal-group::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: -1.5rem;
-    width: 1.5rem;
-    pointer-events: none;
-    background: linear-gradient(to right, rgba(0, 0, 0, 0.55), transparent);
-    opacity: 0.45;
-  }
-
-  .reveal-brand :global(header) {
+  .reveal-group :global(header) {
     position: relative;
     padding: 0;
     z-index: auto;
@@ -252,24 +293,42 @@
 
   @media (max-width: 900px) {
     :root {
-      --reveal-width: 13.75rem;
+      --reveal-width: 14rem;
     }
 
-    .reveal-group {
+    .hover-nav {
+      width: auto;
+      min-width: var(--nav-peek);
+      padding: 0;
+    }
+
+    .hover-nav.open {
       width: var(--reveal-width);
+      padding: 1.25rem 1rem;
     }
 
-    main.shift-panel {
+    .nav-tip {
+      top: auto;
+      bottom: 1.25rem;
       transform: none;
+      flex-direction: row;
+      width: auto;
+      min-width: 2.75rem;
+      padding: 0.55rem 0.75rem;
+      border-left: 1px solid rgba(255, 255, 255, 0.18);
     }
 
-    .edge-hotspot {
-      width: 1.25rem;
-      cursor: pointer;
+    .nav-tip-hidden {
+      transform: translateX(-120%);
+    }
+
+    .nav-tip-label {
+      writing-mode: horizontal-tb;
+      letter-spacing: 0.08em;
     }
 
     .reveal-group {
-      transform: translateX(calc(-1 * var(--reveal-width) + 6px));
+      padding-left: 0;
     }
   }
 
@@ -278,8 +337,10 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .reveal-group,
-    main {
+    .hover-nav,
+    main,
+    .nav-tip,
+    .reveal-group {
       transition: none;
     }
   }
