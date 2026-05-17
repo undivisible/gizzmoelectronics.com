@@ -1,6 +1,52 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import type { PageData } from './$types';
+
+	export let data: PageData;
+
+	const b1Product = {
+		id: 'b1',
+		name: 'B1 Boost Controller',
+		description: 'Pre-order — Gizzmo B1 boost controller',
+		price: 590,
+		image: '/images/b1/b1.png'
+	};
+
+	let isCheckoutProcessing = false;
+	let checkoutError = '';
+
+	async function handlePreOrder(): Promise<void> {
+		isCheckoutProcessing = true;
+		checkoutError = '';
+
+		try {
+			const response = await fetch('/api/create-checkout-session', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					items: [{ ...b1Product, quantity: 1 }],
+					customerEmail: ''
+				})
+			});
+
+			const data = await response.json();
+
+			if (data.error) {
+				throw new Error(data.error);
+			}
+
+			if (data.url) {
+				window.location.href = data.url;
+			} else {
+				throw new Error('No checkout URL returned');
+			}
+		} catch (err) {
+			console.error('Checkout error:', err);
+			checkoutError = err instanceof Error ? err.message : 'An error occurred during checkout';
+			isCheckoutProcessing = false;
+		}
+	}
 	
 	let scroller: HTMLElement;
 	let bgOuter: HTMLElement;
@@ -11,56 +57,56 @@
 		{
 			title: 'Next-Gen Display',
 			description: 'Experience crisp, vivid feedback on a 65K colour TFT LCD for the clearest, most informative boost data at a glance.',
-			image: '/images/b1.png',
+			image: '/images/b1/displayproperties.jpeg',
 			color: '#3b82f6',
 			features: [
 				'65,536 colour TFT LCD display',
-				'Real-time boost monitoring',
+				'Monitor real time engine vitals',
 				'Crisp, vivid feedback at a glance'
 			]
 		},
 		{
 			title: 'Billet Alloy Brains',
 			description: 'Crafted from anodized billet alloy for durability and a premium look that stands up to real-world conditions.',
-			image: '/images/b1.png',
+			image: '/images/b1/b1.png',
 			color: '#a855f7',
 			features: [
 				'CNC machined billet alloy construction',
-				'Anodized premium finish',
+				'Satin Black Anodised finish',
 				'Built for real-world durability'
 			]
 		},
 		{
 			title: 'Epic Boost Range',
 			description: 'Handle anything from mild street setups to full race builds with precision control across the entire boost spectrum.',
-			image: '/images/solenoid.png',
+			image: '/images/b1/solenoid.jpeg',
 			color: '#10b981',
 			features: [
-				'Wide boost pressure range',
-				'Precision control across spectrum',
-				'Street to race-ready performance'
+				'Genuine MAC 3-port solenoid',
+				'3 bar stainless MAP sensor',
+				'Configurable for up to 100 psi sensors'
 			]
 		},
 		{
 			title: 'Total Flexibility',
-			description: 'Modular design and extensive I/O options mean you can adapt the B1 to virtually any turbo setup imaginable.',
-			image: '/images/loom.png',
+			description: 'Modular design and extensive I/O options let you tailor inputs, sensors, and on-screen data to your build.',
+			image: '/images/b1/displayvalues.jpeg',
 			color: '#f59e0b',
 			features: [
-				'Modular expandable design',
-				'Extensive I/O connectivity',
-				'Adapts to any turbo setup'
+				'AFR input adapts to any AFR meter — display Lambda or AFR',
+				'MAP sensor input configurable to any voltage-output MAP sensor',
+				'Top display: boost, duty, voltage, AFR, lambda, voltage%, speed, RPM, and more'
 			]
 		},
 		{
 			title: 'Real Engine Protection',
-			description: 'Closed-loop control, actively protect your engine with advanced knock and AFR monitoring – plus multiple active engine protection features.',
-			image: '/images/b1.png',
+			description: 'Closed-loop control actively protects your engine — with AFR and knock safeguards when you add the required sensors.',
+			image: '/images/b1/wbcalibration.jpeg',
 			color: '#f97316',
 			features: [
-				'Advanced knock detection monitoring',
-				'AFR (Air-Fuel Ratio) protection',
-				'Multiple active protection features'
+				'AFR protection (requires AFR meter)',
+				'Knock protection (requires Gizzmo knock adaptor)',
+				'Multiple active engine protection features'
 			]
 		}
 	];
@@ -69,7 +115,7 @@
 		{f:'RRP',v:[439,590,725,1195,2000],type:'numeric',max:2000},
 		{f:'Speed dependence',v:[0,1,1,1,1],type:'boolean'},
 		{f:'RPM dependence',v:[0,1,1,1,1],type:'boolean'},
-		{f:'3D mapping',v:[0,0,1,1,1],type:'boolean'},
+		{f:'2D mapping',v:[0,1,1,1,1],type:'boolean'},
 		{f:'Max Bar pressure',v:[3.45,6.9,3,3,6],type:'numeric',max:7},
 		{f:'Configurable MAP sensors',v:[0,1,0,0,1],type:'boolean'},
 		{f:'Memories',v:[6,6,2,4,4],type:'numeric',max:6},
@@ -367,12 +413,14 @@ function onFeaturesScroll() {
 			
 			<div bind:this={heroDevice} class="w-full flex-1 hero-device flex items-center justify-center">
 				<div class="w-full h-full flex items-center justify-center">
-					<img src="/images/b1.png" alt="B1 Boost Controller" class="w-full h-full object-contain drop-shadow-[0_30px_90px_rgba(0,0,0,0.9)]" />
+					<img src="/images/b1/b1.png" alt="B1 Boost Controller" class="w-full h-full object-contain drop-shadow-[0_30px_90px_rgba(0,0,0,0.9)]" />
 				</div>
 			</div>
 			
 			<div class="flex gap-4 justify-end items-center hero-cta z-10 relative">
-				<button on:click={() => window.location.href = '/store'} class="rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold tracking-wide px-7 py-3.5 text-base transition-all hover:scale-105 shadow-lg shadow-blue-600/30">Buy Now</button>
+				{#if data.checkoutAvailable}
+					<button on:click={handlePreOrder} disabled={isCheckoutProcessing} class="rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold tracking-wide px-7 py-3.5 text-base transition-all hover:scale-105 shadow-lg shadow-blue-600/30">{isCheckoutProcessing ? 'Processing…' : 'Pre Order'}</button>
+				{/if}
 				<button on:click={() => handleNavClick('features')} class="rounded-full border-2 border-white/30 hover:border-white/60 text-white font-semibold tracking-wide px-7 py-3.5 text-base transition-all hover:scale-105">Learn More</button>
 			</div>
 		</div>
@@ -469,19 +517,19 @@ function onFeaturesScroll() {
 				<div class="bg-zinc-900/50 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 hover:bg-zinc-900/70 hover:border-white/20 transition-all hover:scale-[1.02] transform stagger-fade-in">
 					<div class="text-5xl font-bold text-purple-400 mb-4">100</div>
 					<div class="text-xl font-semibold text-white mb-2">PSI Range</div>
-					<div class="text-sm text-white/60">Extreme boost control capability for ultimate performance builds</div>
+					<div class="text-sm text-white/60">Up to 100 psi — requires 100 psi MAP sensor</div>
 				</div>
 				
 				<div class="bg-zinc-900/50 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 hover:bg-zinc-900/70 hover:border-white/20 transition-all hover:scale-[1.02] transform stagger-fade-in">
 					<div class="text-5xl font-bold text-emerald-400 mb-4">6</div>
-					<div class="text-xl font-semibold text-white mb-2">Memory Banks</div>
-					<div class="text-sm text-white/60">Store multiple boost maps for different driving conditions</div>
+					<div class="text-xl font-semibold text-white mb-2">Independent Memories</div>
+					<div class="text-sm text-white/60">Six independent memories for different driving conditions</div>
 				</div>
 				
 				<div class="bg-zinc-900/50 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 hover:bg-zinc-900/70 hover:border-white/20 transition-all hover:scale-[1.02] transform stagger-fade-in">
-					<div class="text-5xl font-bold text-pink-400 mb-4">3D</div>
+					<div class="text-5xl font-bold text-pink-400 mb-4">2D</div>
 					<div class="text-xl font-semibold text-white mb-2">Map System</div>
-					<div class="text-sm text-white/60">Speed × RPM matrix mapping for precise boost control</div>
+					<div class="text-sm text-white/60">Boost offset against RPM, speed, voltage, or voltage%</div>
 				</div>
 				
 				<div class="bg-zinc-900/50 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 hover:bg-zinc-900/70 hover:border-white/20 transition-all hover:scale-[1.02] transform stagger-fade-in">
@@ -493,7 +541,7 @@ function onFeaturesScroll() {
 				<div class="bg-zinc-900/50 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 hover:bg-zinc-900/70 hover:border-white/20 transition-all hover:scale-[1.02] transform stagger-fade-in">
 					<div class="text-5xl font-bold text-red-400 mb-4">AFR</div>
 					<div class="text-xl font-semibold text-white mb-2">Protection</div>
-					<div class="text-sm text-white/60">Real-time air-fuel ratio monitoring and engine protection</div>
+					<div class="text-sm text-white/60">AFR protection — requires AFR meter</div>
 				</div>
 			</div>
 		</div>
@@ -542,7 +590,7 @@ function onFeaturesScroll() {
 							<div class="w-2 h-2 rounded-full bg-orange-400 mt-2 flex-shrink-0"></div>
 							<div>
 								<div class="text-lg font-semibold text-white">Wiring Harness</div>
-								<div class="text-sm text-white/60">Complete plug-and-play installation loom</div>
+								<div class="text-sm text-white/60">Not plug-and-play — requires wiring 3 wires</div>
 							</div>
 						</li>
 					</ul>
@@ -555,7 +603,7 @@ function onFeaturesScroll() {
 							<div class="w-2 h-2 rounded-full bg-blue-400 mt-2 flex-shrink-0"></div>
 							<div>
 								<div class="text-lg font-semibold text-white">Alternative MAP Sensor</div>
-								<div class="text-sm text-white/60">High-range sensor for extreme boost applications</div>
+								<div class="text-sm text-white/60">100 psi range requires 100 psi MAP sensor</div>
 							</div>
 						</li>
 						<li class="flex items-start gap-4">
@@ -563,20 +611,6 @@ function onFeaturesScroll() {
 							<div>
 								<div class="text-lg font-semibold text-white">Knock Detection Module</div>
 								<div class="text-sm text-white/60">Real-time engine knock monitoring and protection</div>
-							</div>
-						</li>
-						<li class="flex items-start gap-4">
-							<div class="w-2 h-2 rounded-full bg-emerald-400 mt-2 flex-shrink-0"></div>
-							<div>
-								<div class="text-lg font-semibold text-white">AFR Module</div>
-								<div class="text-sm text-white/60">Air-fuel ratio monitoring with analog input</div>
-							</div>
-						</li>
-						<li class="flex items-start gap-4">
-							<div class="w-2 h-2 rounded-full bg-pink-400 mt-2 flex-shrink-0"></div>
-							<div>
-								<div class="text-lg font-semibold text-white">Auxiliary Inputs</div>
-								<div class="text-sm text-white/60">Additional sensor inputs for custom tuning</div>
 							</div>
 						</li>
 					</ul>
@@ -606,9 +640,17 @@ function onFeaturesScroll() {
 							<div class="text-3xl font-bold text-purple-400 mb-2">RPM</div>
 							<div class="text-sm text-white/50 font-medium">Engine Rev Based</div>
 						</div>
+						<div class="bg-zinc-900/60 backdrop-blur-xl border border-white/10 rounded-[1.5rem] p-6 hover:bg-zinc-900/80 hover:border-white/20 transition-all hover:scale-[1.02] transform">
+							<div class="text-3xl font-bold text-amber-400 mb-2">Voltage</div>
+							<div class="text-sm text-white/50 font-medium">Voltage Based</div>
+						</div>
+						<div class="bg-zinc-900/60 backdrop-blur-xl border border-white/10 rounded-[1.5rem] p-6 hover:bg-zinc-900/80 hover:border-white/20 transition-all hover:scale-[1.02] transform">
+							<div class="text-3xl font-bold text-rose-400 mb-2">Volt %</div>
+							<div class="text-sm text-white/50 font-medium">Voltage % Based</div>
+						</div>
 						<div class="bg-zinc-900/60 backdrop-blur-xl border border-white/10 rounded-[1.5rem] p-6 col-span-2 hover:bg-zinc-900/80 hover:border-white/20 transition-all hover:scale-[1.02] transform">
-							<div class="text-3xl font-bold text-emerald-400 mb-2">3D Mapping</div>
-							<div class="text-sm text-white/50 font-medium">Speed × RPM Matrix</div>
+							<div class="text-3xl font-bold text-emerald-400 mb-2">2D Mapping</div>
+							<div class="text-sm text-white/50 font-medium">Two-axis boost tables</div>
 						</div>
 					</div>
 				</div>
@@ -626,10 +668,10 @@ function onFeaturesScroll() {
 				</div>
 				<div class="relative w-full z-10 px-6 overflow-hidden">
 					<div class="whitespace-nowrap animate-marquee track" aria-hidden="true">
-						{#each ['65K TFT', 'Closed-loop', 'Billet Alloy', '6 Memories', 'Plug & Play', 'Analog AFR', 'Knock Detection', 'Speed-based Tuning', 'RPM Mapping', '3D Lookup', 'Wide Range MAP', 'Configurable Solenoid'] as item}
+						{#each ['65K TFT', 'Closed-loop', 'Billet Alloy', '6 Independent Memories', 'Analog AFR', 'Knock Detection', 'Speed-based Tuning', 'RPM Mapping', '2D Lookup', 'Wide Range MAP', 'Configurable Solenoid'] as item}
 							<span class="inline-block px-10 py-5 text-[clamp(24px,3vw,36px)] font-bold text-white/80 tracking-tight">{item}</span>
 						{/each}
-						{#each ['65K TFT', 'Closed-loop', 'Billet Alloy', '6 Memories', 'Plug & Play', 'Analog AFR', 'Knock Detection', 'Speed-based Tuning', 'RPM Mapping', '3D Lookup', 'Wide Range MAP', 'Configurable Solenoid'] as item}
+						{#each ['65K TFT', 'Closed-loop', 'Billet Alloy', '6 Independent Memories', 'Analog AFR', 'Knock Detection', 'Speed-based Tuning', 'RPM Mapping', '2D Lookup', 'Wide Range MAP', 'Configurable Solenoid'] as item}
 							<span class="inline-block px-10 py-5 text-[clamp(24px,3vw,36px)] font-bold text-white/80 tracking-tight">{item}</span>
 						{/each}
 					</div>
@@ -743,34 +785,35 @@ function onFeaturesScroll() {
 			<div class="max-w-4xl mx-auto text-center space-y-12">
 				<div class="space-y-6 stagger-fade-in">
 					<h3 class="text-[clamp(56px,8vw,96px)] font-bold text-white tracking-tight">So, are you convinced?</h3>
-					<p class="text-2xl text-white/60 font-medium max-w-2xl mx-auto">Join thousands of enthusiasts who trust B1 for their boost control needs.</p>
+					<p class="text-2xl text-white/60 font-medium max-w-2xl mx-auto">Precision boost control, built for serious builds.</p>
 				</div>
 				
 				<div class="flex flex-col sm:flex-row gap-6 justify-center items-center stagger-fade-in">
-					<button class="rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold tracking-wide px-12 py-5 text-xl transition-all hover:scale-105 shadow-2xl shadow-blue-600/40">
-						Buy B1 Now
-					</button>
+					{#if data.checkoutAvailable}
+						<button on:click={handlePreOrder} disabled={isCheckoutProcessing} class="rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold tracking-wide px-12 py-5 text-xl transition-all hover:scale-105 shadow-2xl shadow-blue-600/40">
+							{isCheckoutProcessing ? 'Processing…' : 'Pre Order B1'}
+						</button>
+					{/if}
 					<div class="text-center sm:text-left">
 						<div class="text-3xl font-bold text-white">$590</div>
-						<div class="text-sm text-white/50">Free shipping worldwide</div>
 					</div>
 				</div>
+				{#if data.checkoutAvailable && checkoutError}
+					<p class="text-red-400 text-center text-sm">{checkoutError}</p>
+				{/if}
 				
 				<div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-12 stagger-fade-in">
 					<div class="space-y-2">
 						<div class="text-4xl">✓</div>
 						<div class="text-lg font-semibold text-white">2 Year Warranty</div>
-						<div class="text-sm text-white/50">Full coverage included</div>
 					</div>
 					<div class="space-y-2">
 						<div class="text-4xl">✓</div>
 						<div class="text-lg font-semibold text-white">Expert Support</div>
-						<div class="text-sm text-white/50">24/7 technical assistance</div>
 					</div>
 					<div class="space-y-2">
 						<div class="text-4xl">✓</div>
 						<div class="text-lg font-semibold text-white">Easy Installation</div>
-						<div class="text-sm text-white/50">Plug & play setup</div>
 					</div>
 				</div>
 			</div>
