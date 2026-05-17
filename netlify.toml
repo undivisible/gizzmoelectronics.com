@@ -1,6 +1,9 @@
 [build]
-  command = "bun run build"
+  command = "bun install --frozen-lockfile && bun run build"
   publish = "build"
+
+[build.environment]
+  BUN_VERSION = "1.2.18"
 
 [functions]
   node_bundler = "esbuild"

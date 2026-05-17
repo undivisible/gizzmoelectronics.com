@@ -31,11 +31,6 @@
 		"vite": "^6.2.6",
 		"vite-plugin-node-polyfills": "^0.23.0"
 	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"esbuild"
-		]
-	},
 	"dependencies": {
 		"@icons-pack/svelte-simple-icons": "^5.0.0",
 		"browserify-fs": "^1.0.0",
