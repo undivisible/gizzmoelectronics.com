@@ -271,13 +271,17 @@
     width: 100%;
     min-height: 100%;
     padding-left: 1.35rem;
-    opacity: 0.4;
+    opacity: 0;
+    visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.35s ease;
+    transition:
+      opacity 0.35s ease,
+      visibility 0.35s ease;
   }
 
   .reveal-group.visible {
     opacity: 1;
+    visibility: visible;
     pointer-events: auto;
   }
 

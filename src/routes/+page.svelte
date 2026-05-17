@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Footer from '$lib/components/Footer.svelte';
-	import { PUBLIC_BASE_URL } from '$env/static/public';
-	const hasPublicSiteUrl = Boolean(PUBLIC_BASE_URL?.trim());
-	let checkoutAvailable = hasPublicSiteUrl;
+	let checkoutAvailable = false;
 	let isCheckoutProcessing = false;
 	let checkoutError = '';
 
