@@ -212,35 +212,6 @@ function onFeaturesScroll() {
 	}
 }
 
-let featIsDragging = false;
-let featDragStartX = 0;
-let featDragScrollLeft = 0;
-
-function onFeatPointerDown(e: PointerEvent) {
-	if (!featuresTrack) return;
-	featIsDragging = true;
-	featDragStartX = e.clientX;
-	featDragScrollLeft = featuresTrack.scrollLeft;
-	featuresTrack.setPointerCapture(e.pointerId);
-	featuresTrack.style.cursor = 'grabbing';
-	featuresTrack.style.userSelect = 'none';
-}
-
-function onFeatPointerMove(e: PointerEvent) {
-	if (!featIsDragging || !featuresTrack) return;
-	e.preventDefault();
-	const walk = (e.clientX - featDragStartX) * 1.5;
-	featuresTrack.scrollLeft = featDragScrollLeft - walk;
-}
-
-function onFeatPointerUp(e: PointerEvent) {
-	if (!featIsDragging || !featuresTrack) return;
-	featIsDragging = false;
-	featuresTrack.releasePointerCapture(e.pointerId);
-	featuresTrack.style.cursor = 'grab';
-	featuresTrack.style.userSelect = '';
-}
-
 	function handleNavClick(id: string){
 		const node = document.getElementById(id);
 		if(node && scroller) scroller.scrollTo({ top: (node as HTMLElement).offsetTop, behavior: 'smooth' });
@@ -409,24 +380,11 @@ function onFeatPointerUp(e: PointerEvent) {
 				slidesIO.observe(slidesNode);
 			}
 
-			if (featuresTrack) {
-				featuresTrack.addEventListener('pointerdown', onFeatPointerDown);
-				featuresTrack.addEventListener('pointermove', onFeatPointerMove);
-				featuresTrack.addEventListener('pointerup', onFeatPointerUp);
-				featuresTrack.addEventListener('pointercancel', onFeatPointerUp);
-			}
-
 			return () => {
 				window.removeEventListener('resize', setVH);
 				scroller?.removeEventListener('scroll', handleParallax);
 				lineIO.disconnect();
 				if (slidesIO) slidesIO.disconnect();
-				if (featuresTrack) {
-					featuresTrack.removeEventListener('pointerdown', onFeatPointerDown);
-					featuresTrack.removeEventListener('pointermove', onFeatPointerMove);
-					featuresTrack.removeEventListener('pointerup', onFeatPointerUp);
-					featuresTrack.removeEventListener('pointercancel', onFeatPointerUp);
-				}
 			};
 	});
 </script>
@@ -949,12 +907,7 @@ svg rect{transition:width 900ms cubic-bezier(.22,.8,.32,1)}
 	-ms-overflow-style: none;
 	overscroll-behavior-x: contain;
 	-webkit-overflow-scrolling: touch;
-	cursor: grab;
-	user-select: none;
-}
-
-.carousel-track:active {
-	cursor: grabbing;
+	scroll-behavior: smooth;
 }
 
 .carousel-track::-webkit-scrollbar {
