@@ -84,18 +84,18 @@
 			features: [
 				'AFR input adapts to any AFR meter — display Lambda or AFR',
 				'MAP sensor input configurable to any voltage-output MAP sensor',
-				'Top display: boost, duty, voltage, AFR, lambda, voltage%, speed, RPM, and more'
+				'Top display: peak boost, duty, volt%, voltage, speed, RPM, solenoid %, max boost (lambda, AFR & knock with OPT box)'
 			]
 		},
 		{
 			title: 'Real Engine Protection',
-			description: 'Closed-loop control actively protects your engine — with AFR and knock safeguards when you add the required sensors.',
+			description: 'Active engine protection using required modules, not sensors — multiple active warnings and cuts.',
 			image: '/images/b1/wbcalibration.jpeg',
 			color: '#f97316',
 			features: [
-				'AFR protection (requires AFR meter)',
-				'Knock protection (requires Gizzmo knock adaptor)',
-				'Multiple active engine protection features'
+				'AFR protection — requires opt modules',
+				'Knock protection — requires opt modules',
+				'Multiple active engine warnings and cuts'
 			]
 		}
 	];
@@ -212,6 +212,35 @@ function onFeaturesScroll() {
 	}
 }
 
+let featIsDragging = false;
+let featDragStartX = 0;
+let featDragScrollLeft = 0;
+
+function onFeatPointerDown(e: PointerEvent) {
+	if (!featuresTrack) return;
+	featIsDragging = true;
+	featDragStartX = e.clientX;
+	featDragScrollLeft = featuresTrack.scrollLeft;
+	featuresTrack.setPointerCapture(e.pointerId);
+	featuresTrack.style.cursor = 'grabbing';
+	featuresTrack.style.userSelect = 'none';
+}
+
+function onFeatPointerMove(e: PointerEvent) {
+	if (!featIsDragging || !featuresTrack) return;
+	e.preventDefault();
+	const walk = (e.clientX - featDragStartX) * 1.5;
+	featuresTrack.scrollLeft = featDragScrollLeft - walk;
+}
+
+function onFeatPointerUp(e: PointerEvent) {
+	if (!featIsDragging || !featuresTrack) return;
+	featIsDragging = false;
+	featuresTrack.releasePointerCapture(e.pointerId);
+	featuresTrack.style.cursor = 'grab';
+	featuresTrack.style.userSelect = '';
+}
+
 	function handleNavClick(id: string){
 		const node = document.getElementById(id);
 		if(node && scroller) scroller.scrollTo({ top: (node as HTMLElement).offsetTop, behavior: 'smooth' });
@@ -313,6 +342,12 @@ function onFeaturesScroll() {
 	}
 
 	onMount(() => {
+		function setVH() {
+			document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+		}
+		setVH();
+		window.addEventListener('resize', setVH);
+
 		void refreshCheckoutAvailability();
 
 		if (scroller) {
@@ -374,10 +409,24 @@ function onFeaturesScroll() {
 				slidesIO.observe(slidesNode);
 			}
 
+			if (featuresTrack) {
+				featuresTrack.addEventListener('pointerdown', onFeatPointerDown);
+				featuresTrack.addEventListener('pointermove', onFeatPointerMove);
+				featuresTrack.addEventListener('pointerup', onFeatPointerUp);
+				featuresTrack.addEventListener('pointercancel', onFeatPointerUp);
+			}
+
 			return () => {
+				window.removeEventListener('resize', setVH);
 				scroller?.removeEventListener('scroll', handleParallax);
 				lineIO.disconnect();
 				if (slidesIO) slidesIO.disconnect();
+				if (featuresTrack) {
+					featuresTrack.removeEventListener('pointerdown', onFeatPointerDown);
+					featuresTrack.removeEventListener('pointermove', onFeatPointerMove);
+					featuresTrack.removeEventListener('pointerup', onFeatPointerUp);
+					featuresTrack.removeEventListener('pointercancel', onFeatPointerUp);
+				}
 			};
 	});
 </script>
@@ -386,7 +435,7 @@ function onFeaturesScroll() {
 	<meta name="description" content="Gizzmo B1 boost controller — precision boost control with 2D mapping, real-time display, and engine protection." />
 </svelte:head>
 
-<div class="relative w-full h-screen">
+<div class="relative w-full vh-fix">
 	<nav class="fixed top-1/2 right-[46px] -translate-y-1/2 z-[230]" aria-label="Section navigation">
 		<ul class="m-0 p-0 flex flex-col gap-[18px] list-none">
 			{#each sectionIds as id}
@@ -427,7 +476,10 @@ function onFeaturesScroll() {
 			
 			<div class="flex gap-4 justify-end items-center hero-cta z-10 relative">
 				{#if checkoutAvailable}
-					<button on:click={handlePreOrder} disabled={isCheckoutProcessing} class="rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold tracking-wide px-7 py-3.5 text-base transition-all hover:scale-105 shadow-lg shadow-blue-600/30">{isCheckoutProcessing ? 'Processing…' : 'Pre Order'}</button>
+					<div class="flex items-center gap-4">
+						<span class="text-2xl font-bold text-white">$590</span>
+						<button on:click={handlePreOrder} disabled={isCheckoutProcessing} class="rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold tracking-wide px-7 py-3.5 text-base transition-all hover:scale-105 shadow-lg shadow-blue-600/30">{isCheckoutProcessing ? 'Processing…' : 'Pre Order'}</button>
+					</div>
 				{/if}
 				<button on:click={() => handleNavClick('features')} class="rounded-full border-2 border-white/30 hover:border-white/60 text-white font-semibold tracking-wide px-7 py-3.5 text-base transition-all hover:scale-105">Learn More</button>
 			</div>
@@ -548,8 +600,8 @@ function onFeaturesScroll() {
 				
 				<div class="bg-zinc-900/50 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 hover:bg-zinc-900/70 hover:border-white/20 transition-all hover:scale-[1.02] transform stagger-fade-in">
 					<div class="text-5xl font-bold text-red-400 mb-4">AFR</div>
-					<div class="text-xl font-semibold text-white mb-2">Protection</div>
-					<div class="text-sm text-white/60">AFR protection — requires AFR meter</div>
+					<div class="text-xl font-semibold text-white mb-2">AFR & Knock</div>
+					<div class="text-sm text-white/60">AFR & knock protection. Requires opt modules.</div>
 				</div>
 			</div>
 		</div>
@@ -584,7 +636,7 @@ function onFeaturesScroll() {
 							<div class="w-2 h-2 rounded-full bg-emerald-400 mt-2 flex-shrink-0"></div>
 							<div>
 								<div class="text-lg font-semibold text-white">MAP Sensor</div>
-								<div class="text-sm text-white/60">Precision manifold absolute pressure sensor</div>
+								<div class="text-sm text-white/60">4 bar manifold absolute pressure sensor</div>
 							</div>
 						</li>
 						<li class="flex items-start gap-4">
@@ -598,7 +650,7 @@ function onFeaturesScroll() {
 							<div class="w-2 h-2 rounded-full bg-orange-400 mt-2 flex-shrink-0"></div>
 							<div>
 								<div class="text-lg font-semibold text-white">Wiring Harness</div>
-								<div class="text-sm text-white/60">Not plug-and-play — requires wiring 3 wires</div>
+								<div class="text-sm text-white/60">Only requires a minimum of 2 wires</div>
 							</div>
 						</li>
 					</ul>
@@ -658,7 +710,7 @@ function onFeaturesScroll() {
 						</div>
 						<div class="bg-zinc-900/60 backdrop-blur-xl border border-white/10 rounded-[1.5rem] p-6 col-span-2 hover:bg-zinc-900/80 hover:border-white/20 transition-all hover:scale-[1.02] transform">
 							<div class="text-3xl font-bold text-emerald-400 mb-2">2D Mapping</div>
-							<div class="text-sm text-white/50 font-medium">Two-axis boost tables</div>
+							<div class="text-sm text-white/50 font-medium">Two axis boost table with up to 20 zones</div>
 						</div>
 					</div>
 				</div>
@@ -799,13 +851,11 @@ function onFeaturesScroll() {
 				<div class="flex flex-col sm:flex-row gap-6 justify-center items-center stagger-fade-in">
 					{#if checkoutAvailable}
 						<button on:click={handlePreOrder} disabled={isCheckoutProcessing} class="rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold tracking-wide px-12 py-5 text-xl transition-all hover:scale-105 shadow-2xl shadow-blue-600/40">
-							{isCheckoutProcessing ? 'Processing…' : 'Pre Order B1'}
+							{isCheckoutProcessing ? 'Processing…' : 'Pre Order B1 — $590'}
 						</button>
 					{/if}
-					<div class="text-center sm:text-left">
-						<div class="text-3xl font-bold text-white">$590</div>
-					</div>
 				</div>
+				<p class="text-white/40 text-sm stagger-fade-in">Australia only. Available June 2026.</p>
 				{#if checkoutAvailable && checkoutError}
 					<p class="text-red-400 text-center text-sm">{checkoutError}</p>
 				{/if}
@@ -854,6 +904,8 @@ function onFeaturesScroll() {
 	.options-marquee .track{font-size:8vw;animation-duration:20s}
 	.options-marquee{height:12vw}
 }
+.vh-fix { height: 100vh; height: calc(var(--vh, 1vh) * 100); }
+
 /* Enhanced fluid background system - continuous across all sections */
 .b1-bg{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% 50%,rgba(10,13,17,0.98),rgba(0,0,0,1))}
 .b1-ellipse-outer{position:absolute;top:50%;left:50%;width:1800px;height:1800px;translate:-50% -50%;background:conic-gradient(from 0deg,#5e81ac,#88c0d0,#a3be8c,#ebcb8b,#d08770,#bf616a,#5e81ac);filter:hue-rotate(var(--huerot,0deg)) blur(180px) brightness(1.15) saturate(1.4);opacity:.6;mix-blend-mode:screen;transition:opacity .35s ease-out,filter .5s ease-out,transform .8s cubic-bezier(.22,.61,.36,1);will-change:transform,opacity}
@@ -1049,5 +1101,29 @@ section.animate-in img {
 
 @media (max-width:880px){
     .table-clean thead th:nth-child(n+4){display:none}
+}
+
+@media (max-width: 768px) {
+	section[data-section] {
+		opacity: 1;
+	}
+	nav.fixed.top-1\/2 {
+		right: 12px !important;
+	}
+	nav.fixed.top-1\/2 ul {
+		gap: 10px !important;
+	}
+	nav.fixed.top-1\/2 button {
+		width: 12px !important;
+		height: 12px !important;
+	}
+	.carousel-track > * {
+		width: 85vw !important;
+		height: 60vh !important;
+	}
+	#hero {
+		padding-left: 1.5rem !important;
+		padding-right: 1.5rem !important;
+	}
 }
 </style>
