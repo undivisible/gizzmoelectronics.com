@@ -124,34 +124,30 @@ const _priceColors = ['#ef4444','#3b82f6','#10b981','#f59e0b','#8b5cf6'];
 const _maxBarVals = [3.45,6.9,3,3,6];
 const _maxBarColors = ['#ef4444','#3b82f6','#10b981','#f59e0b','#8b5cf6'];
 
-$: {
-	{
- 		const max = 2000;
- 		let x = 0;
- 		priceParts = _priceVals.map((v,i) => {
- 			const w = Math.max(4, Math.round((v / max) * 320));
- 			const p = { x, w, color: _priceColors[i], label: i===0? 'GFB' : i===1? 'B1' : i===2? 'Greddy' : i===3? 'HKS' : 'Plex' };
- 			x += w + 4;
- 			return p;
- 		});
- 	}
+{
+	const max = 2000;
+	let x = 0;
+	priceParts = _priceVals.map((v,i) => {
+		const w = Math.max(4, Math.round((v / max) * 320));
+		const p = { x, w, color: _priceColors[i], label: i===0? 'GFB' : i===1? 'B1' : i===2? 'Greddy' : i===3? 'HKS' : 'Plex' };
+		x += w + 4;
+		return p;
+	});
+}
 
- 	{
- 		const max = 7;
- 		let x = 0;
- 		maxBarParts = _maxBarVals.map((v,i) => {
- 			const w = Math.max(4, Math.round((v / max) * 320));
- 			const p = { x, w, color: _maxBarColors[i], label: i===0? 'GFB' : i===1? 'B1' : i===2? 'Greddy' : i===3? 'HKS' : 'Plex' };
- 			x += w + 4;
- 			return p;
- 		});
- 	}
+{
+	const max = 7;
+	let x = 0;
+	maxBarParts = _maxBarVals.map((v,i) => {
+		const w = Math.max(4, Math.round((v / max) * 320));
+		const p = { x, w, color: _maxBarColors[i], label: i===0? 'GFB' : i===1? 'B1' : i===2? 'Greddy' : i===3? 'HKS' : 'Plex' };
+		x += w + 4;
+		return p;
+	});
 }
 
 	let velocity = 0;
 	let lastScrollY = 0;
-	let ticking = false;
-	let settleRAF: number | null = null;
 
 	const sectionIds: string[] = ['hero','features','power','specs','tuning','engineered','comparison','cta'];
 	const sectionVisible: Record<string, boolean> = {};
@@ -217,72 +213,50 @@ function onFeaturesScroll() {
 		if(node && scroller) scroller.scrollTo({ top: (node as HTMLElement).offsetTop, behavior: 'smooth' });
 	}
 
+	let parallaxRAF: number | null = null;
 	function handleParallax(){
-		if(!scroller) return;
-		const y = scroller.scrollTop;
-		velocity = y - lastScrollY; lastScrollY = y;
-		const totalScrollable = scroller.scrollHeight - scroller.clientHeight;
-		const progress = totalScrollable > 0 ? Math.min(Math.max(y / totalScrollable, 0), 1) : 0;
-		const hueRotate = 0 + progress * 120;
-		document.documentElement.style.setProperty('--huerot', hueRotate + 'deg');
+		if (!scroller || parallaxRAF) return;
+		parallaxRAF = requestAnimationFrame(() => {
+			parallaxRAF = null;
+			const y = scroller!.scrollTop;
+			velocity = y - lastScrollY; lastScrollY = y;
+			const totalScrollable = scroller!.scrollHeight - scroller!.clientHeight;
+			const progress = totalScrollable > 0 ? Math.min(Math.max(y / totalScrollable, 0), 1) : 0;
+			const hueRotate = 0 + progress * 120;
+			document.documentElement.style.setProperty('--huerot', hueRotate + 'deg');
 
-		const h = window.innerHeight;
-		let sectionIndex = sectionIds.indexOf(active);
-		if(sectionIndex < 0) sectionIndex = 0;
-		const sectionTop = Math.max(0, sectionIndex * h);
-		const localY = Math.max(0, Math.min(h, y - sectionTop));
-		const localProgress = h > 0 ? localY / h : 0;
-
-		if(bgOuter){
-			const scale = 1 + (0.15 * Math.sin(progress * Math.PI * 3));
-			const rotate = progress * 90 + (Math.sin(progress * 4) * 20);
-			const tx = -10 + (progress * 80) + (Math.sin(progress * 2.5) * 15);
-			const ty = 20 + (progress * -100) + (Math.cos(progress * 1.8) * 25);
-			bgOuter.style.transform = `translate3d(${tx}%, ${ty}%, 0) rotate(${rotate}deg) scale(${scale})`;
-			bgOuter.style.opacity = String(0.6 + (Math.sin(progress * Math.PI) * 0.25));
-		}
-
-		if(bgInner){
-			const scaleI = 1.2 + (0.3 * Math.cos(progress * Math.PI * 2));
-			const rotateI = -progress * 60 + (Math.cos(progress * 3) * 15);
-			const txi = 30 - (progress * 60) + (Math.cos(progress * 2.2) * 20);
-			const tyi = 10 + (progress * -80) + (Math.sin(progress * 1.5) * 30);
-			bgInner.style.transform = `translate3d(${txi}%, ${tyi}%, 0) rotate(${rotateI}deg) scale(${scaleI})`;
-			bgInner.style.opacity = String(0.7 + (Math.cos(progress * Math.PI) * 0.2));
-		}
-		const optionsRoot = document.getElementById('options');
-		if(optionsRoot){
-			const nodes = Array.from(optionsRoot.querySelectorAll('[data-parallax-line]')) as HTMLElement[];
-			const total = nodes.length || 1;
-			const maxAmp = 140;
-			const v = Math.max(Math.min(velocity, 900), -900);
-			nodes.forEach((el,i)=>{
-				const progress = i/(total-1 || 1);
-				const dir = (i % 2 === 0) ? 1 : -1;
-				const amp = maxAmp * progress;
-				const offset = (v * 0.55) * (amp/maxAmp) * dir;
-				el.style.transform = `translate3d(0, ${offset.toFixed(2)}px, 0)`;
-			});
-			if(!ticking){
-				ticking = true;
-					if (settleRAF) cancelAnimationFrame(settleRAF as number);
-				const settle = () => {
-					velocity *= 0.68;
-					const v2 = Math.max(Math.min(velocity,900), -900);
-					const nodes2 = Array.from(optionsRoot.querySelectorAll('[data-parallax-line]')) as HTMLElement[];
-					const total2 = nodes2.length || 1;
-					nodes2.forEach((el,i)=>{
-						const progress = i/(total2-1 || 1);
-						const dir = (i % 2 === 0) ? 1 : -1;
-						const amp = maxAmp * progress;
-						const offset = (v2 * 0.55) * (amp/maxAmp) * dir;
-						el.style.transform = `translate3d(0, ${offset.toFixed(2)}px, 0)`;
-					});
-					if(Math.abs(velocity) > 0.15){ settleRAF = requestAnimationFrame(settle); } else { ticking = false; }
-				};
-					settleRAF = requestAnimationFrame(settle);
+			if(bgOuter){
+				const scale = 1 + (0.15 * Math.sin(progress * Math.PI * 3));
+				const rotate = progress * 90 + (Math.sin(progress * 4) * 20);
+				const tx = -10 + (progress * 80) + (Math.sin(progress * 2.5) * 15);
+				const ty = 20 + (progress * -100) + (Math.cos(progress * 1.8) * 25);
+				bgOuter.style.transform = `translate3d(${tx}%, ${ty}%, 0) rotate(${rotate}deg) scale(${scale})`;
+				bgOuter.style.opacity = String(0.6 + (Math.sin(progress * Math.PI) * 0.25));
 			}
-		}
+
+			if(bgInner){
+				const scaleI = 1.2 + (0.3 * Math.cos(progress * Math.PI * 2));
+				const rotateI = -progress * 60 + (Math.cos(progress * 3) * 15);
+				const txi = 30 - (progress * 60) + (Math.cos(progress * 2.2) * 20);
+				const tyi = 10 + (progress * -80) + (Math.sin(progress * 1.5) * 30);
+				bgInner.style.transform = `translate3d(${txi}%, ${tyi}%, 0) rotate(${rotateI}deg) scale(${scaleI})`;
+				bgInner.style.opacity = String(0.7 + (Math.cos(progress * Math.PI) * 0.2));
+			}
+			const optionsRoot = document.getElementById('options');
+			if(optionsRoot){
+				const nodes = Array.from(optionsRoot.querySelectorAll('[data-parallax-line]')) as HTMLElement[];
+				const total = nodes.length || 1;
+				const maxAmp = 140;
+				const v = Math.max(Math.min(velocity, 900), -900);
+				nodes.forEach((el,i)=>{
+					const p = i/(total-1 || 1);
+					const dir = (i % 2 === 0) ? 1 : -1;
+					const amp = maxAmp * p;
+					const offset = (v * 0.55) * (amp/maxAmp) * dir;
+					el.style.transform = `translate3d(0, ${offset.toFixed(2)}px, 0)`;
+				});
+			}
+		});
 	}
 	function observe(){
 		const io = new IntersectionObserver(entries => {
@@ -418,8 +392,8 @@ function onFeaturesScroll() {
 		<div class="b1-ellipse-outer" bind:this={bgOuter} style="top:78%;"></div>
 		<div class="b1-ellipse-inner" bind:this={bgInner} style="top:82%;"></div>
 	</div>
-	<div class="relative h-screen w-screen overflow-y-auto overflow-x-hidden snap-y snap-mandatory scroll-smooth overscroll-contain" bind:this={scroller}>
-	<section id="hero" class="relative h-screen w-screen snap-start flex items-center px-12 lg:px-20 overflow-hidden">
+	<div class="relative h-full w-full overflow-y-auto overflow-x-hidden snap-y snap-mandatory scroll-smooth overscroll-contain" bind:this={scroller}>
+	<section id="hero" class="relative h-screen w-full snap-start flex items-center px-12 lg:px-20 overflow-hidden">
 		<div class="max-w-7xl mx-auto w-full flex flex-col justify-center space-y-8">
 			<div class="text-left space-y-4 z-10 relative">
 				<h2 class="text-[clamp(80px,12vw,140px)] font-bold leading-none tracking-tight hero-title">B1</h2>
@@ -444,7 +418,7 @@ function onFeaturesScroll() {
 		</div>
 	</section>
 
-	<section id="features" data-section="features" bind:this={sectionRefs.features} class="min-h-screen w-screen snap-start relative overflow-hidden flex items-center justify-center" class:animate-in={sectionVisible.features}>
+	<section id="features" data-section="features" bind:this={sectionRefs.features} class="min-h-screen w-full snap-start relative overflow-hidden flex items-center justify-center" class:animate-in={sectionVisible.features}>
 	<div class="relative z-10 w-full h-full px-6">
 		<div class="h-full flex flex-col">
 					<div class="flex-1 flex flex-col justify-center">
@@ -518,7 +492,7 @@ function onFeaturesScroll() {
 		</div>
 	</section>
 
-	<section id="power" data-section="power" bind:this={sectionRefs.power} class="min-h-screen w-screen snap-start relative py-32 px-8 flex items-center justify-center" class:animate-in={sectionVisible.power}>
+	<section id="power" data-section="power" bind:this={sectionRefs.power} class="min-h-screen w-full snap-start relative py-32 px-8 flex items-center justify-center" class:animate-in={sectionVisible.power}>
 		<div class="max-w-7xl mx-auto">
 			<div class="text-center mb-20 stagger-fade-in">
 				<h3 class="text-[clamp(48px,7vw,80px)] font-bold text-white mb-6 tracking-tight">Power under the hood.</h3>
@@ -565,7 +539,7 @@ function onFeaturesScroll() {
 		</div>
 	</section>
 
-	<section id="specs" data-section="specs" bind:this={sectionRefs.specs} class="min-h-screen w-screen snap-start relative py-32 px-8 flex items-center justify-center" class:animate-in={sectionVisible.specs}>
+	<section id="specs" data-section="specs" bind:this={sectionRefs.specs} class="min-h-screen w-full snap-start relative py-32 px-8 flex items-center justify-center" class:animate-in={sectionVisible.specs}>
 		<div class="max-w-6xl mx-auto">
 			<div class="text-center mb-20 stagger-fade-in">
 				<h3 class="text-[clamp(48px,7vw,80px)] font-bold text-white mb-6 tracking-tight">Everything you need.</h3>
@@ -641,7 +615,7 @@ function onFeaturesScroll() {
 		id="tuning" 
 		data-section="tuning"
 		bind:this={sectionRefs.tuning}
-		class="h-screen w-screen snap-start relative overflow-hidden flex items-center"
+		class="h-screen w-full snap-start relative overflow-hidden flex items-center"
 		class:animate-in={sectionVisible.tuning}>
 				<div class="relative z-10 w-full max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 					<div class="space-y-8 content-slide-left">
@@ -678,7 +652,7 @@ function onFeaturesScroll() {
 		id="engineered" 
 		data-section="engineered"
 		bind:this={sectionRefs.engineered}
-		class="h-screen w-screen snap-start relative flex flex-col items-center justify-center overflow-hidden"
+		class="h-screen w-full snap-start relative flex flex-col items-center justify-center overflow-hidden"
 		class:animate-in={sectionVisible.engineered}>
 				<div class="text-center mb-16 z-10 relative px-6">
 					<h3 class="text-[clamp(40px,6vw,64px)] font-bold text-white mb-5 tracking-tight">Engineered for excellence.</h3>
@@ -700,7 +674,7 @@ function onFeaturesScroll() {
 		id="comparison" 
 		data-section="comparison"
 		bind:this={sectionRefs.comparison}
-		class="min-h-screen w-screen snap-start relative px-8 py-24 flex flex-col items-center justify-center"
+		class="min-h-screen w-full snap-start relative px-8 py-24 flex flex-col items-center justify-center"
 		class:animate-in={sectionVisible.comparison}>
 				<div class="relative w-full max-w-7xl mx-auto">
 					<div class="text-center mb-12">
@@ -799,7 +773,7 @@ function onFeaturesScroll() {
 				</div>
 			</section>
 
-	<section id="cta" data-section="cta" class="min-h-screen w-screen snap-start relative py-32 px-8 flex items-center justify-center" class:animate-in={sectionVisible.cta}>
+	<section id="cta" data-section="cta" class="min-h-screen w-full snap-start relative py-32 px-8 flex items-center justify-center" class:animate-in={sectionVisible.cta}>
 			<div class="max-w-4xl mx-auto text-center space-y-12">
 				<div class="space-y-6 stagger-fade-in">
 					<h3 class="text-[clamp(56px,8vw,96px)] font-bold text-white tracking-tight">So, are you convinced?</h3>
@@ -1056,9 +1030,25 @@ section.animate-in img {
     .table-clean thead th:nth-child(n+4){display:none}
 }
 
+/* Mobile: ensure sections visible even before JS, reduce GPU load */
 @media (max-width: 768px) {
 	section[data-section] {
-		opacity: 1;
+		opacity: 1 !important;
+	}
+	section[data-section].animate-in {
+		opacity: 1 !important;
+	}
+	.hero-title, .hero-subtitle, .hero-cta, .hero-device {
+		opacity: 1 !important;
+		animation: none !important;
+	}
+	.stagger-fade-in {
+		opacity: 1 !important;
+		animation: none !important;
+	}
+	.content-slide-left, .content-slide-right, .content-fade-up {
+		opacity: 1 !important;
+		transform: none !important;
 	}
 	nav.fixed.top-1\/2 {
 		right: 12px !important;
@@ -1078,5 +1068,32 @@ section.animate-in img {
 		padding-left: 1.5rem !important;
 		padding-right: 1.5rem !important;
 	}
+	/* Reduce backdrop-filter on mobile (heavy GPU cost) */
+	.backdrop-blur-xl, .backdrop-blur, [class*="backdrop-blur"] {
+		backdrop-filter: none !important;
+		-webkit-backdrop-filter: none !important;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.animate-marquee { animation: none !important; }
+	.hero-title, .hero-subtitle, .hero-cta, .hero-device {
+		opacity: 1 !important;
+		animation: none !important;
+	}
+	.stagger-fade-in {
+		opacity: 1 !important;
+		animation: none !important;
+	}
+	section[data-section] {
+		opacity: 1 !important;
+		transition: none !important;
+	}
+	.content-slide-left, .content-slide-right, .content-fade-up {
+		opacity: 1 !important;
+		transform: none !important;
+		transition: none !important;
+	}
+	.carousel-track { scroll-behavior: auto; }
 }
 </style>

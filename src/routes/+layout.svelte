@@ -141,6 +141,10 @@
     overflow: hidden;
   }
 
+  .app[data-b1="true"] {
+    overflow: visible;
+  }
+
   main {
     position: relative;
     z-index: 10;
