@@ -217,8 +217,13 @@
 		if (!featuresTrack) return;
 		const child = featuresTrack.children[index] as HTMLElement | undefined;
 		if (child) {
-			const scrollLeft = child.offsetLeft - 24;
-			featuresTrack.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+			const maxScroll = featuresTrack.scrollWidth - featuresTrack.clientWidth;
+			const scrollLeft =
+				child.offsetLeft - (featuresTrack.clientWidth - child.clientWidth) / 2;
+			featuresTrack.scrollTo({
+				left: Math.min(Math.max(scrollLeft, 0), maxScroll),
+				behavior: 'smooth',
+			});
 		}
 	}
 
@@ -228,21 +233,15 @@
 		const scrollWidth = featuresTrack.scrollWidth - featuresTrack.clientWidth;
 		scrollProgress = scrollWidth > 0 ? scrollLeft / scrollWidth : 0;
 
-		if (scrollLeft >= scrollWidth - 10) {
-			if (featuresIndex !== 4) {
-				featuresIndex = 4;
-			}
-			return;
-		}
-
 		const children = Array.from(featuresTrack.children) as HTMLElement[];
+		const trackCenter = scrollLeft + featuresTrack.clientWidth / 2;
 		let closestIndex = 0;
 		let minDistance = Infinity;
 
 		for (let i = 0; i < children.length; i++) {
 			const card = children[i];
-			const cardScrollPosition = card.offsetLeft - 24;
-			const distance = Math.abs(scrollLeft - cardScrollPosition);
+			const cardCenter = card.offsetLeft + card.clientWidth / 2;
+			const distance = Math.abs(trackCenter - cardCenter);
 			if (distance < minDistance) {
 				minDistance = distance;
 				closestIndex = i;
@@ -557,15 +556,15 @@
 			class="min-h-screen w-full snap-start relative overflow-hidden flex items-center justify-center"
 			class:animate-in={sectionVisible.features}
 		>
-			<div class="relative z-10 w-full h-full px-6">
+			<div class="features-shell relative z-10 w-full h-full px-6">
 				<div class="h-full flex flex-col">
 					<div class="flex-1 flex flex-col justify-center">
 						<h3
-							class="text-[clamp(32px,5vw,52px)] font-semibold text-white mb-8 tracking-tight text-left ml-6"
+							class="feature-heading text-[clamp(32px,5vw,52px)] font-semibold text-white mb-8 tracking-tight text-left ml-6"
 						>
 							Get the highlights.
 						</h3>
-						<div class="relative w-full h-full overflow-hidden">
+						<div class="carousel-frame relative w-full h-full overflow-hidden">
 							<div
 								bind:this={featuresTrack}
 								class="flex items-center overflow-x-auto carousel-track snap-x snap-proximity"
@@ -582,7 +581,10 @@
 										scrollToFeature(newIndex);
 									} else if (ke.key === 'ArrowRight') {
 										ke.preventDefault();
-										const newIndex = Math.min(4, featuresIndex + 1);
+										const newIndex = Math.min(
+											featureCards.length - 1,
+											featuresIndex + 1,
+										);
 										featuresIndex = newIndex;
 										scrollToFeature(newIndex);
 									}
@@ -647,18 +649,22 @@
 
 					<div class="py-8 flex items-center justify-center">
 						<div
-							class="flex items-center justify-center py-2.5 px-4 rounded-full gap-1"
-							style="background: rgba(115, 115, 115, 0.3); backdrop-filter: blur(12px);"
+							class="feature-status flex items-center justify-center py-2.5 px-4 rounded-full gap-1"
 						>
-							{#each Array(5) as _, i}
-								<div
+							{#each featureCards as _, i}
+								<button
+									type="button"
 									aria-label={`Slide ${i + 1}`}
-									class="h-2 rounded-full transition-all duration-300"
-									class:bg-white={featuresIndex === i}
+									aria-current={featuresIndex === i ? 'true' : undefined}
+									class="feature-dot h-2 rounded-full transition-all duration-300"
 									style={featuresIndex === i
 										? 'width: 2rem; background: white;'
 										: 'width: 0.5rem; background: rgba(156, 163, 175, 0.5);'}
-								></div>
+									on:click={() => {
+										featuresIndex = i;
+										scrollToFeature(i);
+									}}
+								></button>
 							{/each}
 						</div>
 					</div>
@@ -1449,7 +1455,9 @@
 		scroll-behavior: smooth;
 		gap: 1rem;
 		padding-left: 1.5rem;
+		padding-right: 1.5rem;
 		scroll-padding-left: 1.5rem;
+		scroll-padding-right: 1.5rem;
 	}
 
 	.carousel-track::-webkit-scrollbar {
@@ -1459,7 +1467,7 @@
 	/* Gentle snap points - left aligned */
 	.carousel-track > * {
 		scroll-snap-align: start;
-		scroll-snap-stop: normal;
+		scroll-snap-stop: always;
 	}
 
 	.feature-card {
@@ -1467,6 +1475,17 @@
 		height: clamp(360px, 50vh, 540px);
 		border-radius: 1.5rem;
 		background: rgba(18, 18, 20, 0.82);
+	}
+
+	.feature-status {
+		background: rgba(115, 115, 115, 0.3);
+		backdrop-filter: blur(12px);
+	}
+
+	.feature-dot {
+		border: 0;
+		cursor: pointer;
+		padding: 0;
 	}
 
 	.hero-device-mobile {
@@ -1716,11 +1735,26 @@
 			padding-left: 1rem;
 			padding-right: 1rem;
 			scroll-padding-left: 1rem;
+			scroll-padding-right: 1rem;
+			width: 100vw;
+			margin-left: calc(50% - 50vw);
 		}
 		.feature-card {
-			width: min(78vw, 20rem);
-			height: 24rem;
+			width: calc(100vw - 2rem);
+			height: 25rem;
 			border-radius: 1.125rem;
+		}
+		.features-shell {
+			padding-left: 0 !important;
+			padding-right: 0 !important;
+		}
+		.feature-heading {
+			margin-left: 0 !important;
+			padding-left: 1.5rem;
+			padding-right: 1.5rem;
+		}
+		.carousel-frame {
+			overflow: visible;
 		}
 		#hero {
 			padding-left: 1.5rem !important;
