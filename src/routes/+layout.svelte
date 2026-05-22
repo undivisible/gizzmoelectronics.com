@@ -342,11 +342,13 @@
 			width: auto;
 			min-width: var(--nav-peek);
 			padding: 0;
+			pointer-events: none;
 		}
 
 		.hover-nav.open {
 			width: var(--reveal-width);
 			padding: 1.25rem 1rem;
+			pointer-events: auto;
 		}
 
 		.nav-tip {
@@ -358,6 +360,7 @@
 			min-width: 2.75rem;
 			padding: 0.55rem 0.75rem;
 			border-left: 1px solid rgba(255, 255, 255, 0.18);
+			pointer-events: auto;
 		}
 
 		.nav-tip-hidden {
