@@ -1238,7 +1238,7 @@
 			</div>
 		</section>
 
-		<div class="w-full min-h-[40vh] block pt-0 snap-end">
+		<div class="w-full block pt-0 snap-end">
 			<Footer />
 		</div>
 	</div>
