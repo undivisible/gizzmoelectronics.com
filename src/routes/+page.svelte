@@ -1021,12 +1021,14 @@
 
 				<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 					<div
-						class="bg-zinc-900/40 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 overflow-auto"
+						class="comparison-table-panel bg-zinc-900/40 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 overflow-auto"
 					>
 						<h4 class="text-3xl font-semibold mb-6 text-white/90">
 							Specs at a glance
 						</h4>
-						<table class="w-full table-fixed text-left table-clean">
+						<table
+							class="comparison-table w-full table-fixed text-left table-clean"
+						>
 							<colgroup>
 								<col style="width: 35%;" />
 								<col style="width: 13%;" />
@@ -1663,12 +1665,6 @@
 		font-size: 12px;
 	}
 
-	@media (max-width: 880px) {
-		.table-clean thead th:nth-child(n + 4) {
-			display: none;
-		}
-	}
-
 	/* Mobile: ensure sections visible even before JS, reduce GPU load */
 	@media (max-width: 768px) {
 		nav.fixed.top-1\/2 {
@@ -1774,6 +1770,40 @@
 		#hero {
 			padding-left: 1.5rem !important;
 			padding-right: 1.5rem !important;
+		}
+		#comparison {
+			padding-left: 0 !important;
+			padding-right: 0 !important;
+		}
+		#comparison > div {
+			max-width: none !important;
+		}
+		#comparison .text-center {
+			padding-left: 1.5rem;
+			padding-right: 1.5rem;
+		}
+		.comparison-table-panel {
+			width: 100vw;
+			margin-left: calc(50% - 50vw);
+			margin-right: calc(50% - 50vw);
+			border-left: 0;
+			border-right: 0;
+			border-radius: 0;
+			padding-left: 1rem;
+			padding-right: 1rem;
+			-webkit-overflow-scrolling: touch;
+		}
+		.comparison-table {
+			min-width: 44rem;
+		}
+		.comparison-table th,
+		.comparison-table td {
+			padding-left: 0.5rem;
+			padding-right: 0.5rem;
+		}
+		.comparison-table th:first-child,
+		.comparison-table td:first-child {
+			padding-left: 0.75rem;
 		}
 		/* Reduce backdrop-filter on mobile (heavy GPU cost) */
 		.backdrop-blur-xl,
