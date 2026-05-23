@@ -12,8 +12,8 @@ const CATALOG: Record<CatalogProductId, CatalogProduct> = {
 	b1: {
 		id: 'b1',
 		name: 'B1 Boost Controller',
-		description: 'Pre-order — Gizzmo B1 boost controller',
-		priceCents: 59000,
+		description: 'Pre-order deposit — 50% deposit for Gizzmo B1 boost controller',
+		priceCents: 29500,
 		image: '/images/b1/b1.png'
 	},
 	v4: {

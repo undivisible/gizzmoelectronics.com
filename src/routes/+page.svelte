@@ -4,6 +4,10 @@
 	let checkoutAvailable = false;
 	let isCheckoutProcessing = false;
 	let checkoutError = '';
+	const b1FullPrice = 590;
+	const b1DepositPrice = b1FullPrice / 2;
+	const b1DepositLabel = `$${b1DepositPrice} deposit`;
+	const b1FullPriceLabel = `$${b1FullPrice} full price`;
 
 	async function handlePreOrder(): Promise<void> {
 		isCheckoutProcessing = true;
@@ -531,7 +535,15 @@
 				<div class="flex gap-4 justify-end items-center hero-cta z-10 relative">
 					{#if checkoutAvailable}
 						<div class="flex items-center gap-4">
-							<span class="text-2xl font-bold text-white">$590</span>
+							<div class="text-right">
+								<span class="block text-2xl font-bold text-white"
+									>{b1DepositLabel}</span
+								>
+								<span
+									class="block text-xs font-semibold uppercase tracking-[0.18em] text-white/45"
+									>50% preorder deposit · {b1FullPriceLabel}</span
+								>
+							</div>
 							<button
 								on:click={handlePreOrder}
 								disabled={isCheckoutProcessing}
@@ -1206,12 +1218,15 @@
 							disabled={isCheckoutProcessing}
 							class="rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold tracking-wide px-12 py-5 text-xl transition-all hover:scale-105 shadow-2xl shadow-blue-600/40"
 						>
-							{isCheckoutProcessing ? 'Processing…' : 'Pre Order B1 — $590'}
+							{isCheckoutProcessing
+								? 'Processing…'
+								: `Pre Order B1 — ${b1DepositLabel}`}
 						</button>
 					{/if}
 				</div>
 				<p class="text-white/40 text-sm stagger-fade-in">
-					Australia only. Available June 2026.
+					Australia only. Available June 2026. 50% deposit today, balance due
+					before dispatch.
 				</p>
 				{#if checkoutAvailable && checkoutError}
 					<p class="text-red-400 text-center text-sm">{checkoutError}</p>
