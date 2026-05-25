@@ -66,7 +66,7 @@
 			title: 'Billet Alloy Brains',
 			description:
 				'Crafted from anodized billet alloy for durability and a premium look that stands up to real-world conditions.',
-			image: '/images/b1/b1.png',
+			image: '/images/b1/billet.jpeg',
 			color: '#a855f7',
 			features: [
 				'CNC machined billet alloy construction',
