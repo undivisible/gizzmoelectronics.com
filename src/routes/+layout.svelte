@@ -156,12 +156,6 @@
 						>Downloads</a
 					>
 					<a
-						href="/b1/instructions"
-						class="nav-link"
-						class:nav-link-active={$page.url.pathname === '/b1/instructions'}
-						>Instructions</a
-					>
-					<a
 						href="/"
 						class="nav-link"
 						class:nav-link-active={$page.url.pathname === '/'}>B1 Controller</a
