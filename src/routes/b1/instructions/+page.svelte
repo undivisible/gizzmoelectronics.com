@@ -931,19 +931,20 @@
 
 	.menu-screen {
 		position: relative;
-		display: grid;
-		grid-template-columns: minmax(2.2rem, 14%) 1fr;
+		display: block;
 		height: 100%;
-		padding: clamp(0.34rem, 0.95vw, 0.8rem);
-		column-gap: clamp(0.2rem, 0.7vw, 0.55rem);
 	}
 
 	.vertical-title {
-		align-self: stretch;
+		position: absolute;
+		left: 2.6%;
+		top: 1.6%;
+		z-index: 3;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		min-width: 0;
+		width: 9%;
+		height: 96%;
 		overflow: visible;
 	}
 
@@ -951,31 +952,42 @@
 		transform: rotate(-90deg);
 		transform-origin: center;
 		white-space: nowrap;
+		gap: 0;
 	}
 
 	.vertical-title .glyph-text img {
-		height: clamp(0.74rem, 1.7vw, 1.24rem);
+		height: clamp(0.68rem, 1.45vw, 1.08rem);
+	}
+
+	.vertical-title .glyph-space {
+		width: clamp(0.16rem, 0.34vw, 0.26rem);
 	}
 
 	.menu-rows {
-		position: relative;
+		position: absolute;
+		left: 19.2%;
+		top: 30%;
+		right: 5.8%;
+		bottom: 13%;
 		z-index: 2;
-		display: grid;
-		align-content: center;
-		gap: clamp(0.08rem, 0.34vw, 0.22rem);
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		gap: clamp(0.02rem, 0.11vw, 0.08rem);
 		min-width: 0;
-		padding-right: clamp(0.2rem, 0.7vw, 0.6rem);
 	}
 
 	.menu-rows.compact {
-		gap: clamp(0.04rem, 0.22vw, 0.16rem);
+		top: 29%;
+		gap: clamp(0.01rem, 0.08vw, 0.05rem);
 	}
 
 	.menu-rows button {
 		display: grid;
-		grid-template-columns: clamp(0.32rem, 0.8vw, 0.58rem) minmax(0, 1fr) auto;
+		grid-template-columns: clamp(0.34rem, 0.74vw, 0.54rem) minmax(0, 1fr) auto;
 		align-items: center;
 		min-width: 0;
+		height: clamp(0.88rem, 1.96vw, 1.42rem);
 		border: 0;
 		background: transparent;
 		padding: 0;
@@ -983,11 +995,25 @@
 	}
 
 	.menu-rows button .glyph-text img {
-		height: clamp(0.74rem, 1.86vw, 1.34rem);
+		height: clamp(0.72rem, 1.52vw, 1.12rem);
 	}
 
 	.menu-rows.compact button .glyph-text img {
-		height: clamp(0.62rem, 1.48vw, 1.08rem);
+		height: clamp(0.62rem, 1.28vw, 0.96rem);
+	}
+
+	.mode-values .menu-rows {
+		top: 23%;
+		bottom: 8%;
+	}
+
+	.mode-values .menu-rows.compact,
+	.mode-confirm .menu-rows.compact {
+		top: 22%;
+	}
+
+	.mode-confirm .menu-rows {
+		top: 34%;
 	}
 
 	.menu-rows button.clickable {
@@ -1002,12 +1028,12 @@
 	.selection-dot {
 		display: grid;
 		place-items: center;
-		width: clamp(0.32rem, 0.8vw, 0.58rem);
+		width: clamp(0.34rem, 0.74vw, 0.54rem);
 	}
 
 	.selection-dot img {
 		display: block;
-		width: clamp(0.22rem, 0.5vw, 0.38rem);
+		width: clamp(0.22rem, 0.46vw, 0.34rem);
 		height: auto;
 		opacity: 0;
 		image-rendering: pixelated;
@@ -1026,29 +1052,29 @@
 	}
 
 	.row-value {
-		padding-left: clamp(0.28rem, 0.85vw, 0.7rem);
+		padding-left: clamp(0.2rem, 0.6vw, 0.48rem);
 		text-align: right;
 	}
 
 	.screen-footer {
 		position: absolute;
-		right: clamp(0.42rem, 1.2vw, 0.9rem);
-		bottom: clamp(0.32rem, 0.9vw, 0.72rem);
+		right: 4.2%;
+		bottom: 5.4%;
 		display: flex;
 		justify-content: flex-end;
 	}
 
 	.screen-footer .glyph-text img {
-		height: clamp(0.52rem, 1.08vw, 0.84rem);
+		height: clamp(0.44rem, 0.9vw, 0.68rem);
 	}
 
 	.screen-icon {
 		position: absolute;
-		right: clamp(0.48rem, 1.25vw, 1rem);
-		top: clamp(0.4rem, 1.1vw, 0.88rem);
+		right: 4.3%;
+		top: 7%;
 		z-index: 1;
-		width: clamp(1.1rem, 3vw, 2.4rem);
-		height: clamp(1.1rem, 3vw, 2.4rem);
+		width: clamp(1rem, 2.6vw, 2rem);
+		height: clamp(1rem, 2.6vw, 2rem);
 		object-fit: contain;
 		image-rendering: pixelated;
 		opacity: 0.95;
