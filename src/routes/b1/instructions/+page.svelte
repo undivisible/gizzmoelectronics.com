@@ -43,13 +43,6 @@
 	const holdDelayMs = 520;
 
 	const imageBase = '/images/b1/instructions/';
-	const digitPath = `${imageBase}0%20to%209/29pixHigh/`;
-
-	function digitSrc(character: string): string {
-		if (character === '.') return `${digitPath}BigCoolDot.bmp`;
-		return `${digitPath}BigCool${character}.bmp`;
-	}
-
 	function glyphSrc(character: string): string | undefined {
 		const upper = character.toUpperCase();
 		if (upper >= 'A' && upper <= 'Z') {
@@ -637,16 +630,6 @@
 </svelte:head>
 
 <section class="b1-instructions" class:booted>
-	<div class="instruction-bg" aria-hidden="true">
-		<div></div>
-		<div></div>
-	</div>
-
-	<div class="stage-copy">
-		<p>B1 Instructions</p>
-		<h1>Run it like the real controller.</h1>
-	</div>
-
 	<div class="controller-wrap">
 		<div class="controller-shell" aria-label="Interactive B1 controller">
 			<img
@@ -693,34 +676,10 @@
 							/>
 						</div>
 					{:else if activeScreen.mode === 'live' && activeLive}
-						<div class="live-screen">
-							<div class="live-labels">
-								{@render glyphText(`MEMORY ${activeLive.memory}`, 'lime')}
-								{@render glyphText(`RPM ${activeLive.rpm}`, 'lime')}
-							</div>
-							<div class="live-main">
-								<div class="live-memory">
-									{@render glyphText('MEMORY')}
-									<div class="memory-digit">
-										<img
-											src={digitSrc(activeLive.memory)}
-											alt={activeLive.memory}
-										/>
-									</div>
-								</div>
-								<div class="live-boost">
-									<div class="digit-row" aria-label={`${activeLive.psi} PSI`}>
-										{#each activeLive.psi.split('') as digit, index (`${digit}-${index}`)}
-											<img src={digitSrc(digit)} alt={digit} />
-										{/each}
-									</div>
-									{@render glyphText(activeLive.label)}
-								</div>
-							</div>
-							<div class="boost-arc" aria-hidden="true">
-								<img src={`${imageBase}Bars/Base.bmp`} alt="" />
-							</div>
-						</div>
+						<div
+							class="live-screen"
+							aria-label={`Memory ${activeLive.memory}`}
+						></div>
 					{:else}
 						<div class="menu-screen">
 							<div class="vertical-title">
@@ -819,78 +778,19 @@
 		transform: scale(1);
 	}
 
-	.instruction-bg {
-		position: absolute;
-		inset: 0;
-		overflow: hidden;
-		pointer-events: none;
-	}
-
-	.instruction-bg div {
-		position: absolute;
-		width: 64vw;
-		aspect-ratio: 1;
-		border: 1px solid rgba(110, 198, 255, 0.22);
-		border-radius: 50%;
-		filter: blur(0.4px);
-		opacity: 0.48;
-	}
-
-	.instruction-bg div:first-child {
-		right: -24vw;
-		top: -26vw;
-		box-shadow:
-			inset 0 0 90px rgba(59, 130, 246, 0.16),
-			0 0 110px rgba(59, 130, 246, 0.11);
-	}
-
-	.instruction-bg div:last-child {
-		left: -32vw;
-		bottom: -36vw;
-		box-shadow:
-			inset 0 0 100px rgba(16, 185, 129, 0.12),
-			0 0 130px rgba(59, 130, 246, 0.09);
-	}
-
-	.stage-copy {
-		position: absolute;
-		z-index: 6;
-		left: clamp(1.2rem, 4vw, 4rem);
-		top: clamp(1.2rem, 6vh, 4.5rem);
-		max-width: min(34rem, 48vw);
-		pointer-events: none;
-	}
-
-	.stage-copy p {
-		margin: 0 0 0.7rem;
-		color: #7dd3fc;
-		font-size: 0.72rem;
-		font-weight: 850;
-		text-transform: uppercase;
-	}
-
-	.stage-copy h1 {
-		margin: 0;
-		font-size: clamp(3.25rem, 8.4vw, 9rem);
-		font-weight: 950;
-		line-height: 0.84;
-		letter-spacing: 0;
-	}
-
 	.controller-wrap {
 		position: relative;
 		z-index: 4;
 		display: grid;
 		place-items: center;
 		min-height: 100vh;
-		padding: 15vh 4vw 12vh;
+		padding: 4vh 4vw;
 	}
 
 	.controller-shell {
 		position: relative;
-		width: min(88vw, 1120px);
+		width: min(92vw, 1040px);
 		aspect-ratio: 1016 / 460;
-		transform: translateY(7vh);
 	}
 
 	.controller-image {
@@ -905,17 +805,22 @@
 
 	.controller-screen {
 		position: absolute;
-		left: 8.1%;
-		top: 14.4%;
+		left: 10.45%;
+		top: 20.9%;
 		z-index: 4;
-		width: 54.2%;
-		height: 63.4%;
+		width: 49.7%;
+		height: 60%;
 		border: 0;
-		border-radius: 22px;
+		border-radius: 19px;
 		background: transparent;
 		padding: 0;
 		cursor: pointer;
 		overflow: hidden;
+	}
+
+	.screen-ui.mode-live {
+		background: transparent;
+		box-shadow: none;
 	}
 
 	.screen-ui {
@@ -1020,97 +925,8 @@
 
 	.live-screen {
 		position: relative;
-		display: grid;
-		grid-template-rows: auto 1fr;
+		display: block;
 		height: 100%;
-		padding: clamp(0.38rem, 1.05vw, 0.82rem);
-	}
-
-	.live-labels {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		min-width: 0;
-	}
-
-	.live-main {
-		position: relative;
-		display: grid;
-		grid-template-columns: 0.44fr 1fr;
-		align-items: center;
-		min-height: 0;
-	}
-
-	.live-memory {
-		display: grid;
-		gap: 0.25rem;
-		justify-items: start;
-	}
-
-	.live-memory .glyph-text img {
-		height: clamp(0.5rem, 1.05vw, 0.82rem);
-	}
-
-	.memory-digit img {
-		height: clamp(2rem, 5vw, 4.3rem);
-		width: auto;
-		image-rendering: pixelated;
-		filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.76))
-			drop-shadow(0 0 18px rgba(125, 211, 252, 0.54));
-	}
-
-	.screen-ui.memory-active .memory-digit img {
-		filter: hue-rotate(72deg) saturate(1.75)
-			drop-shadow(0 0 10px rgba(183, 255, 34, 0.9));
-	}
-
-	.screen-ui.memory-active .memory-digit {
-		animation: memory-pulse 0.82s steps(2, jump-none) infinite;
-	}
-
-	.live-boost {
-		display: grid;
-		justify-items: end;
-		gap: 0.2rem;
-	}
-
-	.digit-row {
-		display: flex;
-		align-items: flex-end;
-		justify-content: flex-end;
-		gap: clamp(0.08rem, 0.22vw, 0.16rem);
-		height: clamp(3.2rem, 9.2vw, 7.4rem);
-	}
-
-	.digit-row img {
-		height: 100%;
-		width: auto;
-		object-fit: contain;
-		filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.76))
-			drop-shadow(0 0 18px rgba(125, 211, 252, 0.54));
-	}
-
-	.live-boost .glyph-text img {
-		height: clamp(0.72rem, 1.45vw, 1.12rem);
-	}
-
-	.boost-arc {
-		position: absolute;
-		left: 5%;
-		right: 5%;
-		bottom: 2%;
-		display: grid;
-		place-items: end center;
-		pointer-events: none;
-	}
-
-	.boost-arc img {
-		width: 100%;
-		max-height: clamp(2.2rem, 6.5vw, 5.2rem);
-		object-fit: contain;
-		image-rendering: pixelated;
-		filter: drop-shadow(0 0 12px rgba(59, 183, 255, 0.74));
-		mix-blend-mode: screen;
 	}
 
 	.menu-screen {
@@ -1138,7 +954,7 @@
 	}
 
 	.vertical-title .glyph-text img {
-		height: clamp(0.62rem, 1.48vw, 1.12rem);
+		height: clamp(0.74rem, 1.7vw, 1.24rem);
 	}
 
 	.menu-rows {
@@ -1167,11 +983,11 @@
 	}
 
 	.menu-rows button .glyph-text img {
-		height: clamp(0.62rem, 1.55vw, 1.18rem);
+		height: clamp(0.74rem, 1.86vw, 1.34rem);
 	}
 
 	.menu-rows.compact button .glyph-text img {
-		height: clamp(0.5rem, 1.22vw, 0.92rem);
+		height: clamp(0.62rem, 1.48vw, 1.08rem);
 	}
 
 	.menu-rows button.clickable {
@@ -1223,7 +1039,7 @@
 	}
 
 	.screen-footer .glyph-text img {
-		height: clamp(0.42rem, 1vw, 0.76rem);
+		height: clamp(0.52rem, 1.08vw, 0.84rem);
 	}
 
 	.screen-icon {
@@ -1245,10 +1061,10 @@
 
 	.knob {
 		position: absolute;
-		right: 6.1%;
-		top: 19.3%;
+		right: 9.7%;
+		top: 23.6%;
 		z-index: 5;
-		width: 23.5%;
+		width: 20.8%;
 		aspect-ratio: 1;
 		border: 0;
 		border-radius: 999px;
@@ -1257,28 +1073,7 @@
 	}
 
 	.knob span {
-		position: absolute;
-		inset: 12%;
-		border-radius: 999px;
-		background:
-			linear-gradient(
-				90deg,
-				transparent 48%,
-				rgba(255, 255, 255, 0.88) 49%,
-				rgba(255, 255, 255, 0.88) 52%,
-				transparent 53%
-			),
-			repeating-radial-gradient(
-				circle at 50% 50%,
-				rgba(255, 255, 255, 0.12) 0 1px,
-				transparent 1px 4px
-			),
-			radial-gradient(circle at 38% 30%, #91949b, #202126 58%, #090a0e);
-		box-shadow:
-			inset -10px -10px 24px rgba(0, 0, 0, 0.62),
-			inset 7px 7px 15px rgba(255, 255, 255, 0.18),
-			0 12px 24px rgba(0, 0, 0, 0.52);
-		transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+		display: none;
 	}
 
 	@keyframes memory-pulse {
@@ -1288,21 +1083,9 @@
 	}
 
 	@media (max-width: 900px) {
-		.stage-copy {
-			position: relative;
-			left: auto;
-			top: auto;
-			max-width: none;
-			padding: 1.25rem 1rem 0;
-		}
-
-		.stage-copy h1 {
-			font-size: clamp(3.4rem, 16vw, 5.8rem);
-		}
-
 		.controller-wrap {
-			min-height: auto;
-			padding: 2rem 0 9rem;
+			min-height: 100vh;
+			padding: 2rem 0;
 		}
 
 		.controller-shell {
