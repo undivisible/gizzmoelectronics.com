@@ -5,6 +5,7 @@
 
 	let { data }: { data: PageData } = $props();
 
+	type ScreenMode = 'live' | 'menu' | 'map' | 'status';
 	type ControllerScreen = {
 		id: string;
 		label: string;
@@ -14,11 +15,11 @@
 		status: string;
 		accent: string;
 		image: string;
+		mode: ScreenMode;
 		lines: string[];
 	};
 
 	let assets: InstructionAsset[] = $derived(data.assets);
-	let groups: string[] = $derived(['All', ...data.groups]);
 
 	function assetUrl(relativePath: string): string {
 		return (
@@ -27,39 +28,81 @@
 		);
 	}
 
+	const menuItems = [
+		{
+			label: 'Map',
+			screen: 'map',
+			image: 'TheRest/map119.bmp',
+			accent: '#70dcff',
+		},
+		{
+			label: 'Sol',
+			screen: 'solenoid',
+			image: 'TheRest/Main Menu Images/Sol.bmp',
+			accent: '#f8d36b',
+		},
+		{
+			label: 'Input',
+			screen: 'inputs',
+			image: 'TheRest/Main Menu Images/InputConfig.bmp',
+			accent: '#5ee6d2',
+		},
+		{
+			label: 'Display',
+			screen: 'display',
+			image: 'TheRest/Main Menu Images/displaysetting.bmp',
+			accent: '#c58bff',
+		},
+		{
+			label: 'Safety',
+			screen: 'safety',
+			image: 'TheRest/Main Menu Images/safety.bmp',
+			accent: '#ff7d5c',
+		},
+		{
+			label: 'Log',
+			screen: 'datalog',
+			image: 'TheRest/Datalog.bmp',
+			accent: '#ff9dd1',
+		},
+	];
+
 	let screens: ControllerScreen[] = $derived([
 		{
-			id: 'home',
-			label: 'Home',
-			title: 'B1 live',
+			id: 'live',
+			label: 'Live',
+			title: 'Boost',
 			value: '18.6',
-			unit: 'psi',
-			status: 'Memory 3 · closed loop',
+			unit: 'PSI',
+			status: 'MEM 3',
 			accent: '#3bb7ff',
-			image: assetUrl('TheRest/Splash2.bmp'),
-			lines: ['Peak hold armed', 'Solenoid duty 42%', 'Aux input nominal'],
-		},
-		{
-			id: 'boost',
-			label: 'Boost',
-			title: 'Boost target',
-			value: '22.4',
-			unit: 'psi',
-			status: 'Ramp by RPM and speed',
-			accent: '#78d4ff',
 			image: assetUrl('Bars/Base.bmp'),
-			lines: ['Target table active', 'Gain 16', 'Overboost cut 26.0 psi'],
+			mode: 'live',
+			lines: ['DUTY 42%', 'RPM TRIM ON', 'PEAK 22.4'],
 		},
 		{
-			id: 'mapping',
+			id: 'menu',
+			label: 'Menu',
+			title: 'Main Menu',
+			value: '',
+			unit: '',
+			status: 'PUSH TO SELECT',
+			accent: '#ffffff',
+			image: assetUrl('TheRest/gears1.png'),
+			mode: 'menu',
+			lines: ['Rotate to move', 'Press knob to enter', 'Tap a screen icon'],
+		},
+		{
+			id: 'map',
 			label: 'Map',
-			title: '2D map',
+			title: '2D Map',
 			value: '119',
-			unit: 'kpa',
-			status: 'High load cell selected',
-			accent: '#80f2a8',
+			unit: 'KPA',
+			status: 'HIGH LOAD',
+			accent: '#70dcff',
 			image: assetUrl('TheRest/map119HIGH.bmp'),
-			lines: ['RPM axis enabled', 'Speed trim enabled', 'Interpolation on'],
+			mode: 'map',
+			lines: ['RPM axis active', 'Speed axis active', 'Interpolation enabled'],
 		},
 		{
 			id: 'solenoid',
@@ -67,110 +110,118 @@
 			title: 'Solenoid',
 			value: '42',
 			unit: '%',
-			status: 'MAC 3-port output',
+			status: '31 HZ',
 			accent: '#f8d36b',
 			image: assetUrl('TheRest/HiResSol.png'),
-			lines: ['Frequency 31 hz', 'Duty limit 90%', 'Output test ready'],
+			mode: 'status',
+			lines: ['MAC 3-port output', 'Duty limit 90%', 'Output test ready'],
 		},
 		{
-			id: 'safety',
-			label: 'Safety',
-			title: 'Protection',
-			value: 'ON',
-			unit: '',
-			status: 'AFR and knock watched',
-			accent: '#ff7d5c',
-			image: assetUrl('TheRest/Main Menu Images/safety.bmp'),
-			lines: [
-				'AFR cut enabled',
-				'Knock warning enabled',
-				'Reset requires press',
-			],
+			id: 'inputs',
+			label: 'Input',
+			title: 'Input Config',
+			value: '6.9',
+			unit: 'BAR',
+			status: 'MAP SENSOR',
+			accent: '#5ee6d2',
+			image: assetUrl('TheRest/Main Menu Images/InputConfig2.bmp'),
+			mode: 'status',
+			lines: ['AFR petrol stoic', 'Aux volts enabled', 'Knock module optional'],
 		},
 		{
 			id: 'display',
 			label: 'Display',
-			title: 'Display setup',
+			title: 'Display',
 			value: '65K',
-			unit: 'colour',
-			status: 'TFT display properties',
+			unit: 'TFT',
+			status: 'DIM 48%',
 			accent: '#c58bff',
 			image: assetUrl('TheRest/Main Menu Images/displaysetting.bmp'),
-			lines: ['Top value peak boost', 'Bottom value duty', 'Night dim 48%'],
+			mode: 'status',
+			lines: ['Top value boost', 'Bottom value duty', 'Night mode ready'],
 		},
 		{
-			id: 'inputs',
-			label: 'Inputs',
-			title: 'Input config',
-			value: '4',
-			unit: 'chan',
-			status: 'MAP, AFR, knock, aux',
-			accent: '#5ee6d2',
-			image: assetUrl('TheRest/Main Menu Images/InputConfig.bmp'),
-			lines: ['MAP sensor 6.9 bar', 'AFR petrol stoic', 'Aux input volts'],
+			id: 'safety',
+			label: 'Safety',
+			title: 'Safety',
+			value: 'ON',
+			unit: '',
+			status: 'AFR / KNOCK',
+			accent: '#ff7d5c',
+			image: assetUrl('TheRest/NewResetLARGE.bmp'),
+			mode: 'status',
+			lines: ['AFR cut enabled', 'Knock warning enabled', 'Hold to reset'],
 		},
 		{
 			id: 'datalog',
 			label: 'Log',
 			title: 'Datalog',
 			value: '20',
-			unit: 'hz',
-			status: 'Session buffer ready',
+			unit: 'HZ',
+			status: 'READY',
 			accent: '#ff9dd1',
 			image: assetUrl('TheRest/Datalog.bmp'),
+			mode: 'status',
 			lines: [
 				'Boost, RPM, duty',
 				'AFR and knock optional',
-				'Hold press to clear',
+				'Clear with long press',
 			],
 		},
 	]);
 
-	const screenGrid = [
-		{ screen: 0, label: 'Live' },
-		{ screen: 1, label: 'Boost' },
-		{ screen: 2, label: 'Map' },
-		{ screen: 3, label: 'Sol' },
-		{ screen: 4, label: 'Safety' },
-		{ screen: 5, label: 'Display' },
-		{ screen: 6, label: 'Inputs' },
-		{ screen: 7, label: 'Log' },
-	];
-
 	let activeIndex = $state(0);
 	let knobAngle = $state(18);
-	let selectedGroup = $state('All');
-	let assetQuery = $state('');
-	let live = $state(false);
-
+	let booted = $state(false);
 	let activeScreen = $derived(screens[activeIndex]);
-	let visibleAssets = $derived(
-		assets.filter((asset) => {
-			const groupMatches =
-				selectedGroup === 'All' || asset.group === selectedGroup;
-			const query = assetQuery.trim().toLowerCase();
-			const queryMatches =
-				query === '' ||
-				asset.name.toLowerCase().includes(query) ||
-				asset.relativePath.toLowerCase().includes(query);
-
-			return groupMatches && queryMatches;
-		}),
+	let currentLine = $derived(activeScreen.lines.join('   ·   '));
+	let stripAssets = $derived(
+		assets
+			.filter((asset) =>
+				[
+					'TheRest/Splash2.bmp',
+					'Bars/Base.bmp',
+					'TheRest/map119HIGH.bmp',
+					'TheRest/HiResSol.png',
+					'TheRest/Main Menu Images/InputConfig.bmp',
+					'TheRest/Main Menu Images/displaysetting.bmp',
+					'TheRest/Main Menu Images/safety.bmp',
+					'TheRest/Datalog.bmp',
+				].includes(asset.relativePath),
+			)
+			.slice(0, 8),
 	);
 
-	function rotateKnob(direction: number) {
-		activeIndex = (activeIndex + direction + screens.length) % screens.length;
-		knobAngle += direction * 36;
-	}
-
-	function pressKnob() {
-		knobAngle += 16;
-		activeIndex = (activeIndex + 1) % screens.length;
+	function indexFor(id: string): number {
+		return Math.max(
+			0,
+			screens.findIndex((screen) => screen.id === id),
+		);
 	}
 
 	function chooseScreen(index: number) {
 		activeIndex = index;
-		knobAngle = index * 36 + 18;
+		knobAngle = index * 39 + 18;
+	}
+
+	function chooseScreenId(id: string) {
+		chooseScreen(indexFor(id));
+	}
+
+	function rotateKnob(direction: number) {
+		chooseScreen((activeIndex + direction + screens.length) % screens.length);
+		knobAngle += direction * 24;
+	}
+
+	function pressKnob() {
+		if (activeScreen.id === 'live') {
+			chooseScreenId('menu');
+		} else if (activeScreen.id === 'menu') {
+			chooseScreenId(menuItems[0].screen);
+		} else {
+			chooseScreenId('menu');
+		}
+		knobAngle += 18;
 	}
 
 	function handleWheel(event: WheelEvent) {
@@ -179,722 +230,553 @@
 	}
 
 	onMount(() => {
-		live = true;
+		requestAnimationFrame(() => {
+			booted = true;
+		});
 	});
 </script>
 
 <svelte:head>
-	<title>B1 Interactive Instructions | Gizzmo Electronics</title>
+	<title>B1 Instructions | Gizzmo Electronics</title>
 	<meta
 		name="description"
-		content="Interactive B1 boost controller instruction route built from the provided display, icon, map, and gauge images."
+		content="A full-screen interactive B1 boost controller instruction simulator based on the supplied controller UI images."
 	/>
 </svelte:head>
 
-<section class="instructions-shell" class:live>
-	<div class="hero-grid">
-		<div class="intro-panel">
-			<p class="eyebrow">B1 interactive instructions</p>
-			<h1>Drive the controller instead of reading around it.</h1>
-			<p class="intro-copy">
-				Scroll over the knob, click the knob, or press the display hotspots to
-				step through the B1-style menus, display modes, mapping, solenoid,
-				safety, and input screens assembled from the instruction image set.
-			</p>
-			<div class="control-row" aria-label="Controller actions">
-				<button type="button" onclick={() => rotateKnob(-1)}>Previous</button>
-				<button type="button" class="primary" onclick={pressKnob}
-					>Press knob</button
-				>
-				<button type="button" onclick={() => rotateKnob(1)}>Next</button>
-			</div>
-		</div>
+<section class="b1-instructions" class:booted>
+	<div class="instruction-bg" aria-hidden="true">
+		<div></div>
+		<div></div>
+	</div>
 
-		<div class="controller-stage" aria-label="Interactive B1 controller">
-			<div class="device-frame">
-				<img
-					class="device-image"
-					src={assetUrl('TheRest/display.bmp')}
-					alt="B1 controller front render"
-				/>
-				<button
-					type="button"
-					class="screen-layer"
-					aria-label="Cycle controller display"
-					onclick={pressKnob}
-				>
-					<div class="screen-content" style={`--accent:${activeScreen.accent}`}>
-						<div class="screen-topline">
-							<span>{activeScreen.title}</span>
-							<span>{activeScreen.status}</span>
+	<div class="stage-copy">
+		<p>B1 Instructions</p>
+		<h1>Run it like the real controller.</h1>
+	</div>
+
+	<div class="controller-wrap">
+		<div class="controller-shell" aria-label="Interactive B1 controller">
+			<img
+				class="controller-image"
+				src={assetUrl('TheRest/display.bmp')}
+				alt="B1 controller"
+			/>
+
+			<div
+				class="controller-screen"
+				role="button"
+				tabindex="0"
+				aria-label="Controller screen. Press to change screen."
+				onclick={pressKnob}
+				onkeydown={(event) => {
+					if (event.key === 'Enter' || event.key === ' ') {
+						event.preventDefault();
+						pressKnob();
+					}
+				}}
+			>
+				<div class="screen-ui" style={`--accent:${activeScreen.accent}`}>
+					<div class="screen-header">
+						<span>{activeScreen.title}</span>
+						<span>{activeScreen.status}</span>
+					</div>
+
+					{#if activeScreen.mode === 'menu'}
+						<div class="controller-menu">
+							{#each menuItems as item (item.label)}
+								<button
+									type="button"
+									style={`--tile:${item.accent}`}
+									onclick={(event) => {
+										event.stopPropagation();
+										chooseScreenId(item.screen);
+									}}
+								>
+									<img src={assetUrl(item.image)} alt="" />
+									<span>{item.label}</span>
+								</button>
+							{/each}
 						</div>
-						<div class="screen-main">
+					{:else if activeScreen.mode === 'map'}
+						<div class="map-screen">
 							<img src={activeScreen.image} alt="" />
 							<div>
 								<strong>{activeScreen.value}</strong>
 								<em>{activeScreen.unit}</em>
 							</div>
 						</div>
-						<div class="screen-lines">
-							{#each activeScreen.lines as line (line)}
-								<span>{line}</span>
-							{/each}
+					{:else}
+						<div class="metric-screen">
+							<div class="metric-asset">
+								<img src={activeScreen.image} alt="" />
+							</div>
+							<div class="metric-value">
+								<strong>{activeScreen.value}</strong>
+								<em>{activeScreen.unit}</em>
+							</div>
 						</div>
+					{/if}
+
+					<div class="screen-footer">
+						<span>{currentLine}</span>
 					</div>
-				</button>
-				<button
-					type="button"
-					class="knob-target"
-					aria-label="Rotate B1 knob"
-					onclick={pressKnob}
-					onwheel={handleWheel}
-				>
-					<span style={`transform:rotate(${knobAngle}deg)`}></span>
-				</button>
+				</div>
 			</div>
-			<div class="screen-picker" aria-label="Screen shortcuts">
-				{#each screenGrid as item (item.label)}
+
+			<button
+				type="button"
+				class="knob"
+				aria-label="B1 rotary knob"
+				onclick={pressKnob}
+				onwheel={handleWheel}
+			>
+				<span style={`transform:rotate(${knobAngle}deg)`}></span>
+			</button>
+
+			<div class="screen-hotspots" aria-label="Direct screen controls">
+				{#each screens as screen, index (screen.id)}
 					<button
 						type="button"
-						class:active={activeIndex === item.screen}
-						onclick={() => chooseScreen(item.screen)}
+						class:active={activeIndex === index}
+						style={`--accent:${screen.accent}`}
+						onclick={() => chooseScreen(index)}
 					>
-						{item.label}
+						{screen.label}
 					</button>
 				{/each}
 			</div>
 		</div>
 	</div>
 
-	<div class="instruction-layout">
-		<aside class="menu-panel" aria-label="B1 menu tree">
-			<p class="panel-label">Menu stack</p>
-			{#each screens as screen, index (screen.id)}
-				<button
-					type="button"
-					class:active={index === activeIndex}
-					onclick={() => chooseScreen(index)}
-				>
-					<span style={`background:${screen.accent}`}></span>
-					<strong>{screen.label}</strong>
-					<em>{screen.title}</em>
-				</button>
-			{/each}
-		</aside>
+	<div class="control-rail">
+		<button type="button" onclick={() => rotateKnob(-1)}>Prev</button>
+		<button type="button" class="press" onclick={pressKnob}>Press</button>
+		<button type="button" onclick={() => rotateKnob(1)}>Next</button>
+	</div>
 
-		<section class="detail-panel" style={`--accent:${activeScreen.accent}`}>
-			<div>
-				<p class="panel-label">Selected display</p>
-				<h2>{activeScreen.title}</h2>
-				<p>{activeScreen.status}</p>
-			</div>
-			<div class="detail-visual">
-				<img src={activeScreen.image} alt={activeScreen.title} />
-				<div>
-					<strong>{activeScreen.value}</strong>
-					<span>{activeScreen.unit}</span>
-				</div>
-			</div>
-			<ul>
-				{#each activeScreen.lines as line (line)}
-					<li>{line}</li>
-				{/each}
-			</ul>
-		</section>
-
-		<section class="asset-panel">
-			<div class="asset-heading">
-				<div>
-					<p class="panel-label">Instruction images</p>
-					<h2>{assets.length} source assets</h2>
-				</div>
-				<input
-					type="search"
-					placeholder="Filter images"
-					bind:value={assetQuery}
-					aria-label="Filter instruction images"
-				/>
-			</div>
-
-			<div class="group-tabs" aria-label="Instruction image groups">
-				{#each groups as group (group)}
-					<button
-						type="button"
-						class:active={group === selectedGroup}
-						onclick={() => (selectedGroup = group)}
-					>
-						{group}
-					</button>
-				{/each}
-			</div>
-
-			<div class="asset-grid">
-				{#each visibleAssets as asset (asset.relativePath)}
-					<figure>
-						<div>
-							<img loading="lazy" src={asset.url} alt={asset.name} />
-						</div>
-						<figcaption>
-							<strong>{asset.name}</strong>
-							<span>{asset.relativePath}</span>
-						</figcaption>
-					</figure>
-				{/each}
-			</div>
-		</section>
+	<div class="image-strip" aria-label="B1 source UI images">
+		{#each stripAssets as asset (asset.relativePath)}
+			<img src={asset.url} alt={asset.name} />
+		{/each}
 	</div>
 </section>
 
 <style>
-	.instructions-shell {
-		width: min(100%, 1180px);
-		margin: 0 auto;
-		color: #f8fafc;
+	.b1-instructions {
+		position: relative;
+		min-height: 100vh;
+		width: 100%;
+		overflow: hidden;
+		background: #000;
+		color: #fff;
 		opacity: 0;
-		transform: translateY(12px);
+		transform: scale(1.025);
 		transition:
-			opacity 0.5s ease,
-			transform 0.5s ease;
+			opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+			transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
-	.instructions-shell.live {
+	.b1-instructions.booted {
 		opacity: 1;
-		transform: translateY(0);
+		transform: scale(1);
 	}
 
-	.hero-grid {
-		display: grid;
-		grid-template-columns: minmax(280px, 0.72fr) minmax(420px, 1.28fr);
-		gap: 2rem;
-		align-items: center;
-		min-height: calc(100vh - 8rem);
+	.instruction-bg {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+		pointer-events: none;
 	}
 
-	.intro-panel {
-		border: 1px solid rgba(148, 163, 184, 0.28);
-		background:
-			linear-gradient(140deg, rgba(7, 12, 20, 0.94), rgba(19, 28, 43, 0.72)),
-			radial-gradient(
-				circle at 20% 0%,
-				rgba(59, 183, 255, 0.28),
-				transparent 32%
-			);
-		border-radius: 8px;
-		padding: clamp(1.25rem, 3vw, 2.25rem);
-		box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+	.instruction-bg div {
+		position: absolute;
+		width: 64vw;
+		aspect-ratio: 1;
+		border: 1px solid rgba(110, 198, 255, 0.22);
+		border-radius: 50%;
+		filter: blur(0.4px);
+		opacity: 0.48;
 	}
 
-	.eyebrow,
-	.panel-label {
-		margin: 0 0 0.75rem;
+	.instruction-bg div:first-child {
+		right: -24vw;
+		top: -26vw;
+		box-shadow:
+			inset 0 0 90px rgba(59, 130, 246, 0.16),
+			0 0 110px rgba(59, 130, 246, 0.11);
+	}
+
+	.instruction-bg div:last-child {
+		left: -32vw;
+		bottom: -36vw;
+		box-shadow:
+			inset 0 0 100px rgba(16, 185, 129, 0.12),
+			0 0 130px rgba(59, 130, 246, 0.09);
+	}
+
+	.stage-copy {
+		position: absolute;
+		z-index: 6;
+		left: clamp(1.2rem, 4vw, 4rem);
+		top: clamp(1.2rem, 6vh, 4.5rem);
+		max-width: min(34rem, 48vw);
+		pointer-events: none;
+	}
+
+	.stage-copy p {
+		margin: 0 0 0.7rem;
 		color: #7dd3fc;
 		font-size: 0.72rem;
-		font-weight: 800;
-		letter-spacing: 0;
+		font-weight: 850;
 		text-transform: uppercase;
 	}
 
-	h1,
-	h2,
-	p {
-		margin-top: 0;
-	}
-
-	h1 {
-		max-width: 10ch;
-		margin-bottom: 1.2rem;
-		font-size: clamp(3rem, 7vw, 6.5rem);
-		line-height: 0.86;
+	.stage-copy h1 {
+		margin: 0;
+		font-size: clamp(3.25rem, 8.4vw, 9rem);
 		font-weight: 950;
+		line-height: 0.84;
 		letter-spacing: 0;
 	}
 
-	h2 {
-		margin-bottom: 0.5rem;
-		font-size: clamp(1.6rem, 3vw, 2.6rem);
-		line-height: 0.95;
-		font-weight: 900;
-		letter-spacing: 0;
-	}
-
-	.intro-copy {
-		max-width: 44rem;
-		color: #cbd5e1;
-		font-size: 1rem;
-		line-height: 1.65;
-	}
-
-	.control-row,
-	.screen-picker,
-	.group-tabs {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.6rem;
-	}
-
-	button,
-	input {
-		font: inherit;
-	}
-
-	button {
-		border: 1px solid rgba(148, 163, 184, 0.3);
-		background: rgba(15, 23, 42, 0.82);
-		color: #f8fafc;
-		border-radius: 7px;
-		cursor: pointer;
-		transition:
-			border-color 0.16s ease,
-			background 0.16s ease,
-			transform 0.16s ease;
-	}
-
-	button:hover,
-	button:focus-visible {
-		border-color: rgba(125, 211, 252, 0.86);
-		background: rgba(30, 41, 59, 0.92);
-		transform: translateY(-1px);
-		outline: none;
-	}
-
-	.control-row button {
-		min-height: 2.75rem;
-		padding: 0 1rem;
-		font-size: 0.85rem;
-		font-weight: 800;
-	}
-
-	.control-row .primary {
-		background: #f8fafc;
-		color: #030712;
-	}
-
-	.controller-stage {
-		display: grid;
-		gap: 1rem;
-	}
-
-	.device-frame {
+	.controller-wrap {
 		position: relative;
-		aspect-ratio: 1142 / 645;
-		isolation: isolate;
+		z-index: 4;
+		display: grid;
+		place-items: center;
+		min-height: 100vh;
+		padding: 8vh 4vw 12vh;
 	}
 
-	.device-image {
+	.controller-shell {
+		position: relative;
+		width: min(96vw, 1280px);
+		aspect-ratio: 1142 / 645;
+		transform: translateY(5vh);
+	}
+
+	.controller-image {
 		position: absolute;
 		inset: 0;
 		width: 100%;
 		height: 100%;
 		object-fit: contain;
-		filter: drop-shadow(0 34px 62px rgba(0, 0, 0, 0.62));
+		filter: drop-shadow(0 38px 90px rgba(0, 0, 0, 0.85))
+			drop-shadow(0 0 34px rgba(37, 99, 235, 0.16));
 	}
 
-	.screen-layer {
+	.controller-screen {
 		position: absolute;
 		left: 21%;
-		top: 21.6%;
-		z-index: 3;
-		width: 45.8%;
+		top: 21.5%;
+		z-index: 4;
+		width: 45.7%;
 		height: 55%;
-		padding: 0;
 		border: 0;
+		border-radius: 10px;
 		background: transparent;
-		border-radius: 8px;
-		transform: perspective(900px) rotateX(1deg) rotateY(-2deg) rotateZ(-0.4deg);
+		padding: 0;
+		cursor: pointer;
 		overflow: hidden;
+		transform: perspective(900px) rotateX(1deg) rotateY(-2deg) rotateZ(-0.4deg);
 	}
 
-	.screen-content {
+	.screen-ui {
 		display: grid;
 		grid-template-rows: auto 1fr auto;
 		width: 100%;
 		height: 100%;
-		padding: clamp(0.45rem, 1.5vw, 1rem);
 		background:
-			linear-gradient(180deg, rgba(2, 6, 14, 0.82), rgba(1, 4, 9, 0.96)),
 			radial-gradient(
-				circle at 70% 24%,
-				color-mix(in srgb, var(--accent), transparent 64%),
-				transparent 42%
-			);
-		box-shadow: inset 0 0 18px rgba(125, 211, 252, 0.22);
+				circle at 50% 44%,
+				rgba(45, 54, 70, 0.78),
+				transparent 32%
+			),
+			linear-gradient(180deg, #02040b 0%, #000 100%);
+		box-shadow:
+			inset 0 0 20px color-mix(in srgb, var(--accent), transparent 70%),
+			inset 0 0 1px rgba(255, 255, 255, 0.6);
+		padding: clamp(0.42rem, 1.35vw, 0.95rem);
 	}
 
-	.screen-topline,
-	.screen-lines {
+	.screen-header,
+	.screen-footer {
 		display: flex;
-		justify-content: space-between;
-		gap: 0.75rem;
-		color: #bae6fd;
-		font-size: clamp(0.42rem, 1.1vw, 0.72rem);
-		font-weight: 800;
-		text-transform: uppercase;
-	}
-
-	.screen-main {
-		display: grid;
-		grid-template-columns: 0.95fr 1.05fr;
-		gap: 0.75rem;
 		align-items: center;
+		justify-content: space-between;
+		gap: 0.8rem;
 		min-width: 0;
-	}
-
-	.screen-main img {
-		max-width: 100%;
-		max-height: 8.5rem;
-		margin: auto;
-		object-fit: contain;
-		image-rendering: auto;
-	}
-
-	.screen-main strong {
-		display: block;
-		color: var(--accent);
-		font-size: clamp(2rem, 7vw, 5.5rem);
-		line-height: 0.82;
+		color: #dff5ff;
+		font-size: clamp(0.4rem, 1vw, 0.72rem);
 		font-weight: 950;
-		letter-spacing: 0;
-		text-shadow: 0 0 22px color-mix(in srgb, var(--accent), transparent 45%);
-	}
-
-	.screen-main em {
-		display: block;
-		margin-top: 0.4rem;
-		color: #f8fafc;
-		font-style: normal;
-		font-size: clamp(0.7rem, 1.8vw, 1.05rem);
-		font-weight: 900;
 		text-transform: uppercase;
+		text-shadow: 0 0 10px rgba(125, 211, 252, 0.7);
 	}
 
-	.screen-lines {
+	.screen-footer {
 		justify-content: flex-start;
 		overflow: hidden;
 		white-space: nowrap;
+		color: color-mix(in srgb, var(--accent), white 42%);
 	}
 
-	.knob-target {
+	.controller-menu {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: clamp(0.32rem, 1vw, 0.75rem);
+		align-content: center;
+		padding: clamp(0.4rem, 1vw, 0.85rem) 0;
+	}
+
+	.controller-menu button {
+		display: grid;
+		place-items: center;
+		gap: 0.2rem;
+		min-width: 0;
+		min-height: clamp(2.5rem, 6vw, 4.8rem);
+		border: 1px solid color-mix(in srgb, var(--tile), transparent 44%);
+		border-radius: 8px;
+		background:
+			radial-gradient(
+				circle at 50% 15%,
+				color-mix(in srgb, var(--tile), transparent 70%),
+				transparent 55%
+			),
+			linear-gradient(180deg, rgba(8, 13, 22, 0.86), rgba(0, 0, 0, 0.86));
+		color: #fff;
+		font-size: clamp(0.48rem, 1.2vw, 0.82rem);
+		font-weight: 950;
+		text-transform: uppercase;
+		cursor: pointer;
+	}
+
+	.controller-menu img {
+		max-width: 42%;
+		max-height: clamp(1.15rem, 3vw, 2.4rem);
+		object-fit: contain;
+	}
+
+	.metric-screen,
+	.map-screen {
+		display: grid;
+		grid-template-columns: 0.9fr 1.1fr;
+		gap: clamp(0.5rem, 1.5vw, 1rem);
+		align-items: center;
+		min-height: 0;
+	}
+
+	.map-screen {
+		grid-template-columns: 1.08fr 0.92fr;
+	}
+
+	.metric-asset,
+	.map-screen > img {
+		display: grid;
+		place-items: center;
+		min-width: 0;
+	}
+
+	.metric-asset img,
+	.map-screen > img {
+		max-width: 100%;
+		max-height: clamp(4.5rem, 15vw, 10rem);
+		object-fit: contain;
+		filter: drop-shadow(
+			0 0 22px color-mix(in srgb, var(--accent), transparent 58%)
+		);
+	}
+
+	.metric-value strong,
+	.map-screen strong {
+		display: block;
+		color: var(--accent);
+		font-size: clamp(2.8rem, 8.5vw, 7rem);
+		font-weight: 950;
+		line-height: 0.78;
+		text-align: right;
+		text-shadow:
+			0 0 10px color-mix(in srgb, var(--accent), transparent 20%),
+			0 0 28px color-mix(in srgb, var(--accent), transparent 46%);
+	}
+
+	.metric-value em,
+	.map-screen em {
+		display: block;
+		margin-top: 0.45rem;
+		color: #fff;
+		font-size: clamp(0.7rem, 1.8vw, 1.25rem);
+		font-style: normal;
+		font-weight: 950;
+		text-align: right;
+		text-transform: uppercase;
+	}
+
+	.knob {
 		position: absolute;
 		right: 5%;
-		top: 35.5%;
-		z-index: 4;
+		top: 35.4%;
+		z-index: 5;
 		width: 18%;
 		aspect-ratio: 1;
 		border: 0;
 		border-radius: 999px;
-		background: radial-gradient(
-			circle at 38% 32%,
-			rgba(255, 255, 255, 0.44),
-			rgba(15, 18, 25, 0.18) 48%,
-			rgba(0, 0, 0, 0.04)
-		);
+		background: transparent;
+		cursor: pointer;
 	}
 
-	.knob-target span {
+	.knob span {
 		position: absolute;
-		inset: 18%;
+		inset: 16%;
 		border-radius: 999px;
 		background:
 			linear-gradient(
 				90deg,
 				transparent 48%,
-				rgba(255, 255, 255, 0.72) 49%,
-				rgba(255, 255, 255, 0.72) 52%,
+				rgba(255, 255, 255, 0.88) 49%,
+				rgba(255, 255, 255, 0.88) 52%,
 				transparent 53%
 			),
-			radial-gradient(circle at 35% 28%, #a7abb4, #2b2d34 54%, #0f1014);
+			radial-gradient(circle at 35% 28%, #b9bdc7, #2d2f36 54%, #090a0e);
 		box-shadow:
-			inset -12px -12px 22px rgba(0, 0, 0, 0.48),
-			inset 8px 8px 16px rgba(255, 255, 255, 0.18),
-			0 12px 22px rgba(0, 0, 0, 0.5);
-		transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+			inset -12px -12px 22px rgba(0, 0, 0, 0.56),
+			inset 8px 8px 16px rgba(255, 255, 255, 0.2),
+			0 14px 26px rgba(0, 0, 0, 0.58);
+		transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
-	.screen-picker button,
-	.group-tabs button {
-		min-height: 2.25rem;
-		padding: 0 0.8rem;
-		font-size: 0.78rem;
-		font-weight: 800;
+	.screen-hotspots {
+		position: absolute;
+		left: 22.3%;
+		top: 79.5%;
+		z-index: 8;
+		display: flex;
+		width: 44%;
+		gap: 0.35rem;
+		justify-content: center;
 	}
 
-	.screen-picker button.active,
-	.group-tabs button.active {
-		border-color: #7dd3fc;
-		background: #e0f2fe;
+	.screen-hotspots button,
+	.control-rail button {
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		border-radius: 999px;
+		background: rgba(1, 4, 12, 0.74);
+		color: #fff;
+		font-size: clamp(0.48rem, 1vw, 0.74rem);
+		font-weight: 900;
+		text-transform: uppercase;
+		cursor: pointer;
+		transition:
+			background 0.16s ease,
+			border-color 0.16s ease,
+			transform 0.16s ease;
+	}
+
+	.screen-hotspots button {
+		min-width: 0;
+		padding: 0.38rem 0.52rem;
+	}
+
+	.screen-hotspots button.active,
+	.screen-hotspots button:hover {
+		border-color: var(--accent);
+		background: color-mix(in srgb, var(--accent), rgba(1, 4, 12, 0.84) 72%);
+		transform: translateY(-1px);
+	}
+
+	.control-rail {
+		position: absolute;
+		z-index: 10;
+		right: clamp(1rem, 4vw, 4rem);
+		bottom: clamp(1rem, 4vh, 3.5rem);
+		display: flex;
+		gap: 0.55rem;
+	}
+
+	.control-rail button {
+		min-height: 2.6rem;
+		padding: 0 1rem;
+		backdrop-filter: blur(14px);
+	}
+
+	.control-rail .press {
+		background: #fff;
 		color: #020617;
 	}
 
-	.instruction-layout {
-		display: grid;
-		grid-template-columns: minmax(210px, 0.55fr) minmax(280px, 0.85fr) minmax(
-				420px,
-				1.6fr
-			);
-		gap: 1rem;
-		align-items: start;
-		padding-bottom: 3rem;
-	}
-
-	.menu-panel,
-	.detail-panel,
-	.asset-panel {
-		border: 1px solid rgba(148, 163, 184, 0.22);
-		border-radius: 8px;
-		background: rgba(8, 13, 23, 0.88);
-		box-shadow: 0 18px 56px rgba(0, 0, 0, 0.26);
-	}
-
-	.menu-panel {
-		position: sticky;
-		top: 1rem;
-		display: grid;
-		gap: 0.5rem;
-		padding: 1rem;
-	}
-
-	.menu-panel button {
-		display: grid;
-		grid-template-columns: 0.65rem 2.8rem 1fr;
-		gap: 0.65rem;
-		align-items: center;
-		min-height: 3rem;
-		padding: 0.5rem 0.65rem;
-		text-align: left;
-	}
-
-	.menu-panel button.active {
-		border-color: #e0f2fe;
-		background: rgba(224, 242, 254, 0.14);
-	}
-
-	.menu-panel button span {
-		width: 0.65rem;
-		height: 0.65rem;
-		border-radius: 999px;
-	}
-
-	.menu-panel strong,
-	.menu-panel em {
-		font-size: 0.76rem;
-		line-height: 1.15;
-		letter-spacing: 0;
-	}
-
-	.menu-panel em {
-		color: #94a3b8;
-		font-style: normal;
-	}
-
-	.detail-panel {
-		display: grid;
-		gap: 1rem;
-		padding: 1.1rem;
-	}
-
-	.detail-panel p {
-		color: #cbd5e1;
-		line-height: 1.55;
-	}
-
-	.detail-visual {
-		display: grid;
-		grid-template-columns: minmax(7rem, 0.7fr) 1fr;
-		gap: 1rem;
-		align-items: center;
-		min-height: 10rem;
-		border-radius: 7px;
-		background:
-			linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(2, 6, 23, 0.96)),
-			radial-gradient(
-				circle at 0% 0%,
-				color-mix(in srgb, var(--accent), transparent 74%),
-				transparent 42%
-			);
-		padding: 1rem;
-	}
-
-	.detail-visual img {
-		max-width: 100%;
-		max-height: 9rem;
-		margin: auto;
-		object-fit: contain;
-	}
-
-	.detail-visual strong {
-		display: block;
-		color: var(--accent);
-		font-size: clamp(2.6rem, 6vw, 5rem);
-		line-height: 0.9;
-		font-weight: 950;
-	}
-
-	.detail-visual span {
-		color: #e2e8f0;
-		font-weight: 900;
-		text-transform: uppercase;
-	}
-
-	.detail-panel ul {
-		display: grid;
-		gap: 0.55rem;
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
-
-	.detail-panel li {
-		border-left: 3px solid var(--accent);
-		background: rgba(15, 23, 42, 0.68);
-		padding: 0.65rem 0.8rem;
-		color: #dbeafe;
-		font-size: 0.88rem;
-	}
-
-	.asset-panel {
-		display: grid;
-		gap: 1rem;
-		padding: 1rem;
-	}
-
-	.asset-heading {
+	.image-strip {
+		position: absolute;
+		z-index: 9;
+		left: clamp(1rem, 4vw, 4rem);
+		bottom: clamp(1rem, 4vh, 3.5rem);
 		display: flex;
-		gap: 1rem;
-		justify-content: space-between;
-		align-items: start;
-	}
-
-	.asset-heading input {
-		width: min(100%, 15rem);
-		min-height: 2.5rem;
-		border: 1px solid rgba(148, 163, 184, 0.32);
-		border-radius: 7px;
-		background: rgba(2, 6, 23, 0.74);
-		color: #f8fafc;
-		padding: 0 0.8rem;
-		outline: none;
-	}
-
-	.asset-heading input:focus {
-		border-color: #7dd3fc;
-	}
-
-	.group-tabs {
-		max-height: 8rem;
-		overflow: auto;
-		padding-bottom: 0.2rem;
-	}
-
-	.asset-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
-		gap: 0.75rem;
-		max-height: 40rem;
-		overflow: auto;
-		padding-right: 0.25rem;
-	}
-
-	figure {
-		min-width: 0;
-		margin: 0;
-		border: 1px solid rgba(148, 163, 184, 0.2);
-		border-radius: 7px;
-		background: rgba(2, 6, 23, 0.75);
+		max-width: min(45vw, 40rem);
+		gap: 0.45rem;
 		overflow: hidden;
 	}
 
-	figure div {
-		display: grid;
-		place-items: center;
-		aspect-ratio: 1.24;
-		background:
-			linear-gradient(45deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.78)),
-			repeating-linear-gradient(
-				45deg,
-				rgba(255, 255, 255, 0.04) 0 1px,
-				transparent 1px 8px
-			);
-	}
-
-	figure img {
-		max-width: 86%;
-		max-height: 86%;
+	.image-strip img {
+		width: clamp(2.4rem, 5vw, 4.8rem);
+		aspect-ratio: 1;
 		object-fit: contain;
-		image-rendering: auto;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 7px;
+		background: rgba(255, 255, 255, 0.04);
+		padding: 0.25rem;
 	}
 
-	figcaption {
-		display: grid;
-		gap: 0.25rem;
-		padding: 0.55rem;
-	}
-
-	figcaption strong {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		font-size: 0.76rem;
-		line-height: 1.15;
-	}
-
-	figcaption span {
-		overflow-wrap: anywhere;
-		color: #94a3b8;
-		font-size: 0.64rem;
-		line-height: 1.25;
-	}
-
-	@media (max-width: 1040px) {
-		.hero-grid,
-		.instruction-layout {
-			grid-template-columns: 1fr;
-		}
-
-		.hero-grid {
-			min-height: 0;
-		}
-
-		.menu-panel {
+	@media (max-width: 900px) {
+		.stage-copy {
 			position: relative;
+			left: auto;
 			top: auto;
-			grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+			max-width: none;
+			padding: 1.25rem 1rem 0;
+		}
+
+		.stage-copy h1 {
+			font-size: clamp(3.4rem, 16vw, 5.8rem);
+		}
+
+		.controller-wrap {
+			min-height: auto;
+			padding: 2rem 0 9rem;
+		}
+
+		.controller-shell {
+			width: 130vw;
+			transform: translateX(-10vw);
+		}
+
+		.screen-hotspots {
+			left: 24%;
+			top: 82%;
+			width: 40%;
+			flex-wrap: wrap;
+		}
+
+		.control-rail {
+			right: 1rem;
+		}
+
+		.image-strip {
+			left: 1rem;
+			max-width: calc(100vw - 11rem);
 		}
 	}
 
-	@media (max-width: 640px) {
-		.instructions-shell {
-			width: 100%;
+	@media (max-width: 560px) {
+		.controller-shell {
+			width: 170vw;
+			transform: translateX(-24vw);
 		}
 
-		.intro-panel {
-			padding: 1rem;
-		}
-
-		h1 {
-			max-width: 8ch;
-			font-size: clamp(2.55rem, 16vw, 4rem);
-		}
-
-		.controller-stage {
-			margin-inline: -1rem;
-		}
-
-		.screen-topline,
-		.screen-lines {
-			font-size: 0.42rem;
-		}
-
-		.screen-lines span:nth-child(n + 2) {
+		.screen-hotspots {
 			display: none;
 		}
 
-		.asset-heading,
-		.detail-visual {
-			grid-template-columns: 1fr;
-		}
-
-		.asset-heading {
-			display: grid;
+		.image-strip {
+			display: none;
 		}
 	}
 </style>

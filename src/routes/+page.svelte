@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import Footer from '$lib/components/Footer.svelte';
 	let checkoutAvailable = false;
 	let isCheckoutProcessing = false;
+	let isInstructionTransition = false;
 	let checkoutError = '';
 	const b1FullPrice = 590;
 	const b1DepositPrice = b1FullPrice / 2;
@@ -267,6 +269,13 @@
 		else node?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	}
 
+	function handleInstructionsClick() {
+		isInstructionTransition = true;
+		window.setTimeout(() => {
+			void goto('/b1/instructions');
+		}, 520);
+	}
+
 	let parallaxRAF: number | null = null;
 	function handleParallax() {
 		if (!scroller || parallaxRAF) return;
@@ -461,7 +470,16 @@
 	/>
 </svelte:head>
 
-<div class="relative w-full vh-fix">
+{#if isInstructionTransition}
+	<div class="instruction-transition" aria-hidden="true">
+		<img src="/images/b1/b1.png" alt="" />
+	</div>
+{/if}
+
+<div
+	class="relative w-full vh-fix"
+	class:route-fading={isInstructionTransition}
+>
 	<nav
 		class="fixed top-1/2 right-[46px] -translate-y-1/2 z-[230]"
 		aria-label="Section navigation"
@@ -552,6 +570,11 @@
 							>
 						</div>
 					{/if}
+					<button
+						on:click={handleInstructionsClick}
+						class="rounded-full border-2 border-blue-300/45 bg-blue-500/10 hover:bg-blue-500/20 hover:border-blue-200 text-white font-semibold tracking-wide px-7 py-3.5 text-base transition-all hover:scale-105"
+						>Instructions</button
+					>
 					<button
 						on:click={() => handleNavClick('features')}
 						class="rounded-full border-2 border-white/30 hover:border-white/60 text-white font-semibold tracking-wide px-7 py-3.5 text-base transition-all hover:scale-105"
@@ -1262,6 +1285,57 @@
 </div>
 
 <style>
+	.route-fading {
+		animation: routeFadeOut 0.54s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+	}
+
+	.instruction-transition {
+		position: fixed;
+		inset: 0;
+		z-index: 999;
+		display: grid;
+		place-items: center;
+		background: #000;
+		pointer-events: none;
+		animation: transitionCover 0.58s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+	}
+
+	.instruction-transition img {
+		width: min(88vw, 1060px);
+		height: auto;
+		object-fit: contain;
+		filter: drop-shadow(0 40px 110px rgba(0, 122, 255, 0.34));
+		animation: transitionController 0.58s cubic-bezier(0.76, 0, 0.24, 1)
+			forwards;
+	}
+
+	@keyframes routeFadeOut {
+		to {
+			opacity: 0;
+			transform: scale(0.985);
+		}
+	}
+
+	@keyframes transitionCover {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	@keyframes transitionController {
+		from {
+			opacity: 0;
+			transform: translateY(5vh) scale(0.74);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0) scale(1);
+		}
+	}
+
 	/* Hide scrollbar utility (commented out to avoid unused-selector warning)
 .scrollbar-none::-webkit-scrollbar{display:none}
 */

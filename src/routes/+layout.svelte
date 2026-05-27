@@ -9,6 +9,7 @@
 
 	const ROUTE_TITLES: Record<string, string> = {
 		'/': 'B1 Boost Controller | Gizzmo Electronics',
+		'/b1/instructions': 'B1 Instructions | Gizzmo Electronics',
 		'/downloads': 'Downloads | Gizzmo Electronics',
 		'/support': 'Support | Gizzmo Electronics',
 		'/store': 'Store | Gizzmo Electronics',
@@ -17,7 +18,9 @@
 	};
 
 	$: pageTitle = ROUTE_TITLES[$page.url.pathname] ?? 'Gizzmo Electronics';
-	$: isB1 = $page.url.pathname === '/';
+	$: isB1 =
+		$page.url.pathname === '/' ||
+		$page.url.pathname.startsWith('/b1/instructions');
 
 	let revealChrome = false;
 	let hideTimer: ReturnType<typeof setTimeout> | undefined;
@@ -152,7 +155,17 @@
 						class:nav-link-active={$page.url.pathname === '/downloads'}
 						>Downloads</a
 					>
-					<a href="/" class="nav-link nav-link-active">B1 Controller</a>
+					<a
+						href="/b1/instructions"
+						class="nav-link"
+						class:nav-link-active={$page.url.pathname === '/b1/instructions'}
+						>Instructions</a
+					>
+					<a
+						href="/"
+						class="nav-link"
+						class:nav-link-active={$page.url.pathname === '/'}>B1 Controller</a
+					>
 				</nav>
 			</div>
 		</div>
