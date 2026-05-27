@@ -259,7 +259,7 @@
 		<div class="controller-shell" aria-label="Interactive B1 controller">
 			<img
 				class="controller-image"
-				src={assetUrl('TheRest/display.bmp')}
+				src="/images/b1/b1.png"
 				alt="B1 controller"
 			/>
 
@@ -446,14 +446,14 @@
 		display: grid;
 		place-items: center;
 		min-height: 100vh;
-		padding: 8vh 4vw 12vh;
+		padding: 15vh 4vw 12vh;
 	}
 
 	.controller-shell {
 		position: relative;
-		width: min(96vw, 1280px);
-		aspect-ratio: 1142 / 645;
-		transform: translateY(5vh);
+		width: min(88vw, 1120px);
+		aspect-ratio: 1016 / 460;
+		transform: translateY(7vh);
 	}
 
 	.controller-image {
@@ -468,18 +468,17 @@
 
 	.controller-screen {
 		position: absolute;
-		left: 21%;
-		top: 21.5%;
+		left: 8.1%;
+		top: 14.4%;
 		z-index: 4;
-		width: 45.7%;
-		height: 55%;
+		width: 54.2%;
+		height: 63.4%;
 		border: 0;
-		border-radius: 10px;
+		border-radius: 22px;
 		background: transparent;
 		padding: 0;
 		cursor: pointer;
 		overflow: hidden;
-		transform: perspective(900px) rotateX(1deg) rotateY(-2deg) rotateZ(-0.4deg);
 	}
 
 	.screen-ui {
@@ -614,10 +613,10 @@
 
 	.knob {
 		position: absolute;
-		right: 5%;
-		top: 35.4%;
+		right: 6.1%;
+		top: 19.3%;
 		z-index: 5;
-		width: 18%;
+		width: 23.5%;
 		aspect-ratio: 1;
 		border: 0;
 		border-radius: 999px;
@@ -627,7 +626,7 @@
 
 	.knob span {
 		position: absolute;
-		inset: 16%;
+		inset: 12%;
 		border-radius: 999px;
 		background:
 			linear-gradient(
@@ -637,21 +636,26 @@
 				rgba(255, 255, 255, 0.88) 52%,
 				transparent 53%
 			),
-			radial-gradient(circle at 35% 28%, #b9bdc7, #2d2f36 54%, #090a0e);
+			repeating-radial-gradient(
+				circle at 50% 50%,
+				rgba(255, 255, 255, 0.12) 0 1px,
+				transparent 1px 4px
+			),
+			radial-gradient(circle at 38% 30%, #91949b, #202126 58%, #090a0e);
 		box-shadow:
-			inset -12px -12px 22px rgba(0, 0, 0, 0.56),
-			inset 8px 8px 16px rgba(255, 255, 255, 0.2),
-			0 14px 26px rgba(0, 0, 0, 0.58);
+			inset -10px -10px 24px rgba(0, 0, 0, 0.62),
+			inset 7px 7px 15px rgba(255, 255, 255, 0.18),
+			0 12px 24px rgba(0, 0, 0, 0.52);
 		transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
 	.screen-hotspots {
 		position: absolute;
-		left: 22.3%;
-		top: 79.5%;
+		left: 8.4%;
+		top: 80.6%;
 		z-index: 8;
 		display: flex;
-		width: 44%;
+		width: 53.5%;
 		gap: 0.35rem;
 		justify-content: center;
 	}
@@ -744,14 +748,14 @@
 		}
 
 		.controller-shell {
-			width: 130vw;
-			transform: translateX(-10vw);
+			width: 142vw;
+			transform: translateX(-15vw);
 		}
 
 		.screen-hotspots {
-			left: 24%;
+			left: 8.5%;
 			top: 82%;
-			width: 40%;
+			width: 53%;
 			flex-wrap: wrap;
 		}
 
@@ -767,8 +771,8 @@
 
 	@media (max-width: 560px) {
 		.controller-shell {
-			width: 170vw;
-			transform: translateX(-24vw);
+			width: 190vw;
+			transform: translateX(-32vw);
 		}
 
 		.screen-hotspots {
