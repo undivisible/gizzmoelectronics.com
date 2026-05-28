@@ -41,6 +41,7 @@
 	const red = '#ff4e64';
 	const memoryCount = 6;
 	const holdDelayMs = 520;
+	const wheelResetDelayMs = 320;
 
 	const imageBase = '/images/b1/instructions/';
 	function glyphSrc(character: string): string | undefined {
@@ -63,6 +64,25 @@
 		return text.split('').map((character) => {
 			if (character === ' ') return { kind: 'space' };
 			const src = glyphSrc(character);
+			if (src) return { kind: 'image', src, character };
+			return { kind: 'fallback', character };
+		});
+	}
+
+	function bigDigitSrc(character: string): string | undefined {
+		if (character >= '0' && character <= '9') {
+			return `${imageBase}0%20to%209/29pixHigh/BigCool${character}.bmp`;
+		}
+		if (character === '.') {
+			return `${imageBase}0%20to%209/29pixHigh/BigCoolDot.bmp`;
+		}
+		return undefined;
+	}
+
+	function bigGlyphs(text: string): Glyph[] {
+		return text.split('').map((character) => {
+			if (character === ' ') return { kind: 'space' };
+			const src = bigDigitSrc(character);
 			if (src) return { kind: 'image', src, character };
 			return { kind: 'fallback', character };
 		});
@@ -377,6 +397,8 @@
 	let dragLastY = 0;
 	let dragActive = false;
 	let dragMoved = false;
+	let wheelDeltaBuffer = 0;
+	let lastWheelAt = 0;
 	let activeScreen = $derived(screens[activeIndex]);
 	let activeRowIndex = $derived(selectedRowIndex(activeScreen));
 	let activeLive = $derived(
@@ -489,7 +511,7 @@
 	}
 
 	function rotateKnob(direction: number) {
-		if (activeScreen.id === 'live' && memoryAdjusting) {
+		if (memoryAdjusting) {
 			moveMemory(direction);
 		} else if (editingRow) {
 			changeValue(direction);
@@ -529,7 +551,8 @@
 		holdTimer = null;
 		holdTriggered = true;
 		editingRow = null;
-		if (activeScreen.id === 'live') {
+		if (activeScreen.id === 'live' || activeScreen.id === 'main') {
+			chooseScreenId('set-memory');
 			memoryAdjusting = true;
 		} else {
 			chooseScreenId('live');
@@ -582,7 +605,23 @@
 
 	function handleWheel(event: WheelEvent) {
 		event.preventDefault();
-		rotateKnob(event.deltaY > 0 ? 1 : -1);
+		const scaledDelta =
+			event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
+		const now = performance.now();
+		if (now - lastWheelAt > wheelResetDelayMs) wheelDeltaBuffer = 0;
+		lastWheelAt = now;
+
+		if (Math.abs(scaledDelta) >= 85) {
+			wheelDeltaBuffer = 0;
+			rotateKnob(scaledDelta > 0 ? 1 : -1);
+			return;
+		}
+
+		wheelDeltaBuffer += scaledDelta;
+		if (Math.abs(wheelDeltaBuffer) >= 120) {
+			rotateKnob(wheelDeltaBuffer > 0 ? 1 : -1);
+			wheelDeltaBuffer = 0;
+		}
 	}
 
 	function rowClick(row: MenuRow, index: number) {
@@ -621,11 +660,25 @@
 	</span>
 {/snippet}
 
+{#snippet bigDigitText(text: string)}
+	<span class="big-digit-text" aria-label={text}>
+		{#each bigGlyphs(text) as glyph, index (`${text}-${index}`)}
+			{#if glyph.kind === 'space'}
+				<span class="big-digit-space"></span>
+			{:else if glyph.kind === 'image' && glyph.src}
+				<img src={glyph.src} class:dot-glyph={glyph.character === '.'} alt="" />
+			{:else}
+				<span class="big-digit-fallback">{glyph.character}</span>
+			{/if}
+		{/each}
+	</span>
+{/snippet}
+
 <svelte:head>
-	<title>B1 Instructions | Gizzmo Electronics</title>
+	<title>B1 Interface | Gizzmo Electronics</title>
 	<meta
 		name="description"
-		content="A full-screen interactive B1 boost controller instruction simulator based on the supplied controller UI images."
+		content="Interactive B1 boost controller interface simulator."
 	/>
 </svelte:head>
 
@@ -676,13 +729,27 @@
 							/>
 						</div>
 					{:else if activeScreen.mode === 'live' && activeLive}
-						<div
-							class="live-screen"
-							aria-label={`Memory ${activeLive.memory}`}
-						></div>
+						<div class="live-screen" aria-label={`Memory ${activeLive.memory}`}>
+							<img class="live-arc" src={`${imageBase}Bars/Base.bmp`} alt="" />
+							<div class="live-rpm-label">
+								{@render glyphText('RPM', 'cyan')}
+							</div>
+							<div class="live-rpm-value">
+								{@render bigDigitText(activeLive.rpm)}
+							</div>
+							<div class="live-unit">
+								{@render glyphText(activeLive.label, 'cyan')}
+							</div>
+							<div class="live-pressure">
+								{@render bigDigitText(activeLive.psi)}
+							</div>
+							<div class="live-memory-rail">
+								{@render glyphText(`MEMORY ${activeLive.memory}`, 'lime')}
+							</div>
+						</div>
 					{:else}
 						<div class="menu-screen">
-							<div class="vertical-title">
+							<div class="screen-title">
 								{@render glyphText(activeScreen.title, 'cyan')}
 							</div>
 							{#if activeScreen.icon}
@@ -818,9 +885,9 @@
 		overflow: hidden;
 	}
 
-	.screen-ui.mode-live {
-		background: transparent;
-		box-shadow: none;
+	.controller-screen:focus,
+	.knob:focus {
+		outline: none;
 	}
 
 	.screen-ui {
@@ -842,6 +909,13 @@
 			inset 0 0 18px color-mix(in srgb, var(--accent), transparent 70%),
 			inset 0 0 1px rgba(255, 255, 255, 0.5);
 		overflow: hidden;
+	}
+
+	.screen-ui.mode-live {
+		background: #000;
+		box-shadow:
+			inset 0 0 18px rgba(120, 220, 255, 0.18),
+			inset 0 0 1px rgba(255, 255, 255, 0.52);
 	}
 
 	.glyph-text {
@@ -902,6 +976,42 @@
 			drop-shadow(0 0 8px rgba(255, 78, 100, 0.84));
 	}
 
+	.big-digit-text {
+		display: inline-flex;
+		align-items: flex-end;
+		gap: clamp(0.08rem, 0.18vw, 0.16rem);
+		font-size: 0;
+		line-height: 1;
+		filter: drop-shadow(0 0 8px rgba(236, 254, 255, 0.64))
+			drop-shadow(0 0 18px rgba(125, 211, 252, 0.28));
+	}
+
+	.big-digit-text img {
+		display: block;
+		width: auto;
+		height: clamp(1.9rem, 6.6vw, 4.72rem);
+		object-fit: contain;
+		image-rendering: pixelated;
+		mix-blend-mode: screen;
+	}
+
+	.big-digit-text img.dot-glyph {
+		height: clamp(0.46rem, 1.58vw, 1.12rem);
+		margin-bottom: clamp(0.28rem, 1vw, 0.74rem);
+	}
+
+	.big-digit-space {
+		width: clamp(0.2rem, 0.5vw, 0.42rem);
+	}
+
+	.big-digit-fallback {
+		color: var(--screen-white);
+		font:
+			900 clamp(2.4rem, 8vw, 6rem) Impact,
+			sans-serif;
+		line-height: 0.78;
+	}
+
 	.splash-screen {
 		display: grid;
 		place-content: center;
@@ -929,45 +1039,112 @@
 		height: 100%;
 	}
 
+	.live-arc {
+		position: absolute;
+		left: -5.8%;
+		top: -8%;
+		width: auto;
+		height: 114%;
+		object-fit: contain;
+		image-rendering: pixelated;
+		mix-blend-mode: screen;
+		opacity: 0.96;
+	}
+
+	.live-rpm-label {
+		position: absolute;
+		left: 57.2%;
+		top: 8.4%;
+		z-index: 2;
+	}
+
+	.live-rpm-label .glyph-text img,
+	.live-unit .glyph-text img {
+		height: clamp(0.86rem, 1.78vw, 1.32rem);
+	}
+
+	.live-rpm-value {
+		position: absolute;
+		right: 13.8%;
+		top: 16.5%;
+		z-index: 2;
+	}
+
+	.live-rpm-value .big-digit-text img {
+		height: clamp(1.9rem, 5.2vw, 3.78rem);
+	}
+
+	.live-unit {
+		position: absolute;
+		left: 18.8%;
+		top: 38.8%;
+		z-index: 2;
+	}
+
+	.live-pressure {
+		position: absolute;
+		left: 33.4%;
+		top: 42.4%;
+		z-index: 2;
+	}
+
+	.live-memory-rail {
+		position: absolute;
+		right: -3.6%;
+		top: 53%;
+		z-index: 2;
+		transform: translateY(-50%) rotate(90deg);
+		transform-origin: center;
+	}
+
+	.live-memory-rail .glyph-text {
+		gap: 0;
+	}
+
+	.live-memory-rail .glyph-text img {
+		height: clamp(0.78rem, 1.7vw, 1.26rem);
+	}
+
+	.memory-active .live-memory-rail,
+	.memory-active .screen-title {
+		animation: memory-pulse 0.82s steps(2, jump-none) infinite;
+	}
+
 	.menu-screen {
 		position: relative;
 		display: block;
 		height: 100%;
 	}
 
-	.vertical-title {
+	.screen-title {
 		position: absolute;
-		left: 2.6%;
-		top: 1.6%;
+		left: 4.4%;
+		top: 4.2%;
 		z-index: 3;
 		display: flex;
 		align-items: center;
-		justify-content: center;
-		width: 9%;
-		height: 96%;
+		max-width: 86%;
 		overflow: visible;
 	}
 
-	.vertical-title .glyph-text {
-		transform: rotate(-90deg);
-		transform-origin: center;
+	.screen-title .glyph-text {
 		white-space: nowrap;
 		gap: 0;
 	}
 
-	.vertical-title .glyph-text img {
+	.screen-title .glyph-text img {
 		height: clamp(0.68rem, 1.45vw, 1.08rem);
 	}
 
-	.vertical-title .glyph-space {
+	.screen-title .glyph-space {
 		width: clamp(0.16rem, 0.34vw, 0.26rem);
 	}
 
 	.menu-rows {
 		position: absolute;
-		left: 19.2%;
-		top: 30%;
-		right: 5.8%;
+		left: 6.2%;
+		top: 29.5%;
+		right: 6.4%;
 		bottom: 13%;
 		z-index: 2;
 		display: flex;
@@ -978,7 +1155,7 @@
 	}
 
 	.menu-rows.compact {
-		top: 29%;
+		top: 28.2%;
 		gap: clamp(0.01rem, 0.08vw, 0.05rem);
 	}
 
@@ -1003,17 +1180,17 @@
 	}
 
 	.mode-values .menu-rows {
-		top: 23%;
+		top: 22.5%;
 		bottom: 8%;
 	}
 
 	.mode-values .menu-rows.compact,
 	.mode-confirm .menu-rows.compact {
-		top: 22%;
+		top: 22.5%;
 	}
 
 	.mode-confirm .menu-rows {
-		top: 34%;
+		top: 31%;
 	}
 
 	.menu-rows button.clickable {
@@ -1071,7 +1248,7 @@
 	.screen-icon {
 		position: absolute;
 		right: 4.3%;
-		top: 7%;
+		top: 8%;
 		z-index: 1;
 		width: clamp(1rem, 2.6vw, 2rem);
 		height: clamp(1rem, 2.6vw, 2rem);
@@ -1087,10 +1264,10 @@
 
 	.knob {
 		position: absolute;
-		right: 9.7%;
-		top: 23.6%;
+		right: 8.45%;
+		top: 21.6%;
 		z-index: 5;
-		width: 20.8%;
+		width: 23.2%;
 		aspect-ratio: 1;
 		border: 0;
 		border-radius: 999px;
