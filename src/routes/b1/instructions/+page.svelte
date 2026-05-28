@@ -652,7 +652,7 @@
 			{#if glyph.kind === 'space'}
 				<span class="glyph-space"></span>
 			{:else if glyph.kind === 'image' && glyph.src}
-				<img src={glyph.src} alt="" />
+				<img src={glyph.src} class:dot-glyph={glyph.character === '.'} alt="" />
 			{:else}
 				<span class="glyph-fallback">{glyph.character}</span>
 			{/if}
@@ -866,8 +866,7 @@
 		width: 100%;
 		height: 100%;
 		object-fit: contain;
-		filter: drop-shadow(0 38px 90px rgba(0, 0, 0, 0.85))
-			drop-shadow(0 0 34px rgba(37, 99, 235, 0.16));
+		filter: drop-shadow(0 38px 90px rgba(0, 0, 0, 0.75));
 	}
 
 	.controller-screen {
@@ -893,29 +892,14 @@
 	.screen-ui {
 		width: 100%;
 		height: 100%;
-		background:
-			radial-gradient(
-				circle at 48% 42%,
-				rgba(64, 78, 111, 0.55),
-				transparent 30%
-			),
-			repeating-radial-gradient(
-				circle at 50% 50%,
-				rgba(255, 255, 255, 0.025) 0 1px,
-				transparent 1px 5px
-			),
-			linear-gradient(180deg, #071225 0%, #030712 50%, #000 100%);
-		box-shadow:
-			inset 0 0 18px color-mix(in srgb, var(--accent), transparent 70%),
-			inset 0 0 1px rgba(255, 255, 255, 0.5);
+		background: linear-gradient(180deg, #050b18 0%, #020510 56%, #000 100%);
+		box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.36);
 		overflow: hidden;
 	}
 
 	.screen-ui.mode-live {
 		background: #000;
-		box-shadow:
-			inset 0 0 18px rgba(120, 220, 255, 0.18),
-			inset 0 0 1px rgba(255, 255, 255, 0.52);
+		box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.42);
 	}
 
 	.glyph-text {
@@ -925,7 +909,6 @@
 		min-width: 0;
 		line-height: 1;
 		font-size: 0;
-		filter: drop-shadow(0 0 7px rgba(255, 255, 255, 0.48));
 	}
 
 	.glyph-text img {
@@ -935,6 +918,12 @@
 		object-fit: contain;
 		image-rendering: pixelated;
 		mix-blend-mode: screen;
+	}
+
+	.glyph-text img.dot-glyph {
+		align-self: flex-end;
+		height: clamp(0.18rem, 0.42vw, 0.32rem);
+		margin-bottom: clamp(0.1rem, 0.26vw, 0.2rem);
 	}
 
 	.glyph-space {
@@ -955,25 +944,22 @@
 
 	.glyph-cyan img,
 	.glyph-cyan .glyph-fallback {
-		filter: drop-shadow(0 0 8px rgba(120, 220, 255, 0.8));
+		filter: none;
 	}
 
 	.glyph-lime img,
 	.glyph-lime .glyph-fallback {
-		filter: hue-rotate(72deg) saturate(1.75)
-			drop-shadow(0 0 8px rgba(183, 255, 34, 0.84));
+		filter: hue-rotate(72deg) saturate(1.75);
 	}
 
 	.glyph-blue img,
 	.glyph-blue .glyph-fallback {
-		filter: hue-rotate(18deg) saturate(1.4)
-			drop-shadow(0 0 8px rgba(71, 118, 255, 0.84));
+		filter: hue-rotate(18deg) saturate(1.4);
 	}
 
 	.glyph-red img,
 	.glyph-red .glyph-fallback {
-		filter: hue-rotate(155deg) saturate(1.8)
-			drop-shadow(0 0 8px rgba(255, 78, 100, 0.84));
+		filter: hue-rotate(155deg) saturate(1.8);
 	}
 
 	.big-digit-text {
@@ -982,8 +968,6 @@
 		gap: clamp(0.08rem, 0.18vw, 0.16rem);
 		font-size: 0;
 		line-height: 1;
-		filter: drop-shadow(0 0 8px rgba(236, 254, 255, 0.64))
-			drop-shadow(0 0 18px rgba(125, 211, 252, 0.28));
 	}
 
 	.big-digit-text img {
@@ -996,8 +980,8 @@
 	}
 
 	.big-digit-text img.dot-glyph {
-		height: clamp(0.46rem, 1.58vw, 1.12rem);
-		margin-bottom: clamp(0.28rem, 1vw, 0.74rem);
+		height: clamp(0.26rem, 0.84vw, 0.6rem);
+		margin-bottom: clamp(0.22rem, 0.7vw, 0.5rem);
 	}
 
 	.big-digit-space {
@@ -1137,7 +1121,7 @@
 	}
 
 	.screen-title .glyph-space {
-		width: clamp(0.16rem, 0.34vw, 0.26rem);
+		width: clamp(0.32rem, 0.74vw, 0.56rem);
 	}
 
 	.menu-rows {
@@ -1214,7 +1198,6 @@
 		height: auto;
 		opacity: 0;
 		image-rendering: pixelated;
-		filter: drop-shadow(0 0 7px rgba(38, 77, 255, 0.92));
 	}
 
 	.menu-rows button.selected .selection-dot img {
@@ -1255,11 +1238,10 @@
 		object-fit: contain;
 		image-rendering: pixelated;
 		opacity: 0.95;
-		filter: drop-shadow(0 0 9px rgba(125, 211, 252, 0.7));
 	}
 
 	.screen-icon.warning {
-		filter: drop-shadow(0 0 9px rgba(255, 216, 65, 0.72));
+		filter: none;
 	}
 
 	.knob {
