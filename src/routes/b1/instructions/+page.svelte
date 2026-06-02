@@ -34,6 +34,14 @@
 		src?: string;
 		character?: string;
 	};
+	type SegmentName =
+		| 'top'
+		| 'topleft'
+		| 'topright'
+		| 'middle'
+		| 'botleft'
+		| 'botright'
+		| 'bottom';
 
 	const blue = '#78dcff';
 	const lime = '#b7ff22';
@@ -78,6 +86,38 @@
 			return `${imageBase}0%20to%209/29pixHigh/BigCoolDot.bmp`;
 		}
 		return undefined;
+	}
+
+	function segmentDigitSrc(character: string): string | undefined {
+		if (character === '.') {
+			return `${imageBase}0%20to%209/29pixHigh/BigCoolDot.bmp`;
+		}
+		if (character >= '0' && character <= '9') {
+			return `${imageBase}0%20to%209/29pixHigh/BigCool${character}.bmp`;
+		}
+		return undefined;
+	}
+
+	function segmentParts(character: string): SegmentName[] {
+		if (character === '0') {
+			return ['top', 'topleft', 'topright', 'botleft', 'botright', 'bottom'];
+		}
+		if (character === '8') {
+			return [
+				'top',
+				'topleft',
+				'topright',
+				'middle',
+				'botleft',
+				'botright',
+				'bottom',
+			];
+		}
+		return [];
+	}
+
+	function segmentPartSrc(part: SegmentName): string {
+		return `${imageBase}100pix%207seg/${part}.bmp`;
 	}
 
 	function bigGlyphs(text: string): Glyph[] {
@@ -701,6 +741,36 @@
 	</span>
 {/snippet}
 
+{#snippet segmentDigitText(text: string)}
+	<span class="segment-digit-text" aria-label={text}>
+		{#each text.split('') as character, index (`${text}-${index}`)}
+			{@const parts = segmentParts(character)}
+			{#if character === ' '}
+				<span class="big-digit-space"></span>
+			{:else if parts.length}
+				<span class="segment-digit">
+					{#each parts as part (`${character}-${part}`)}
+						<img
+							class={`segment-part segment-${part}`}
+							src={segmentPartSrc(part)}
+							alt=""
+						/>
+					{/each}
+				</span>
+			{:else if character === '.'}
+				<img src={segmentDigitSrc(character)} class="dot-glyph" alt="" />
+			{:else}
+				{@const src = segmentDigitSrc(character)}
+				{#if src}
+					<img {src} alt="" />
+				{:else}
+					<span class="big-digit-fallback">{character}</span>
+				{/if}
+			{/if}
+		{/each}
+	</span>
+{/snippet}
+
 <svelte:head>
 	<title>B1 Interface | Gizzmo Electronics</title>
 	<meta
@@ -772,13 +842,13 @@
 								{@render glyphText('RPM', 'cyan')}
 							</div>
 							<div class="live-rpm-value">
-								{@render bigDigitText(activeLive.rpm)}
+								{@render segmentDigitText(activeLive.rpm)}
 							</div>
 							<div class="live-unit">
 								{@render glyphText(activeLive.label, 'cyan')}
 							</div>
 							<div class="live-pressure">
-								{@render bigDigitText(activeLive.psi)}
+								{@render segmentDigitText(activeLive.psi)}
 							</div>
 							<div class="live-memory-rail">
 								{@render glyphText(`MEMORY ${activeLive.memory}`, 'lime')}
@@ -1048,6 +1118,89 @@
 		margin-bottom: clamp(0.22rem, 0.7vw, 0.5rem);
 	}
 
+	.segment-digit-text {
+		display: inline-flex;
+		align-items: flex-end;
+		gap: clamp(0.18rem, 0.42vw, 0.32rem);
+		font-size: 0;
+		line-height: 1;
+	}
+
+	.segment-digit-text img {
+		display: block;
+		width: auto;
+		height: clamp(2.8rem, 8.1vw, 5.9rem);
+		object-fit: contain;
+		image-rendering: pixelated;
+		mix-blend-mode: screen;
+	}
+
+	.segment-digit {
+		position: relative;
+		display: inline-block;
+		width: clamp(2.28rem, 6.55vw, 4.78rem);
+		height: clamp(2.8rem, 8.1vw, 5.9rem);
+		flex: 0 0 auto;
+	}
+
+	.segment-digit .segment-part {
+		position: absolute;
+		height: auto;
+		image-rendering: pixelated;
+		mix-blend-mode: screen;
+	}
+
+	.segment-top,
+	.segment-middle,
+	.segment-bottom {
+		left: 18%;
+		width: 64%;
+	}
+
+	.segment-top {
+		top: 0;
+	}
+
+	.segment-middle {
+		top: 46.5%;
+	}
+
+	.segment-bottom {
+		bottom: 0;
+	}
+
+	.segment-topleft,
+	.segment-topright,
+	.segment-botleft,
+	.segment-botright {
+		width: 24%;
+	}
+
+	.segment-topleft,
+	.segment-topright {
+		top: 5.5%;
+	}
+
+	.segment-botleft,
+	.segment-botright {
+		bottom: 5.5%;
+	}
+
+	.segment-topleft,
+	.segment-botleft {
+		left: 0;
+	}
+
+	.segment-topright,
+	.segment-botright {
+		right: 0;
+	}
+
+	.segment-digit-text img.dot-glyph {
+		height: clamp(0.3rem, 0.8vw, 0.58rem);
+		margin-bottom: clamp(0.3rem, 0.78vw, 0.56rem);
+	}
+
 	.big-digit-space {
 		width: clamp(0.2rem, 0.5vw, 0.42rem);
 	}
@@ -1090,15 +1243,15 @@
 
 	.live-arc {
 		position: absolute;
-		left: -3.7%;
-		top: 19.8%;
-		width: 52%;
+		left: -15.7%;
+		top: 41.4%;
+		width: 53.4%;
 		height: auto;
 		object-fit: contain;
 		image-rendering: pixelated;
 		mix-blend-mode: screen;
 		opacity: 0.94;
-		transform: rotate(-2deg);
+		transform: rotate(-5deg);
 	}
 
 	.live-memory-title {
@@ -1115,8 +1268,8 @@
 
 	.live-rpm-label {
 		position: absolute;
-		right: 23.2%;
-		top: 9.2%;
+		right: 19.8%;
+		top: 6.8%;
 		z-index: 2;
 	}
 
@@ -1126,19 +1279,20 @@
 
 	.live-rpm-value {
 		position: absolute;
-		right: 11.6%;
-		top: 6.6%;
+		right: 13.2%;
+		top: 2.5%;
 		z-index: 2;
 	}
 
-	.live-rpm-value .big-digit-text img {
-		height: clamp(1.8rem, 4.05vw, 2.98rem);
+	.live-rpm-value .segment-digit-text {
+		transform: scale(0.56);
+		transform-origin: top right;
 	}
 
 	.live-memory-rail {
 		position: absolute;
-		right: -15.6%;
-		top: 50%;
+		right: -18.9%;
+		top: 52.2%;
 		z-index: 2;
 		transform: rotate(-90deg);
 		transform-origin: center;
@@ -1149,7 +1303,7 @@
 	}
 
 	.live-memory-rail .glyph-text img {
-		height: clamp(1.02rem, 2.34vw, 1.7rem);
+		height: clamp(1.06rem, 2.48vw, 1.8rem);
 	}
 
 	.live-memory-number {
@@ -1162,8 +1316,8 @@
 
 	.live-unit {
 		position: absolute;
-		left: 15.8%;
-		top: 73.8%;
+		left: 8.4%;
+		top: 76.5%;
 		z-index: 2;
 	}
 
@@ -1173,20 +1327,16 @@
 
 	.live-pressure {
 		position: absolute;
-		right: 11.4%;
-		top: 46%;
+		right: 12.6%;
+		top: 32.5%;
 		z-index: 2;
 	}
 
-	.live-pressure .big-digit-text {
-		gap: clamp(0.04rem, 0.08vw, 0.08rem);
+	.live-pressure .segment-digit-text {
+		gap: clamp(0.1rem, 0.22vw, 0.18rem);
 	}
 
-	.live-pressure .big-digit-text img {
-		height: clamp(2.48rem, 6.38vw, 4.7rem);
-	}
-
-	.live-pressure .big-digit-text img.dot-glyph {
+	.live-pressure .segment-digit-text img.dot-glyph {
 		height: clamp(0.3rem, 0.82vw, 0.58rem);
 		margin-bottom: clamp(0.26rem, 0.7vw, 0.52rem);
 	}
