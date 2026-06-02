@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	type ScreenMode = 'live' | 'menu' | 'values' | 'confirm' | 'splash';
 	type RowTone = 'cyan' | 'white' | 'lime' | 'blue' | 'red';
@@ -42,6 +42,7 @@
 	const memoryCount = 6;
 	const holdDelayMs = 520;
 	const wheelResetDelayMs = 320;
+	const holdDotCount = 4;
 
 	const imageBase = '/images/b1/instructions/';
 	function glyphSrc(character: string): string | undefined {
@@ -392,6 +393,8 @@
 	let valueOverrides = $state<Record<string, string>>({});
 	let editingRow = $state<{ screenId: string; rowIndex: number } | null>(null);
 	let holdTimer: ReturnType<typeof setTimeout> | null = null;
+	let holdProgressTimer: ReturnType<typeof setInterval> | null = null;
+	let holdProgressDots = $state(0);
 	let holdTriggered = false;
 	let dragStartX = 0;
 	let dragLastY = 0;
@@ -549,7 +552,12 @@
 
 	function longPress() {
 		holdTimer = null;
+		if (holdProgressTimer) {
+			clearInterval(holdProgressTimer);
+			holdProgressTimer = null;
+		}
 		holdTriggered = true;
+		holdProgressDots = holdDotCount;
 		editingRow = null;
 		if (activeScreen.id === 'live' || activeScreen.id === 'main') {
 			chooseScreenId('set-memory');
@@ -563,10 +571,15 @@
 		holdTriggered = false;
 		dragActive = true;
 		dragMoved = false;
+		holdProgressDots = 0;
 		dragStartX = event.clientX;
 		dragLastY = event.clientY;
 		(event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
 		if (holdTimer) clearTimeout(holdTimer);
+		if (holdProgressTimer) clearInterval(holdProgressTimer);
+		holdProgressTimer = setInterval(() => {
+			holdProgressDots = Math.min(holdDotCount, holdProgressDots + 1);
+		}, holdDelayMs / holdDotCount);
 		holdTimer = setTimeout(longPress, holdDelayMs);
 	}
 
@@ -575,6 +588,11 @@
 			clearTimeout(holdTimer);
 			holdTimer = null;
 		}
+		if (holdProgressTimer) {
+			clearInterval(holdProgressTimer);
+			holdProgressTimer = null;
+		}
+		if (!holdTriggered) holdProgressDots = 0;
 	}
 
 	function cancelInteraction() {
@@ -585,7 +603,11 @@
 	function releaseKnob() {
 		endHold();
 		dragActive = false;
-		if (holdTriggered || dragMoved) return;
+		if (holdTriggered || dragMoved) {
+			holdProgressDots = 0;
+			return;
+		}
+		holdProgressDots = 0;
 		pressKnob();
 	}
 
@@ -643,6 +665,11 @@
 		requestAnimationFrame(() => {
 			booted = true;
 		});
+	});
+
+	onDestroy(() => {
+		if (holdTimer) clearTimeout(holdTimer);
+		if (holdProgressTimer) clearInterval(holdProgressTimer);
 	});
 </script>
 
@@ -720,6 +747,13 @@
 					class:memory-active={memoryAdjusting}
 					style={`--accent:${activeScreen.accent};--cyan:${blue};--lime:${lime};--screen-white:${white};--red:${red}`}
 				>
+					{#if holdProgressDots > 0}
+						<div class="hold-progress" aria-hidden="true">
+							{#each Array.from( { length: holdDotCount }, ) as _, index (`hold-dot-${index}`)}
+								<span class:active={index < holdProgressDots}></span>
+							{/each}
+						</div>
+					{/if}
 					{#if activeScreen.mode === 'splash'}
 						<div class="splash-screen">
 							<img src={`${imageBase}TheRest/Splash_B.bmp`} alt="B1" />
@@ -731,6 +765,9 @@
 					{:else if activeScreen.mode === 'live' && activeLive}
 						<div class="live-screen" aria-label={`Memory ${activeLive.memory}`}>
 							<img class="live-arc" src={`${imageBase}Bars/Base.bmp`} alt="" />
+							<div class="live-memory-title">
+								{@render glyphText(`MEMORY ${activeLive.memory}`, 'lime')}
+							</div>
 							<div class="live-rpm-label">
 								{@render glyphText('RPM', 'cyan')}
 							</div>
@@ -745,6 +782,9 @@
 							</div>
 							<div class="live-memory-rail">
 								{@render glyphText(`MEMORY ${activeLive.memory}`, 'lime')}
+							</div>
+							<div class="live-memory-number">
+								{@render bigDigitText(activeLive.memory)}
 							</div>
 						</div>
 					{:else}
@@ -890,6 +930,7 @@
 	}
 
 	.screen-ui {
+		position: relative;
 		width: 100%;
 		height: 100%;
 		background: linear-gradient(180deg, #050b18 0%, #020510 56%, #000 100%);
@@ -898,8 +939,31 @@
 	}
 
 	.screen-ui.mode-live {
-		background: #000;
+		background: linear-gradient(180deg, #01040c 0%, #000 58%, #01030a 100%);
 		box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.42);
+	}
+
+	.hold-progress {
+		position: absolute;
+		left: 50%;
+		top: 3.6%;
+		z-index: 20;
+		display: flex;
+		gap: clamp(0.16rem, 0.38vw, 0.28rem);
+		transform: translateX(-50%);
+		pointer-events: none;
+	}
+
+	.hold-progress span {
+		display: block;
+		width: clamp(0.22rem, 0.5vw, 0.36rem);
+		aspect-ratio: 1;
+		border-radius: 999px;
+		background: rgba(95, 166, 206, 0.24);
+	}
+
+	.hold-progress span.active {
+		background: var(--cyan);
 	}
 
 	.glyph-text {
@@ -949,7 +1013,7 @@
 
 	.glyph-lime img,
 	.glyph-lime .glyph-fallback {
-		filter: hue-rotate(72deg) saturate(1.75);
+		filter: hue-rotate(-96deg) saturate(2.15) brightness(1.18);
 	}
 
 	.glyph-blue img,
@@ -1021,63 +1085,62 @@
 		position: relative;
 		display: block;
 		height: 100%;
+		overflow: hidden;
 	}
 
 	.live-arc {
 		position: absolute;
-		left: -5.8%;
-		top: -8%;
-		width: auto;
-		height: 114%;
+		left: 20.5%;
+		top: 20.5%;
+		width: 41.5%;
+		height: auto;
 		object-fit: contain;
 		image-rendering: pixelated;
 		mix-blend-mode: screen;
-		opacity: 0.96;
+		opacity: 0.9;
+		transform: rotate(-7deg);
+	}
+
+	.live-memory-title {
+		display: none;
+	}
+
+	.live-memory-title .glyph-text {
+		gap: 0;
+	}
+
+	.live-memory-title .glyph-text img {
+		height: clamp(0.7rem, 1.46vw, 1.08rem);
 	}
 
 	.live-rpm-label {
 		position: absolute;
-		left: 57.2%;
-		top: 8.4%;
+		right: 17.1%;
+		top: 11.4%;
 		z-index: 2;
 	}
 
-	.live-rpm-label .glyph-text img,
-	.live-unit .glyph-text img {
-		height: clamp(0.86rem, 1.78vw, 1.32rem);
+	.live-rpm-label .glyph-text img {
+		height: clamp(0.6rem, 1.2vw, 0.9rem);
 	}
 
 	.live-rpm-value {
 		position: absolute;
-		right: 13.8%;
-		top: 16.5%;
+		right: 4.6%;
+		top: 8.5%;
 		z-index: 2;
 	}
 
 	.live-rpm-value .big-digit-text img {
-		height: clamp(1.9rem, 5.2vw, 3.78rem);
-	}
-
-	.live-unit {
-		position: absolute;
-		left: 18.8%;
-		top: 38.8%;
-		z-index: 2;
-	}
-
-	.live-pressure {
-		position: absolute;
-		left: 33.4%;
-		top: 42.4%;
-		z-index: 2;
+		height: clamp(1.45rem, 3.2vw, 2.38rem);
 	}
 
 	.live-memory-rail {
 		position: absolute;
-		right: -3.6%;
-		top: 53%;
+		right: -10.8%;
+		top: 42.8%;
 		z-index: 2;
-		transform: translateY(-50%) rotate(90deg);
+		transform: rotate(-90deg);
 		transform-origin: center;
 	}
 
@@ -1086,7 +1149,46 @@
 	}
 
 	.live-memory-rail .glyph-text img {
-		height: clamp(0.78rem, 1.7vw, 1.26rem);
+		height: clamp(0.68rem, 1.4vw, 1.04rem);
+	}
+
+	.live-memory-number {
+		display: none;
+	}
+
+	.live-memory-number .big-digit-text img {
+		height: clamp(1.7rem, 4.15vw, 3rem);
+	}
+
+	.live-unit {
+		position: absolute;
+		right: 4.7%;
+		top: 82.2%;
+		z-index: 2;
+	}
+
+	.live-unit .glyph-text img {
+		height: clamp(0.58rem, 1.16vw, 0.86rem);
+	}
+
+	.live-pressure {
+		position: absolute;
+		right: 4.1%;
+		top: 48.4%;
+		z-index: 2;
+	}
+
+	.live-pressure .big-digit-text {
+		gap: clamp(0.04rem, 0.08vw, 0.08rem);
+	}
+
+	.live-pressure .big-digit-text img {
+		height: clamp(2.4rem, 6.2vw, 4.56rem);
+	}
+
+	.live-pressure .big-digit-text img.dot-glyph {
+		height: clamp(0.3rem, 0.82vw, 0.58rem);
+		margin-bottom: clamp(0.26rem, 0.7vw, 0.52rem);
 	}
 
 	.memory-active .live-memory-rail,
