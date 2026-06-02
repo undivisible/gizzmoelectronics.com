@@ -53,6 +53,15 @@
 	const holdDotCount = 4;
 
 	const imageBase = '/images/b1/instructions-png/';
+	const segmentPartFiles: Record<SegmentName, string> = {
+		top: '80high8Top',
+		topleft: '80high8TopLeft',
+		topright: '80high8TopRight',
+		middle: '80high8Middle',
+		botleft: '80high8BotLeft',
+		botright: '80high8BotRight',
+		bottom: '80high8Bottom',
+	};
 	function glyphSrc(character: string): string | undefined {
 		const upper = character.toUpperCase();
 		if (upper >= 'A' && upper <= 'Z') {
@@ -120,7 +129,7 @@
 	}
 
 	function segmentPartSrc(part: SegmentName): string {
-		return `${imageBase}100pix%207seg/${part}.png`;
+		return `${imageBase}80pix%20High%207seg/${segmentPartFiles[part]}.png`;
 	}
 
 	function bigGlyphs(text: string): Glyph[] {
@@ -1165,8 +1174,8 @@
 	.segment-top,
 	.segment-middle,
 	.segment-bottom {
-		left: 18%;
-		width: 64%;
+		left: 15.4%;
+		width: 69.2%;
 	}
 
 	.segment-top {
@@ -1174,7 +1183,7 @@
 	}
 
 	.segment-middle {
-		top: 46.5%;
+		top: 43.6%;
 	}
 
 	.segment-bottom {
@@ -1185,17 +1194,17 @@
 	.segment-topright,
 	.segment-botleft,
 	.segment-botright {
-		width: 24%;
+		width: 27.2%;
 	}
 
 	.segment-topleft,
 	.segment-topright {
-		top: 5.5%;
+		top: 10.6%;
 	}
 
 	.segment-botleft,
 	.segment-botright {
-		bottom: 5.5%;
+		bottom: 10.6%;
 	}
 
 	.segment-topleft,
@@ -1256,7 +1265,7 @@
 	.live-arc {
 		position: absolute;
 		left: -15.7%;
-		top: 41.4%;
+		top: 36.8%;
 		width: 53.4%;
 		height: auto;
 		object-fit: contain;
@@ -1329,7 +1338,7 @@
 	.live-unit {
 		position: absolute;
 		left: 8.4%;
-		top: 76.5%;
+		top: 73.4%;
 		z-index: 2;
 	}
 
