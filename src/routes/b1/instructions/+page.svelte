@@ -1090,15 +1090,15 @@
 
 	.live-arc {
 		position: absolute;
-		left: 20.5%;
-		top: 20.5%;
-		width: 41.5%;
+		left: -3.7%;
+		top: 19.8%;
+		width: 52%;
 		height: auto;
 		object-fit: contain;
 		image-rendering: pixelated;
 		mix-blend-mode: screen;
-		opacity: 0.9;
-		transform: rotate(-7deg);
+		opacity: 0.94;
+		transform: rotate(-2deg);
 	}
 
 	.live-memory-title {
@@ -1115,30 +1115,30 @@
 
 	.live-rpm-label {
 		position: absolute;
-		right: 17.1%;
-		top: 11.4%;
+		right: 23.2%;
+		top: 9.2%;
 		z-index: 2;
 	}
 
 	.live-rpm-label .glyph-text img {
-		height: clamp(0.6rem, 1.2vw, 0.9rem);
+		height: clamp(0.72rem, 1.46vw, 1.08rem);
 	}
 
 	.live-rpm-value {
 		position: absolute;
-		right: 4.6%;
-		top: 8.5%;
+		right: 11.6%;
+		top: 6.6%;
 		z-index: 2;
 	}
 
 	.live-rpm-value .big-digit-text img {
-		height: clamp(1.45rem, 3.2vw, 2.38rem);
+		height: clamp(1.8rem, 4.05vw, 2.98rem);
 	}
 
 	.live-memory-rail {
 		position: absolute;
-		right: -10.8%;
-		top: 42.8%;
+		right: -15.6%;
+		top: 50%;
 		z-index: 2;
 		transform: rotate(-90deg);
 		transform-origin: center;
@@ -1149,7 +1149,7 @@
 	}
 
 	.live-memory-rail .glyph-text img {
-		height: clamp(0.68rem, 1.4vw, 1.04rem);
+		height: clamp(1.02rem, 2.34vw, 1.7rem);
 	}
 
 	.live-memory-number {
@@ -1162,19 +1162,19 @@
 
 	.live-unit {
 		position: absolute;
-		right: 4.7%;
-		top: 82.2%;
+		left: 15.8%;
+		top: 73.8%;
 		z-index: 2;
 	}
 
 	.live-unit .glyph-text img {
-		height: clamp(0.58rem, 1.16vw, 0.86rem);
+		height: clamp(0.58rem, 1.2vw, 0.9rem);
 	}
 
 	.live-pressure {
 		position: absolute;
-		right: 4.1%;
-		top: 48.4%;
+		right: 11.4%;
+		top: 46%;
 		z-index: 2;
 	}
 
@@ -1183,7 +1183,7 @@
 	}
 
 	.live-pressure .big-digit-text img {
-		height: clamp(2.4rem, 6.2vw, 4.56rem);
+		height: clamp(2.48rem, 6.38vw, 4.7rem);
 	}
 
 	.live-pressure .big-digit-text img.dot-glyph {
