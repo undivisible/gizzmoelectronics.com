@@ -52,20 +52,20 @@
 	const wheelResetDelayMs = 320;
 	const holdDotCount = 4;
 
-	const imageBase = '/images/b1/instructions/';
+	const imageBase = '/images/b1/instructions-png/';
 	function glyphSrc(character: string): string | undefined {
 		const upper = character.toUpperCase();
 		if (upper >= 'A' && upper <= 'Z') {
-			return `${imageBase}a%20to%20z/${upper}.bmp`;
+			return `${imageBase}a%20to%20z/${upper}.png`;
 		}
 		if (upper >= '0' && upper <= '9') {
-			return `${imageBase}0%20to%209/${upper}.bmp`;
+			return `${imageBase}0%20to%209/${upper}.png`;
 		}
-		if (upper === '.') return `${imageBase}0%20to%209/dot.bmp`;
-		if (upper === '-') return `${imageBase}0%20to%209/minus.bmp`;
-		if (upper === '+') return `${imageBase}0%20to%209/plus.bmp`;
-		if (upper === '%') return `${imageBase}0%20to%209/perc.bmp`;
-		if (upper === ':') return `${imageBase}a%20to%20z/colon.bmp`;
+		if (upper === '.') return `${imageBase}0%20to%209/dot.png`;
+		if (upper === '-') return `${imageBase}0%20to%209/minus.png`;
+		if (upper === '+') return `${imageBase}0%20to%209/plus.png`;
+		if (upper === '%') return `${imageBase}0%20to%209/perc.png`;
+		if (upper === ':') return `${imageBase}a%20to%20z/colon.png`;
 		return undefined;
 	}
 
@@ -74,26 +74,29 @@
 			if (character === ' ') return { kind: 'space' };
 			const src = glyphSrc(character);
 			if (src) return { kind: 'image', src, character };
+			if (character === '…') {
+				return { kind: 'image', src: glyphSrc('.') ?? '', character: '.' };
+			}
 			return { kind: 'fallback', character };
 		});
 	}
 
 	function bigDigitSrc(character: string): string | undefined {
 		if (character >= '0' && character <= '9') {
-			return `${imageBase}0%20to%209/29pixHigh/BigCool${character}.bmp`;
+			return `${imageBase}0%20to%209/29pixHigh/BigCool${character}.png`;
 		}
 		if (character === '.') {
-			return `${imageBase}0%20to%209/29pixHigh/BigCoolDot.bmp`;
+			return `${imageBase}0%20to%209/29pixHigh/BigCoolDot.png`;
 		}
 		return undefined;
 	}
 
 	function segmentDigitSrc(character: string): string | undefined {
 		if (character === '.') {
-			return `${imageBase}0%20to%209/29pixHigh/BigCoolDot.bmp`;
+			return `${imageBase}0%20to%209/29pixHigh/BigCoolDot.png`;
 		}
 		if (character >= '0' && character <= '9') {
-			return `${imageBase}0%20to%209/29pixHigh/BigCool${character}.bmp`;
+			return `${imageBase}0%20to%209/29pixHigh/BigCool${character}.png`;
 		}
 		return undefined;
 	}
@@ -117,7 +120,7 @@
 	}
 
 	function segmentPartSrc(part: SegmentName): string {
-		return `${imageBase}100pix%207seg/${part}.bmp`;
+		return `${imageBase}100pix%207seg/${part}.png`;
 	}
 
 	function bigGlyphs(text: string): Glyph[] {
@@ -130,15 +133,15 @@
 	}
 
 	function iconSrc(icon: ControllerScreen['icon']): string | undefined {
-		if (icon === 'gear') return `${imageBase}TheRest/gears.bmp`;
+		if (icon === 'gear') return `${imageBase}TheRest/gears.png`;
 		if (icon === 'warning')
-			return `${imageBase}TheRest/Main%20Menu%20Images/safety.bmp`;
-		if (icon === 'turbo') return `${imageBase}TheRest/Turbo.bmp`;
-		if (icon === 'reset') return `${imageBase}TheRest/NewResetLARGE.bmp`;
+			return `${imageBase}TheRest/Main%20Menu%20Images/safety.png`;
+		if (icon === 'turbo') return `${imageBase}TheRest/Turbo.png`;
+		if (icon === 'reset') return `${imageBase}TheRest/NewResetLARGE.png`;
 		if (icon === 'plug')
-			return `${imageBase}TheRest/Main%20Menu%20Images/InputConfig.bmp`;
+			return `${imageBase}TheRest/Main%20Menu%20Images/InputConfig.png`;
 		if (icon === 'solenoid')
-			return `${imageBase}TheRest/Main%20Menu%20Images/Sol.bmp`;
+			return `${imageBase}TheRest/Main%20Menu%20Images/Sol.png`;
 		return undefined;
 	}
 
@@ -705,6 +708,15 @@
 		requestAnimationFrame(() => {
 			booted = true;
 		});
+		const requestedScreen = new URLSearchParams(window.location.search).get(
+			'screen',
+		);
+		if (
+			requestedScreen &&
+			screens.some((screen) => screen.id === requestedScreen)
+		) {
+			chooseScreenId(requestedScreen);
+		}
 	});
 
 	onDestroy(() => {
@@ -826,15 +838,15 @@
 					{/if}
 					{#if activeScreen.mode === 'splash'}
 						<div class="splash-screen">
-							<img src={`${imageBase}TheRest/Splash_B.bmp`} alt="B1" />
+							<img src={`${imageBase}TheRest/Splash_B.png`} alt="B1" />
 							<img
-								src={`${imageBase}TheRest/Splash_byGizzmo.bmp`}
+								src={`${imageBase}TheRest/Splash_byGizzmo.png`}
 								alt="by Gizzmo"
 							/>
 						</div>
 					{:else if activeScreen.mode === 'live' && activeLive}
 						<div class="live-screen" aria-label={`Memory ${activeLive.memory}`}>
-							<img class="live-arc" src={`${imageBase}Bars/Base.bmp`} alt="" />
+							<img class="live-arc" src={`${imageBase}Bars/Base.png`} alt="" />
 							<div class="live-memory-title">
 								{@render glyphText(`MEMORY ${activeLive.memory}`, 'lime')}
 							</div>
@@ -892,7 +904,7 @@
 										}}
 									>
 										<span class="selection-dot">
-											<img src={`${imageBase}TheRest/BlueBall5px.bmp`} alt="" />
+											<img src={`${imageBase}TheRest/BlueBall5px.png`} alt="" />
 										</span>
 										<span class="row-label"
 											>{@render glyphText(row.label, row.tone ?? 'white')}</span
@@ -1354,12 +1366,12 @@
 
 	.screen-title {
 		position: absolute;
-		left: 4.4%;
-		top: 4.2%;
+		left: 3.9%;
+		top: 3.7%;
 		z-index: 3;
 		display: flex;
 		align-items: center;
-		max-width: 86%;
+		max-width: 91%;
 		overflow: visible;
 	}
 
@@ -1369,7 +1381,7 @@
 	}
 
 	.screen-title .glyph-text img {
-		height: clamp(0.68rem, 1.45vw, 1.08rem);
+		height: clamp(0.7rem, 1.5vw, 1.12rem);
 	}
 
 	.screen-title .glyph-space {
@@ -1378,29 +1390,29 @@
 
 	.menu-rows {
 		position: absolute;
-		left: 6.2%;
-		top: 29.5%;
-		right: 6.4%;
-		bottom: 13%;
+		left: 4.5%;
+		top: 25.6%;
+		right: 4.4%;
+		bottom: 12.8%;
 		z-index: 2;
 		display: flex;
 		flex-direction: column;
 		justify-content: flex-start;
-		gap: clamp(0.02rem, 0.11vw, 0.08rem);
+		gap: clamp(0.01rem, 0.08vw, 0.05rem);
 		min-width: 0;
 	}
 
 	.menu-rows.compact {
-		top: 28.2%;
-		gap: clamp(0.01rem, 0.08vw, 0.05rem);
+		top: 24.4%;
+		gap: 0;
 	}
 
 	.menu-rows button {
 		display: grid;
-		grid-template-columns: clamp(0.34rem, 0.74vw, 0.54rem) minmax(0, 1fr) auto;
+		grid-template-columns: clamp(0.32rem, 0.68vw, 0.5rem) minmax(0, 1fr) auto;
 		align-items: center;
 		min-width: 0;
-		height: clamp(0.88rem, 1.96vw, 1.42rem);
+		height: clamp(0.9rem, 2.08vw, 1.5rem);
 		border: 0;
 		background: transparent;
 		padding: 0;
@@ -1408,25 +1420,25 @@
 	}
 
 	.menu-rows button .glyph-text img {
-		height: clamp(0.72rem, 1.52vw, 1.12rem);
+		height: clamp(0.76rem, 1.66vw, 1.2rem);
 	}
 
 	.menu-rows.compact button .glyph-text img {
-		height: clamp(0.62rem, 1.28vw, 0.96rem);
+		height: clamp(0.66rem, 1.42vw, 1.02rem);
 	}
 
 	.mode-values .menu-rows {
-		top: 22.5%;
-		bottom: 8%;
+		top: 19.8%;
+		bottom: 7%;
 	}
 
 	.mode-values .menu-rows.compact,
 	.mode-confirm .menu-rows.compact {
-		top: 22.5%;
+		top: 19.8%;
 	}
 
 	.mode-confirm .menu-rows {
-		top: 31%;
+		top: 27.5%;
 	}
 
 	.menu-rows button.clickable {
@@ -1441,12 +1453,12 @@
 	.selection-dot {
 		display: grid;
 		place-items: center;
-		width: clamp(0.34rem, 0.74vw, 0.54rem);
+		width: clamp(0.32rem, 0.68vw, 0.5rem);
 	}
 
 	.selection-dot img {
 		display: block;
-		width: clamp(0.22rem, 0.46vw, 0.34rem);
+		width: clamp(0.18rem, 0.4vw, 0.3rem);
 		height: auto;
 		opacity: 0;
 		image-rendering: pixelated;
@@ -1464,29 +1476,29 @@
 	}
 
 	.row-value {
-		padding-left: clamp(0.2rem, 0.6vw, 0.48rem);
+		padding-left: clamp(0.18rem, 0.48vw, 0.38rem);
 		text-align: right;
 	}
 
 	.screen-footer {
 		position: absolute;
-		right: 4.2%;
-		bottom: 5.4%;
+		right: 3.9%;
+		bottom: 4.7%;
 		display: flex;
 		justify-content: flex-end;
 	}
 
 	.screen-footer .glyph-text img {
-		height: clamp(0.44rem, 0.9vw, 0.68rem);
+		height: clamp(0.5rem, 1.02vw, 0.78rem);
 	}
 
 	.screen-icon {
 		position: absolute;
-		right: 4.3%;
-		top: 8%;
+		right: 4.8%;
+		top: 8.4%;
 		z-index: 1;
-		width: clamp(1rem, 2.6vw, 2rem);
-		height: clamp(1rem, 2.6vw, 2rem);
+		width: clamp(1.2rem, 3vw, 2.25rem);
+		height: clamp(1.2rem, 3vw, 2.25rem);
 		object-fit: contain;
 		image-rendering: pixelated;
 		opacity: 0.95;
