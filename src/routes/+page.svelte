@@ -6,8 +6,8 @@
 	let checkoutError = '';
 	const b1FullPrice = 590;
 	const b1DepositPrice = b1FullPrice / 2;
-	const b1DepositLabel = `$${b1DepositPrice} deposit`;
-	const b1FullPriceLabel = `$${b1FullPrice} full price`;
+	const b1DepositLabel = `A$${b1DepositPrice} deposit`;
+	const b1FullPriceLabel = `A$${b1FullPrice} full price`;
 
 	async function handlePreOrder(): Promise<void> {
 		isCheckoutProcessing = true;

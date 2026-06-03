@@ -9,7 +9,7 @@
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
-		"format": "prettier --check package.json src/routes/+page.svelte src/routes/+layout.svelte src/routes/b1/instructions/+page.svelte src/routes/b1/instructions/+page.ts src/lib/data/b1InstructionAssets.ts src/lib/components/Cart.svelte src/lib/components/CartSidebar.svelte src/lib/components/Footer.svelte src/lib/server/manuals.ts",
+		"format": "prettier --check package.json tsconfig.json src/routes/+page.svelte src/routes/+layout.svelte src/routes/b1/instructions/+page.svelte src/routes/b1/instructions/+page.ts src/lib/data/b1InstructionAssets.ts src/lib/components/Cart.svelte src/lib/components/CartSidebar.svelte src/lib/components/Footer.svelte src/lib/server/manuals.ts src/lib/server/products.ts src/routes/api/create-checkout-session/+server.ts tests/products.test.ts",
 		"lint": "bun run check",
 		"preview": "vite preview",
 		"tailwind": "tailwindcss -i ./src/app.css -o ./src/app.post.css --watch",
@@ -17,13 +17,14 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"typecheck": "bun run check",
-		"test": "bun run check && bun run build"
+		"test": "bun run check && bun test && bun run build"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^6.0.0",
 		"@sveltejs/adapter-netlify": "^5.0.2",
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
+		"@types/bun": "^1.3.14",
 		"@types/node": "^22.15.18",
 		"@types/path-browserify": "^1.0.3",
 		"autoprefixer": "^10.4.20",

@@ -1,7 +1,10 @@
 import { json } from '@sveltejs/kit';
 import { stripe } from '$lib/server/stripe';
 import { getPublicBaseUrl, isCheckoutConfigured } from '$lib/server/checkout';
-import { getCatalogProduct, type CheckoutItemRequest } from '$lib/server/products';
+import {
+	getCatalogProduct,
+	type CheckoutItemRequest,
+} from '$lib/server/products';
 
 export const prerender = false;
 
@@ -18,7 +21,8 @@ export async function POST({ request }) {
 	try {
 		const body = await request.json();
 		const items = body?.items as CheckoutItemRequest[] | undefined;
-		const customerEmail = typeof body?.customerEmail === 'string' ? body.customerEmail : '';
+		const customerEmail =
+			typeof body?.customerEmail === 'string' ? body.customerEmail : '';
 
 		if (!items || !Array.isArray(items) || items.length === 0) {
 			return json({ error: 'No items provided' }, { status: 400 });
@@ -37,15 +41,15 @@ export async function POST({ request }) {
 
 			lineItems.push({
 				price_data: {
-					currency: 'usd',
+					currency: product.currency,
 					product_data: {
 						name: product.name,
 						description: product.description,
-						images: product.image ? [`${publicBaseUrl}${product.image}`] : []
+						images: product.image ? [`${publicBaseUrl}${product.image}`] : [],
 					},
-					unit_amount: product.priceCents
+					unit_amount: product.priceCents,
 				},
-				quantity
+				quantity,
 			});
 		}
 
@@ -55,7 +59,7 @@ export async function POST({ request }) {
 			mode: 'payment',
 			success_url: `${publicBaseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
 			cancel_url: `${publicBaseUrl}/checkout/cancel`,
-			customer_email: customerEmail || undefined
+			customer_email: customerEmail || undefined,
 		});
 
 		return json({ url: session.url });
@@ -63,7 +67,7 @@ export async function POST({ request }) {
 		console.error('Error creating checkout session:', error);
 		return json(
 			{ error: error instanceof Error ? error.message : 'An error occurred' },
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }

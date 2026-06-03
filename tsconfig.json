@@ -12,7 +12,7 @@
 		"module": "es2022",
 		"moduleResolution": "bundler",
 		"typeRoots": ["./node_modules/@types", "./src"],
-		"types": ["node"],
+		"types": ["node", "bun"],
 		"paths": {
 			"browserify-fs": ["./src/app.d.ts"],
 			"$lib/*": ["./src/lib/*"]
