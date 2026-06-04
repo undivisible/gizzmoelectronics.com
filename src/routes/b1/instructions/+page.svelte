@@ -1311,8 +1311,8 @@
 
 	.live-rpm-label {
 		position: absolute;
-		left: 80.1%;
-		top: 1%;
+		left: 71.7%;
+		top: -1.8%;
 		z-index: 2;
 	}
 
