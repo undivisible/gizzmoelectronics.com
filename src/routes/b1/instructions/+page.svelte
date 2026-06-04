@@ -54,13 +54,13 @@
 
 	const imageBase = '/images/b1/instructions-png/';
 	const segmentPartFiles: Record<SegmentName, string> = {
-		top: '80high8Top',
-		topleft: '80high8TopLeft',
-		topright: '80high8TopRight',
-		middle: '80high8Middle',
-		botleft: '80high8BotLeft',
-		botright: '80high8BotRight',
-		bottom: '80high8Bottom',
+		top: 'top',
+		topleft: 'topleft',
+		topright: 'topright',
+		middle: 'middle',
+		botleft: 'botleft',
+		botright: 'botright',
+		bottom: 'bottom',
 	};
 	function glyphSrc(character: string): string | undefined {
 		const upper = character.toUpperCase();
@@ -135,7 +135,7 @@
 	}
 
 	function segmentPartSrc(part: SegmentName): string {
-		return `${imageBase}80pix%20High%207seg/${segmentPartFiles[part]}.png`;
+		return `${imageBase}100pix%207seg/${segmentPartFiles[part]}.png`;
 	}
 
 	function bigGlyphs(text: string): Glyph[] {
@@ -1148,7 +1148,7 @@
 	.segment-digit-text {
 		display: inline-flex;
 		align-items: flex-end;
-		gap: clamp(0.08rem, 0.18vw, 0.14rem);
+		gap: clamp(0.07rem, 0.16vw, 0.13rem);
 		font-size: 0;
 		line-height: 1;
 	}
@@ -1156,7 +1156,7 @@
 	.segment-digit-text img {
 		display: block;
 		width: auto;
-		height: clamp(2.4rem, 6.9vw, 5rem);
+		height: clamp(3rem, 8.6vw, 6.2rem);
 		object-fit: contain;
 		image-rendering: pixelated;
 		mix-blend-mode: screen;
@@ -1165,8 +1165,8 @@
 	.segment-digit {
 		position: relative;
 		display: inline-block;
-		width: clamp(1.95rem, 5.60625vw, 4.0625rem);
-		height: clamp(2.4rem, 6.9vw, 5rem);
+		width: clamp(2.43rem, 6.97vw, 5.02rem);
+		height: clamp(3rem, 8.6vw, 6.2rem);
 		flex: 0 0 auto;
 	}
 
@@ -1188,48 +1188,48 @@
 	}
 
 	.segment-top {
-		left: 30.77%;
+		left: 29.63%;
 		top: 0;
-		width: 67.69%;
+		width: 69.14%;
 	}
 
 	.segment-middle {
-		left: 18.46%;
-		top: 43.75%;
-		width: 63.08%;
+		left: 17.28%;
+		top: 43%;
+		width: 65.43%;
 	}
 
 	.segment-bottom {
-		left: 3.08%;
+		left: 2.47%;
 		bottom: 0;
-		width: 66.15%;
+		width: 67.9%;
 	}
 
 	.segment-topleft,
 	.segment-topright,
 	.segment-botleft,
 	.segment-botright {
-		width: 26.15%;
+		width: 27.16%;
 	}
 
 	.segment-topleft {
-		left: 13.85%;
-		top: 2.5%;
+		left: 13.58%;
+		top: 3%;
 	}
 
 	.segment-topright {
-		left: 73.85%;
-		top: 2.5%;
+		left: 72.84%;
+		top: 2%;
 	}
 
 	.segment-botleft {
 		left: 0;
-		bottom: 2.5%;
+		bottom: 2%;
 	}
 
 	.segment-botright {
-		left: 61.54%;
-		bottom: 2.5%;
+		left: 60.49%;
+		bottom: 2%;
 	}
 
 	.segment-digit-text img.dot-glyph {
@@ -1279,15 +1279,15 @@
 
 	.live-arc {
 		position: absolute;
-		left: -1.8%;
-		top: 24%;
-		width: 31.5%;
-		height: auto;
+		left: -6.2%;
+		top: -2.2%;
+		width: auto;
+		height: 104.4%;
 		object-fit: contain;
 		image-rendering: pixelated;
 		mix-blend-mode: screen;
 		opacity: 0.94;
-		transform: rotate(-3deg);
+		transform: rotate(-2deg);
 	}
 
 	.live-memory-title {
@@ -1321,14 +1321,14 @@
 	}
 
 	.live-rpm-value .segment-digit-text {
-		transform: scale(0.48);
+		transform: scale(0.44);
 		transform-origin: top right;
 	}
 
 	.live-memory-rail {
 		position: absolute;
-		right: -18.9%;
-		top: 52.2%;
+		right: -22.8%;
+		top: 50%;
 		z-index: 2;
 		transform: rotate(-90deg);
 		transform-origin: center;
@@ -1339,7 +1339,7 @@
 	}
 
 	.live-memory-rail .glyph-text img {
-		height: clamp(1.06rem, 2.48vw, 1.8rem);
+		height: clamp(1.28rem, 2.82vw, 2.04rem);
 	}
 
 	.live-memory-number {
@@ -1352,8 +1352,8 @@
 
 	.live-unit {
 		position: absolute;
-		left: 7.9%;
-		top: 66.8%;
+		left: 7.4%;
+		top: 69.5%;
 		z-index: 2;
 	}
 
@@ -1363,8 +1363,8 @@
 
 	.live-pressure {
 		position: absolute;
-		right: 15.6%;
-		top: 33.8%;
+		right: 14.2%;
+		top: 30.4%;
 		z-index: 2;
 	}
 
