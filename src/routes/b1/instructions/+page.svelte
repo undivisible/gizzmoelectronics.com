@@ -168,7 +168,7 @@
 			mode: 'splash',
 			accent: white,
 			footer: 'by Gizzmo',
-			source: 'IMG_2781.jpeg',
+			source: 'IMG_2784.jpeg',
 		},
 		{
 			id: 'live',
@@ -192,14 +192,13 @@
 			mode: 'menu',
 			accent: blue,
 			rows: [
-				{ label: 'DISPLAY', selected: true, target: 'display-values' },
-				{ label: 'ENGINE SAFETY', target: 'engine-safety' },
+				{ label: 'DISPLAY', target: 'display-values' },
+				{ label: 'ENGINE SAFETY', selected: true, target: 'engine-safety' },
 				{ label: 'SYSTEM', target: 'system-menu' },
 				{ label: 'AUX IN', target: 'aux-menu' },
 				{ label: 'SOLENOID', target: 'solenoid-frequency' },
 			],
 			icon: 'gear',
-			footer: 'PUSH TO SELECT',
 			source: 'IMG_2761.jpeg',
 		},
 		{
@@ -215,8 +214,7 @@
 				{ label: 'NEXT', value: 'KPA', target: 'display-units' },
 				{ label: 'BAR', value: 'PSI', valueTone: 'lime' },
 			],
-			footer: 'NEXT',
-			source: 'IMG_2766.jpeg',
+			source: 'IMG_2763.jpeg',
 		},
 		{
 			id: 'display-units',
@@ -227,9 +225,65 @@
 			rows: [
 				{ label: 'VOLTS', value: 'PWM', valueTone: 'lime' },
 				{ label: 'RAW', value: 'PERCENTAGE' },
-				{ label: 'LIVE VOLTS 0.0V', tone: 'lime' },
+				{ label: 'LIVE VOLTS 0.0V', tone: 'lime', target: 'freq-volts-live' },
 			],
 			source: 'IMG_2770.jpeg',
+		},
+		{
+			id: 'freq-volts-live',
+			label: 'Freq Live',
+			title: 'FREQ VOLTS CAL',
+			mode: 'values',
+			accent: lime,
+			rows: [
+				{ label: 'VOLTS', selected: true, value: 'PWM', valueTone: 'lime' },
+				{ label: 'RAW', value: 'PERCENTAGE' },
+				{ label: 'LIVE VOLTS 0.0V', tone: 'lime' },
+			],
+			source: 'IMG_2771.jpeg',
+		},
+		{
+			id: 'freq-volts-duty',
+			label: 'Freq Duty',
+			title: 'FREQ VOLTS CAL',
+			mode: 'values',
+			accent: lime,
+			rows: [
+				{ label: 'VOLTS', selected: true, value: 'PWM', valueTone: 'lime' },
+				{ label: 'MSEC', value: 'DUTY' },
+				{ label: 'SAMPLE HIGH LOW' },
+				{ label: 'VOLT THRESH 2.4V' },
+				{ label: 'LIVE PWM', value: '0.0MS', valueTone: 'lime' },
+			],
+			source: 'IMG_2772.jpeg',
+		},
+		{
+			id: 'freq-volts-raw',
+			label: 'Freq Raw',
+			title: 'FREQ VOLTS CAL',
+			mode: 'values',
+			accent: lime,
+			rows: [
+				{ label: 'VOLTS', selected: true, value: 'PWM', valueTone: 'lime' },
+				{ label: 'RAW', value: 'PERCENTAGE' },
+				{ label: 'LIVE VOLTS 0.0V', tone: 'lime' },
+			],
+			source: 'IMG_2773.jpeg',
+		},
+		{
+			id: 'freq-volts-percent',
+			label: 'Freq Percent',
+			title: 'FREQ VOLTS CAL',
+			mode: 'values',
+			accent: lime,
+			rows: [
+				{ label: 'VOLTS', selected: true, value: 'PWM', valueTone: 'lime' },
+				{ label: 'RAW', value: 'PERCENTAGE' },
+				{ label: '0% IS 0.0 VOLTS' },
+				{ label: '100% IS 5.0 VOLTS' },
+				{ label: 'LIVE PERC', value: '0%', valueTone: 'lime' },
+			],
+			source: 'IMG_2774.jpeg',
 		},
 		{
 			id: 'system-menu',
@@ -238,14 +292,13 @@
 			mode: 'menu',
 			accent: blue,
 			rows: [
-				{ label: 'CLOCK', selected: true },
-				{ label: 'SOL SENSOR', target: 'solenoid-frequency' },
+				{ label: 'SOL CHECK', selected: true, target: 'solenoid-frequency' },
+				{ label: 'MAP SENSOR', target: 'map-selector' },
 				{ label: 'HARD RESET', target: 'hard-reset' },
 				{ label: 'DIAGNOSTICS', target: 'diagnostics' },
 			],
-			icon: 'gear',
-			footer: 'SYSTEM',
-			source: 'IMG_2766.jpeg',
+			icon: 'solenoid',
+			source: 'IMG_2767.jpeg',
 		},
 		{
 			id: 'solenoid-frequency',
@@ -269,7 +322,7 @@
 				{ label: 'AUX OPT', value: 'OFF' },
 			],
 			icon: 'warning',
-			source: 'IMG_2767.jpeg',
+			source: 'IMG_2766.jpeg',
 		},
 		{
 			id: 'offset-options',
@@ -288,6 +341,41 @@
 			source: 'IMG_2779.jpeg',
 		},
 		{
+			id: 'offset-duty',
+			label: 'Offset Duty',
+			title: 'OFFSET DUTY',
+			mode: 'values',
+			accent: lime,
+			rows: [
+				{ label: 'IF VOLTAGE IS...' },
+				{ label: 'ABOVE', selected: true, value: 'BELOW', valueTone: 'lime' },
+				{ label: '5.0 VOLTS' },
+				{ label: 'ADD', value: 'SUBTRACT', valueTone: 'lime' },
+				{
+					label: '10%',
+					value: 'MORE...',
+					valueTone: 'lime',
+					target: 'offset-duty-more',
+				},
+			],
+			source: 'IMG_2777.jpeg',
+		},
+		{
+			id: 'offset-duty-more',
+			label: 'Offset More',
+			title: 'OFFSET DUTY',
+			mode: 'values',
+			accent: lime,
+			rows: [
+				{ label: 'IF VOLTAGE IS...' },
+				{ label: 'ABOVE', selected: true, value: 'BELOW', valueTone: 'lime' },
+				{ label: '5.0 VOLTS' },
+				{ label: 'ADD', value: 'SUBTRACT', valueTone: 'lime' },
+				{ label: '10%', value: 'MORE...', valueTone: 'lime' },
+			],
+			source: 'IMG_2778.jpeg',
+		},
+		{
 			id: 'aux-menu',
 			label: 'Aux',
 			title: 'AUX IN MENU',
@@ -295,14 +383,14 @@
 			accent: blue,
 			rows: [
 				{ label: 'OFF', selected: true },
-				{ label: 'VOLTS OR PWM' },
-				{ label: 'SPEED OR RPM' },
-				{ label: 'OFFSET DUTY' },
-				{ label: 'WIDEBAND' },
+				{ label: 'VOLTS OR PWM', target: 'display-units' },
+				{ label: 'SPEED OR RPM', target: 'rpm-cal' },
+				{ label: 'OFFSET DUTY', target: 'offset-duty' },
+				{ label: 'WIDEBAND', target: 'wb-calibration' },
 				{ label: 'KNOCK' },
 			],
 			icon: 'gear',
-			source: 'IMG_2769.jpeg',
+			source: 'IMG_2768.jpeg',
 		},
 		{
 			id: 'wb-calibration',
@@ -363,7 +451,7 @@
 				{ label: 'OPTIONS...', target: 'set-options' },
 			],
 			icon: 'turbo',
-			source: 'IMG_2783.jpeg',
+			source: 'IMG_2785.jpeg',
 		},
 		{
 			id: 'set-options',
@@ -399,7 +487,7 @@
 				{ label: 'CUSTOM' },
 			],
 			icon: 'plug',
-			source: 'IMG_2768.jpeg',
+			source: 'IMG_2780.jpeg',
 		},
 		{
 			id: 'diagnostics',
@@ -415,7 +503,7 @@
 				{ label: 'FW 26-MAY-26' },
 			],
 			icon: 'plug',
-			source: 'IMG_2784.jpeg',
+			source: 'IMG_2781.jpeg',
 		},
 		{
 			id: 'hard-reset',
@@ -429,7 +517,7 @@
 				{ label: 'RESET ALL' },
 			],
 			icon: 'reset',
-			source: 'IMG_2782.jpeg',
+			source: 'IMG_2783.jpeg',
 		},
 		{
 			id: 'factory-reset',
@@ -438,7 +526,7 @@
 			mode: 'confirm',
 			accent: blue,
 			rows: [{ label: 'ESCAPE TO CANCEL' }],
-			source: 'IMG_2781.jpeg',
+			source: 'IMG_2782.jpeg',
 		},
 	];
 
@@ -1286,7 +1374,7 @@
 
 	.live-arc {
 		position: absolute;
-		left: -6.2%;
+		left: -3.8%;
 		top: -2.2%;
 		width: auto;
 		height: 104.4%;
