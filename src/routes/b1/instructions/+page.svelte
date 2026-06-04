@@ -111,11 +111,16 @@
 	}
 
 	function segmentParts(character: string): SegmentName[] {
-		if (character === '0') {
-			return ['top', 'topleft', 'topright', 'botleft', 'botright', 'bottom'];
-		}
-		if (character === '8') {
-			return [
+		const digits: Record<string, SegmentName[]> = {
+			'0': ['top', 'topleft', 'topright', 'botleft', 'botright', 'bottom'],
+			'1': ['topright', 'botright'],
+			'2': ['top', 'topright', 'middle', 'botleft', 'bottom'],
+			'3': ['top', 'topright', 'middle', 'botright', 'bottom'],
+			'4': ['topleft', 'topright', 'middle', 'botright'],
+			'5': ['top', 'topleft', 'middle', 'botright', 'bottom'],
+			'6': ['top', 'topleft', 'middle', 'botleft', 'botright', 'bottom'],
+			'7': ['top', 'topright', 'botright'],
+			'8': [
 				'top',
 				'topleft',
 				'topright',
@@ -123,9 +128,10 @@
 				'botleft',
 				'botright',
 				'bottom',
-			];
-		}
-		return [];
+			],
+			'9': ['top', 'topleft', 'topright', 'middle', 'botright', 'bottom'],
+		};
+		return digits[character] ?? [];
 	}
 
 	function segmentPartSrc(part: SegmentName): string {
@@ -1142,7 +1148,7 @@
 	.segment-digit-text {
 		display: inline-flex;
 		align-items: flex-end;
-		gap: clamp(0.18rem, 0.42vw, 0.32rem);
+		gap: clamp(0.08rem, 0.18vw, 0.14rem);
 		font-size: 0;
 		line-height: 1;
 	}
@@ -1150,7 +1156,7 @@
 	.segment-digit-text img {
 		display: block;
 		width: auto;
-		height: clamp(2.8rem, 8.1vw, 5.9rem);
+		height: clamp(2.4rem, 6.9vw, 5rem);
 		object-fit: contain;
 		image-rendering: pixelated;
 		mix-blend-mode: screen;
@@ -1159,8 +1165,8 @@
 	.segment-digit {
 		position: relative;
 		display: inline-block;
-		width: clamp(2.28rem, 6.55vw, 4.78rem);
-		height: clamp(2.8rem, 8.1vw, 5.9rem);
+		width: clamp(1.95rem, 5.60625vw, 4.0625rem);
+		height: clamp(2.4rem, 6.9vw, 5rem);
 		flex: 0 0 auto;
 	}
 
@@ -1173,53 +1179,62 @@
 
 	.segment-top,
 	.segment-middle,
-	.segment-bottom {
-		left: 15.4%;
-		width: 69.2%;
+	.segment-bottom,
+	.segment-topleft,
+	.segment-topright,
+	.segment-botleft,
+	.segment-botright {
+		right: auto;
 	}
 
 	.segment-top {
+		left: 30.77%;
 		top: 0;
+		width: 67.69%;
 	}
 
 	.segment-middle {
-		top: 43.6%;
+		left: 18.46%;
+		top: 43.75%;
+		width: 63.08%;
 	}
 
 	.segment-bottom {
+		left: 3.08%;
 		bottom: 0;
+		width: 66.15%;
 	}
 
 	.segment-topleft,
 	.segment-topright,
 	.segment-botleft,
 	.segment-botright {
-		width: 27.2%;
+		width: 26.15%;
 	}
 
-	.segment-topleft,
+	.segment-topleft {
+		left: 13.85%;
+		top: 2.5%;
+	}
+
 	.segment-topright {
-		top: 10.6%;
+		left: 73.85%;
+		top: 2.5%;
 	}
 
-	.segment-botleft,
-	.segment-botright {
-		bottom: 10.6%;
-	}
-
-	.segment-topleft,
 	.segment-botleft {
 		left: 0;
+		bottom: 2.5%;
 	}
 
-	.segment-topright,
 	.segment-botright {
-		right: 0;
+		left: 61.54%;
+		bottom: 2.5%;
 	}
 
 	.segment-digit-text img.dot-glyph {
-		height: clamp(0.3rem, 0.8vw, 0.58rem);
-		margin-bottom: clamp(0.3rem, 0.78vw, 0.56rem);
+		height: clamp(0.24rem, 0.62vw, 0.44rem);
+		margin-bottom: clamp(0.42rem, 1.14vw, 0.82rem);
 	}
 
 	.big-digit-space {
@@ -1264,15 +1279,15 @@
 
 	.live-arc {
 		position: absolute;
-		left: -15.7%;
-		top: 36.8%;
-		width: 53.4%;
+		left: -1.8%;
+		top: 24%;
+		width: 31.5%;
 		height: auto;
 		object-fit: contain;
 		image-rendering: pixelated;
 		mix-blend-mode: screen;
 		opacity: 0.94;
-		transform: rotate(-5deg);
+		transform: rotate(-3deg);
 	}
 
 	.live-memory-title {
@@ -1306,7 +1321,7 @@
 	}
 
 	.live-rpm-value .segment-digit-text {
-		transform: scale(0.56);
+		transform: scale(0.48);
 		transform-origin: top right;
 	}
 
@@ -1337,8 +1352,8 @@
 
 	.live-unit {
 		position: absolute;
-		left: 8.4%;
-		top: 73.4%;
+		left: 7.9%;
+		top: 66.8%;
 		z-index: 2;
 	}
 
@@ -1348,8 +1363,8 @@
 
 	.live-pressure {
 		position: absolute;
-		right: 12.6%;
-		top: 32.5%;
+		right: 15.6%;
+		top: 33.8%;
 		z-index: 2;
 	}
 
