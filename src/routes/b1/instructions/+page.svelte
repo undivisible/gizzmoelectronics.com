@@ -1311,8 +1311,8 @@
 
 	.live-rpm-label {
 		position: absolute;
-		right: 10.6%;
-		top: 0.3%;
+		left: 80.1%;
+		top: 1%;
 		z-index: 2;
 	}
 
@@ -1360,7 +1360,7 @@
 	.live-unit {
 		position: absolute;
 		left: 7.4%;
-		top: 62.6%;
+		top: 34.8%;
 		z-index: 2;
 	}
 
@@ -1382,13 +1382,14 @@
 	}
 
 	.live-pressure .segment-digit.fractional {
-		width: clamp(1.54rem, 4.41vw, 3.18rem);
-		height: clamp(1.9rem, 5.44vw, 3.92rem);
+		margin-left: clamp(-1.04rem, -2.28vw, -1.64rem);
+		transform: scale(0.64);
+		transform-origin: bottom right;
 	}
 
 	.live-pressure .segment-digit-text img.dot-glyph {
-		height: clamp(0.22rem, 0.56vw, 0.4rem);
-		margin-bottom: clamp(0.36rem, 1vw, 0.72rem);
+		height: clamp(0.56rem, 1.46vw, 1.04rem);
+		margin-bottom: clamp(0.24rem, 0.64vw, 0.46rem);
 	}
 
 	.memory-active .live-memory-rail,
