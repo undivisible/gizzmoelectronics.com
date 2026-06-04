@@ -775,7 +775,10 @@
 			{#if character === ' '}
 				<span class="big-digit-space"></span>
 			{:else if parts.length}
-				<span class="segment-digit">
+				<span
+					class="segment-digit"
+					class:fractional={text.includes('.') && index > text.indexOf('.')}
+				>
 					{#each parts as part (`${character}-${part}`)}
 						<img
 							class={`segment-part segment-${part}`}
@@ -785,7 +788,11 @@
 					{/each}
 				</span>
 			{:else if character === '.'}
-				<img src={segmentDigitSrc(character)} class="dot-glyph" alt="" />
+				<img
+					src={segmentDigitSrc(character)}
+					class="dot-glyph fractional-dot"
+					alt=""
+				/>
 			{:else}
 				{@const src = segmentDigitSrc(character)}
 				{#if src}
@@ -1304,19 +1311,19 @@
 
 	.live-rpm-label {
 		position: absolute;
-		right: 20.2%;
-		top: 2.6%;
+		right: 10.6%;
+		top: 0.3%;
 		z-index: 2;
 	}
 
 	.live-rpm-label .glyph-text img {
-		height: clamp(0.58rem, 1.16vw, 0.86rem);
+		height: clamp(0.48rem, 0.96vw, 0.72rem);
 	}
 
 	.live-rpm-value {
 		position: absolute;
 		right: 10.8%;
-		top: 1.2%;
+		top: 6.8%;
 		z-index: 2;
 	}
 
@@ -1363,20 +1370,25 @@
 
 	.live-pressure {
 		position: absolute;
-		right: 11.6%;
-		bottom: 7.2%;
+		right: 12.4%;
+		bottom: 7.8%;
 		z-index: 2;
 	}
 
 	.live-pressure .segment-digit-text {
-		gap: clamp(0.1rem, 0.22vw, 0.18rem);
-		transform: scale(1.24);
+		gap: clamp(0.06rem, 0.12vw, 0.1rem);
+		transform: scale(1.58);
 		transform-origin: bottom right;
 	}
 
+	.live-pressure .segment-digit.fractional {
+		width: clamp(1.54rem, 4.41vw, 3.18rem);
+		height: clamp(1.9rem, 5.44vw, 3.92rem);
+	}
+
 	.live-pressure .segment-digit-text img.dot-glyph {
-		height: clamp(0.3rem, 0.82vw, 0.58rem);
-		margin-bottom: clamp(0.26rem, 0.7vw, 0.52rem);
+		height: clamp(0.22rem, 0.56vw, 0.4rem);
+		margin-bottom: clamp(0.36rem, 1vw, 0.72rem);
 	}
 
 	.memory-active .live-memory-rail,
