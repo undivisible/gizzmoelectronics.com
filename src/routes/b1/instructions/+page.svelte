@@ -543,6 +543,7 @@
 	let holdProgressDots = $state(0);
 	let holdTriggered = false;
 	let dragStartX = 0;
+	let dragLastX = 0;
 	let dragLastY = 0;
 	let dragActive = false;
 	let dragMoved = false;
@@ -719,6 +720,7 @@
 		dragMoved = false;
 		holdProgressDots = 0;
 		dragStartX = event.clientX;
+		dragLastX = event.clientX;
 		dragLastY = event.clientY;
 		(event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
 		if (holdTimer) clearTimeout(holdTimer);
@@ -760,13 +762,16 @@
 	function dragTurn(event: PointerEvent) {
 		if (!dragActive) return;
 		const movedX = Math.abs(event.clientX - dragStartX);
+		const stepX = event.clientX - dragLastX;
 		const movedY = event.clientY - dragLastY;
 		if (movedX > 8 || Math.abs(movedY) > 8) {
 			endHold();
 			dragMoved = true;
 		}
-		if (Math.abs(movedY) > 18) {
-			rotateKnob(movedY > 0 ? 1 : -1);
+		if (Math.abs(stepX) > 18 || Math.abs(movedY) > 18) {
+			const useHorizontal = Math.abs(stepX) > Math.abs(movedY);
+			rotateKnob(useHorizontal ? (stepX > 0 ? 1 : -1) : movedY > 0 ? 1 : -1);
+			dragLastX = event.clientX;
 			dragLastY = event.clientY;
 		}
 	}
@@ -1142,6 +1147,7 @@
 		padding: 0;
 		cursor: pointer;
 		overflow: hidden;
+		touch-action: none;
 		container-type: size;
 		--lcd-px: calc(100cqw / 516.88);
 	}
@@ -1304,6 +1310,19 @@
 
 	.segment-top,
 	.segment-middle,
+	.segment-bottom {
+		z-index: 2;
+	}
+
+	.segment-topleft,
+	.segment-topright,
+	.segment-botleft,
+	.segment-botright {
+		z-index: 1;
+	}
+
+	.segment-top,
+	.segment-middle,
 	.segment-bottom,
 	.segment-topleft,
 	.segment-topright,
@@ -1313,21 +1332,21 @@
 	}
 
 	.segment-top {
-		left: 29.63%;
+		left: 30%;
 		top: 0;
-		width: 69.14%;
+		width: 64%;
 	}
 
 	.segment-middle {
-		left: 17.28%;
+		left: 21%;
 		top: 43%;
-		width: 65.43%;
+		width: 60%;
 	}
 
 	.segment-bottom {
-		left: 2.47%;
+		left: 7%;
 		bottom: 0;
-		width: 67.9%;
+		width: 62%;
 	}
 
 	.segment-topleft,
@@ -1338,23 +1357,23 @@
 	}
 
 	.segment-topleft {
-		left: 13.58%;
-		top: 3%;
+		left: 0;
+		top: 14%;
 	}
 
 	.segment-topright {
-		left: 72.84%;
-		top: 2%;
+		left: 75%;
+		top: 14%;
 	}
 
 	.segment-botleft {
 		left: 0;
-		bottom: 2%;
+		bottom: 14%;
 	}
 
 	.segment-botright {
-		left: 60.49%;
-		bottom: 2%;
+		left: 63%;
+		bottom: 14%;
 	}
 
 	.segment-digit-text img.dot-glyph {
@@ -1488,20 +1507,20 @@
 
 	.live-pressure {
 		position: absolute;
-		right: 12.4%;
-		bottom: 7.8%;
+		right: 15.8%;
+		bottom: 10.2%;
 		z-index: 2;
 	}
 
 	.live-pressure .segment-digit-text {
-		gap: calc(var(--lcd-px) * 1.6);
-		transform: scale(1.58);
+		gap: calc(var(--lcd-px) * 3.2);
+		transform: scale(1.36);
 		transform-origin: bottom right;
 	}
 
 	.live-pressure .segment-digit.fractional {
-		margin-left: calc(var(--lcd-px) * -26.24);
-		transform: scale(0.64);
+		margin-left: calc(var(--lcd-px) * -8);
+		transform: scale(0.62);
 		transform-origin: bottom right;
 	}
 
@@ -1676,6 +1695,7 @@
 		border-radius: 999px;
 		background: transparent;
 		cursor: pointer;
+		touch-action: none;
 	}
 
 	.knob span {
