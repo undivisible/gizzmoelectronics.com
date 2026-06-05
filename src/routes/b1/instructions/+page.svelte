@@ -903,156 +903,174 @@
 
 <section class="b1-instructions" class:booted>
 	<div class="controller-wrap">
-		<div class="controller-shell" aria-label="Interactive B1 controller">
-			<img
-				class="controller-image"
-				src="/images/b1/b1.png"
-				alt="B1 controller"
-			/>
+		<div class="controller-stage">
+			<div class="controller-shell" aria-label="Interactive B1 controller">
+				<img
+					class="controller-image"
+					src="/images/b1/b1.png"
+					alt="B1 controller"
+				/>
 
-			<div
-				class="controller-screen"
-				role="button"
-				tabindex="0"
-				aria-label="Controller screen. Press to change screen."
-				onpointerdown={startHold}
-				onpointermove={dragTurn}
-				onpointerup={releaseKnob}
-				onpointerleave={endHold}
-				onpointercancel={cancelInteraction}
-				onwheel={handleWheel}
-				onkeydown={(event) => {
-					if (event.key === 'Enter' || event.key === ' ') {
-						event.preventDefault();
-						pressKnob();
-					} else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
-						event.preventDefault();
-						rotateKnob(-1);
-					} else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
-						event.preventDefault();
-						rotateKnob(1);
-					}
-				}}
-			>
 				<div
-					class={`screen-ui mode-${activeScreen.mode}`}
-					class:memory-active={memoryAdjusting}
-					style={`--accent:${activeScreen.accent};--cyan:${blue};--lime:${lime};--screen-white:${white};--red:${red}`}
+					class="controller-screen"
+					role="button"
+					tabindex="0"
+					aria-label="Controller screen. Press to change screen."
+					onpointerdown={startHold}
+					onpointermove={dragTurn}
+					onpointerup={releaseKnob}
+					onpointerleave={endHold}
+					onpointercancel={cancelInteraction}
+					onwheel={handleWheel}
+					onkeydown={(event) => {
+						if (event.key === 'Enter' || event.key === ' ') {
+							event.preventDefault();
+							pressKnob();
+						} else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+							event.preventDefault();
+							rotateKnob(-1);
+						} else if (
+							event.key === 'ArrowDown' ||
+							event.key === 'ArrowRight'
+						) {
+							event.preventDefault();
+							rotateKnob(1);
+						}
+					}}
 				>
-					{#if holdProgressDots > 0}
-						<div class="hold-progress" aria-hidden="true">
-							{#each Array.from( { length: holdDotCount }, ) as _, index (`hold-dot-${index}`)}
-								<span class:active={index < holdProgressDots}></span>
-							{/each}
-						</div>
-					{/if}
-					{#if activeScreen.mode === 'splash'}
-						<div class="splash-screen">
-							<img src={`${imageBase}TheRest/Splash_B.png`} alt="B1" />
-							<img
-								src={`${imageBase}TheRest/Splash_byGizzmo.png`}
-								alt="by Gizzmo"
-							/>
-						</div>
-					{:else if activeScreen.mode === 'live' && activeLive}
-						<div class="live-screen" aria-label={`Memory ${activeLive.memory}`}>
-							<img class="live-arc" src={`${imageBase}Bars/Base.png`} alt="" />
-							<div class="live-memory-title">
-								{@render glyphText(`MEMORY ${activeLive.memory}`, 'lime')}
-							</div>
-							<div class="live-rpm-label">
-								{@render glyphText('RPM', 'cyan')}
-							</div>
-							<div class="live-rpm-value">
-								{@render segmentDigitText(activeLive.rpm)}
-							</div>
-							<div class="live-unit">
-								{@render glyphText(activeLive.label, 'cyan')}
-							</div>
-							<div class="live-pressure">
-								{@render segmentDigitText(activeLive.psi)}
-							</div>
-							<div class="live-memory-rail">
-								{@render glyphText(`MEMORY ${activeLive.memory}`, 'lime')}
-							</div>
-							<div class="live-memory-number">
-								{@render bigDigitText(activeLive.memory)}
-							</div>
-						</div>
-					{:else}
-						<div class="menu-screen">
-							<div class="screen-title">
-								{@render glyphText(activeScreen.title, 'cyan')}
-							</div>
-							{#if activeScreen.icon}
-								<img
-									class={`screen-icon ${activeScreen.icon}`}
-									src={iconSrc(activeScreen.icon) ?? ''}
-									alt=""
-								/>
-							{/if}
-							<div
-								class="menu-rows"
-								class:compact={(activeScreen.rows?.length ?? 0) > 4}
-							>
-								{#each activeScreen.rows ?? [] as row, index (`${activeScreen.id}-${row.label}-${index}`)}
-									<button
-										type="button"
-										class:selected={index === activeRowIndex}
-										class:clickable={Boolean(
-											row.target || row.value || row.label === 'RETURN',
-										)}
-										class:editing={editingRow?.screenId === activeScreen.id &&
-											editingRow.rowIndex === index}
-										class={`row-tone-${row.tone ?? 'white'} value-tone-${row.valueTone ?? 'white'}`}
-										onpointerdown={(event) => event.stopPropagation()}
-										onpointerup={(event) => event.stopPropagation()}
-										onpointercancel={(event) => event.stopPropagation()}
-										onclick={(event) => {
-											event.stopPropagation();
-											rowClick(row, index);
-										}}
-									>
-										<span class="selection-dot">
-											<img src={`${imageBase}TheRest/BlueBall5px.png`} alt="" />
-										</span>
-										<span class="row-label"
-											>{@render glyphText(row.label, row.tone ?? 'white')}</span
-										>
-										{#if valueFor(activeScreen.id, index, row)}
-											<span class="row-value"
-												>{@render glyphText(
-													valueFor(activeScreen.id, index, row) ?? '',
-													row.valueTone ?? 'white',
-												)}</span
-											>
-										{/if}
-									</button>
+					<div
+						class={`screen-ui mode-${activeScreen.mode}`}
+						class:memory-active={memoryAdjusting}
+						style={`--accent:${activeScreen.accent};--cyan:${blue};--lime:${lime};--screen-white:${white};--red:${red}`}
+					>
+						{#if holdProgressDots > 0}
+							<div class="hold-progress" aria-hidden="true">
+								{#each Array.from( { length: holdDotCount }, ) as _, index (`hold-dot-${index}`)}
+									<span class:active={index < holdProgressDots}></span>
 								{/each}
 							</div>
-							{#if activeScreen.footer}
-								<div class="screen-footer">
-									{@render glyphText(activeScreen.footer, 'cyan')}
+						{/if}
+						{#if activeScreen.mode === 'splash'}
+							<div class="splash-screen">
+								<img src={`${imageBase}TheRest/Splash_B.png`} alt="B1" />
+								<img
+									src={`${imageBase}TheRest/Splash_byGizzmo.png`}
+									alt="by Gizzmo"
+								/>
+							</div>
+						{:else if activeScreen.mode === 'live' && activeLive}
+							<div
+								class="live-screen"
+								aria-label={`Memory ${activeLive.memory}`}
+							>
+								<img
+									class="live-arc"
+									src={`${imageBase}Bars/Base.png`}
+									alt=""
+								/>
+								<div class="live-memory-title">
+									{@render glyphText(`MEMORY ${activeLive.memory}`, 'lime')}
 								</div>
-							{/if}
-						</div>
-					{/if}
+								<div class="live-rpm-label">
+									{@render glyphText('RPM', 'cyan')}
+								</div>
+								<div class="live-rpm-value">
+									{@render segmentDigitText(activeLive.rpm)}
+								</div>
+								<div class="live-unit">
+									{@render glyphText(activeLive.label, 'cyan')}
+								</div>
+								<div class="live-pressure">
+									{@render segmentDigitText(activeLive.psi)}
+								</div>
+								<div class="live-memory-rail">
+									{@render glyphText(`MEMORY ${activeLive.memory}`, 'lime')}
+								</div>
+								<div class="live-memory-number">
+									{@render bigDigitText(activeLive.memory)}
+								</div>
+							</div>
+						{:else}
+							<div class="menu-screen">
+								<div class="screen-title">
+									{@render glyphText(activeScreen.title, 'cyan')}
+								</div>
+								{#if activeScreen.icon}
+									<img
+										class={`screen-icon ${activeScreen.icon}`}
+										src={iconSrc(activeScreen.icon) ?? ''}
+										alt=""
+									/>
+								{/if}
+								<div
+									class="menu-rows"
+									class:compact={(activeScreen.rows?.length ?? 0) > 4}
+								>
+									{#each activeScreen.rows ?? [] as row, index (`${activeScreen.id}-${row.label}-${index}`)}
+										<button
+											type="button"
+											class:selected={index === activeRowIndex}
+											class:clickable={Boolean(
+												row.target || row.value || row.label === 'RETURN',
+											)}
+											class:editing={editingRow?.screenId === activeScreen.id &&
+												editingRow.rowIndex === index}
+											class={`row-tone-${row.tone ?? 'white'} value-tone-${row.valueTone ?? 'white'}`}
+											onpointerdown={(event) => event.stopPropagation()}
+											onpointerup={(event) => event.stopPropagation()}
+											onpointercancel={(event) => event.stopPropagation()}
+											onclick={(event) => {
+												event.stopPropagation();
+												rowClick(row, index);
+											}}
+										>
+											<span class="selection-dot">
+												<img
+													src={`${imageBase}TheRest/BlueBall5px.png`}
+													alt=""
+												/>
+											</span>
+											<span class="row-label"
+												>{@render glyphText(
+													row.label,
+													row.tone ?? 'white',
+												)}</span
+											>
+											{#if valueFor(activeScreen.id, index, row)}
+												<span class="row-value"
+													>{@render glyphText(
+														valueFor(activeScreen.id, index, row) ?? '',
+														row.valueTone ?? 'white',
+													)}</span
+												>
+											{/if}
+										</button>
+									{/each}
+								</div>
+								{#if activeScreen.footer}
+									<div class="screen-footer">
+										{@render glyphText(activeScreen.footer, 'cyan')}
+									</div>
+								{/if}
+							</div>
+						{/if}
+					</div>
 				</div>
-			</div>
 
-			<button
-				type="button"
-				class="knob"
-				aria-label="B1 rotary knob"
-				onpointerdown={startHold}
-				onpointermove={dragTurn}
-				onpointerup={releaseKnob}
-				onpointerleave={endHold}
-				onpointercancel={cancelInteraction}
-				onwheel={handleWheel}
-			>
-				<span style={`transform:rotate(${knobAngle}deg)`}></span>
-			</button>
+				<button
+					type="button"
+					class="knob"
+					aria-label="B1 rotary knob"
+					onpointerdown={startHold}
+					onpointermove={dragTurn}
+					onpointerup={releaseKnob}
+					onpointerleave={endHold}
+					onpointercancel={cancelInteraction}
+					onwheel={handleWheel}
+				>
+					<span style={`transform:rotate(${knobAngle}deg)`}></span>
+				</button>
+			</div>
 		</div>
 	</div>
 </section>
@@ -1086,7 +1104,7 @@
 		padding: clamp(0.75rem, 4vh, 2.5rem) clamp(0.75rem, 4vw, 2.5rem);
 	}
 
-	.controller-shell {
+	.controller-stage {
 		position: relative;
 		width: min(
 			1040px,
@@ -1094,6 +1112,12 @@
 			calc((100svh - clamp(1.5rem, 8vh, 5rem)) * 1016 / 460)
 		);
 		aspect-ratio: 1016 / 460;
+	}
+
+	.controller-shell {
+		position: relative;
+		width: 100%;
+		height: 100%;
 	}
 
 	.controller-image {
@@ -1118,6 +1142,8 @@
 		padding: 0;
 		cursor: pointer;
 		overflow: hidden;
+		container-type: size;
+		--lcd-px: calc(100cqw / 516.88);
 	}
 
 	.controller-screen:focus,
@@ -1145,14 +1171,14 @@
 		top: 3.6%;
 		z-index: 20;
 		display: flex;
-		gap: clamp(0.16rem, 0.38vw, 0.28rem);
+		gap: calc(var(--lcd-px) * 4.48);
 		transform: translateX(-50%);
 		pointer-events: none;
 	}
 
 	.hold-progress span {
 		display: block;
-		width: clamp(0.22rem, 0.5vw, 0.36rem);
+		width: calc(var(--lcd-px) * 5.76);
 		aspect-ratio: 1;
 		border-radius: 999px;
 		background: rgba(95, 166, 206, 0.24);
@@ -1174,7 +1200,7 @@
 	.glyph-text img {
 		display: block;
 		width: auto;
-		height: clamp(0.58rem, 1.35vw, 1.04rem);
+		height: calc(var(--lcd-px) * 16.64);
 		object-fit: contain;
 		image-rendering: pixelated;
 		mix-blend-mode: screen;
@@ -1182,13 +1208,13 @@
 
 	.glyph-text img.dot-glyph {
 		align-self: flex-end;
-		height: clamp(0.18rem, 0.42vw, 0.32rem);
-		margin-bottom: clamp(0.1rem, 0.26vw, 0.2rem);
+		height: calc(var(--lcd-px) * 5.12);
+		margin-bottom: calc(var(--lcd-px) * 3.2);
 	}
 
 	.glyph-space {
 		display: block;
-		width: clamp(0.24rem, 0.62vw, 0.46rem);
+		width: calc(var(--lcd-px) * 7.36);
 		height: 1px;
 		flex: 0 0 auto;
 	}
@@ -1197,7 +1223,7 @@
 		display: inline-block;
 		color: var(--screen-white);
 		font:
-			900 clamp(0.58rem, 1.3vw, 1rem) Impact,
+			900 calc(var(--lcd-px) * 16) Impact,
 			sans-serif;
 		line-height: 0.85;
 	}
@@ -1225,7 +1251,7 @@
 	.big-digit-text {
 		display: inline-flex;
 		align-items: flex-end;
-		gap: clamp(0.08rem, 0.18vw, 0.16rem);
+		gap: calc(var(--lcd-px) * 2.56);
 		font-size: 0;
 		line-height: 1;
 	}
@@ -1233,21 +1259,21 @@
 	.big-digit-text img {
 		display: block;
 		width: auto;
-		height: clamp(1.9rem, 6.6vw, 4.72rem);
+		height: calc(var(--lcd-px) * 75.52);
 		object-fit: contain;
 		image-rendering: pixelated;
 		mix-blend-mode: screen;
 	}
 
 	.big-digit-text img.dot-glyph {
-		height: clamp(0.26rem, 0.84vw, 0.6rem);
-		margin-bottom: clamp(0.22rem, 0.7vw, 0.5rem);
+		height: calc(var(--lcd-px) * 9.6);
+		margin-bottom: calc(var(--lcd-px) * 8);
 	}
 
 	.segment-digit-text {
 		display: inline-flex;
 		align-items: flex-end;
-		gap: clamp(0.07rem, 0.16vw, 0.13rem);
+		gap: calc(var(--lcd-px) * 2.08);
 		font-size: 0;
 		line-height: 1;
 	}
@@ -1255,7 +1281,7 @@
 	.segment-digit-text img {
 		display: block;
 		width: auto;
-		height: clamp(3rem, 8.6vw, 6.2rem);
+		height: calc(var(--lcd-px) * 99.2);
 		object-fit: contain;
 		image-rendering: pixelated;
 		mix-blend-mode: screen;
@@ -1264,8 +1290,8 @@
 	.segment-digit {
 		position: relative;
 		display: inline-block;
-		width: clamp(2.43rem, 6.97vw, 5.02rem);
-		height: clamp(3rem, 8.6vw, 6.2rem);
+		width: calc(var(--lcd-px) * 80.32);
+		height: calc(var(--lcd-px) * 99.2);
 		flex: 0 0 auto;
 	}
 
@@ -1332,18 +1358,18 @@
 	}
 
 	.segment-digit-text img.dot-glyph {
-		height: clamp(0.24rem, 0.62vw, 0.44rem);
-		margin-bottom: clamp(0.42rem, 1.14vw, 0.82rem);
+		height: calc(var(--lcd-px) * 7.04);
+		margin-bottom: calc(var(--lcd-px) * 13.12);
 	}
 
 	.big-digit-space {
-		width: clamp(0.2rem, 0.5vw, 0.42rem);
+		width: calc(var(--lcd-px) * 6.72);
 	}
 
 	.big-digit-fallback {
 		color: var(--screen-white);
 		font:
-			900 clamp(2.4rem, 8vw, 6rem) Impact,
+			900 calc(var(--lcd-px) * 96) Impact,
 			sans-serif;
 		line-height: 0.78;
 	}
@@ -1353,7 +1379,7 @@
 		place-content: center;
 		height: 100%;
 		justify-items: center;
-		gap: clamp(0.2rem, 0.7vw, 0.5rem);
+		gap: calc(var(--lcd-px) * 8);
 	}
 
 	.splash-screen img:first-child {
@@ -1398,7 +1424,7 @@
 	}
 
 	.live-memory-title .glyph-text img {
-		height: clamp(0.7rem, 1.46vw, 1.08rem);
+		height: calc(var(--lcd-px) * 17.28);
 	}
 
 	.live-rpm-label {
@@ -1409,7 +1435,7 @@
 	}
 
 	.live-rpm-label .glyph-text img {
-		height: clamp(0.48rem, 0.96vw, 0.72rem);
+		height: calc(var(--lcd-px) * 11.52);
 	}
 
 	.live-rpm-value {
@@ -1438,7 +1464,7 @@
 	}
 
 	.live-memory-rail .glyph-text img {
-		height: clamp(1.28rem, 2.82vw, 2.04rem);
+		height: calc(var(--lcd-px) * 32.64);
 	}
 
 	.live-memory-number {
@@ -1446,7 +1472,7 @@
 	}
 
 	.live-memory-number .big-digit-text img {
-		height: clamp(1.7rem, 4.15vw, 3rem);
+		height: calc(var(--lcd-px) * 48);
 	}
 
 	.live-unit {
@@ -1457,7 +1483,7 @@
 	}
 
 	.live-unit .glyph-text img {
-		height: clamp(0.58rem, 1.2vw, 0.9rem);
+		height: calc(var(--lcd-px) * 14.4);
 	}
 
 	.live-pressure {
@@ -1468,20 +1494,20 @@
 	}
 
 	.live-pressure .segment-digit-text {
-		gap: clamp(0.06rem, 0.12vw, 0.1rem);
+		gap: calc(var(--lcd-px) * 1.6);
 		transform: scale(1.58);
 		transform-origin: bottom right;
 	}
 
 	.live-pressure .segment-digit.fractional {
-		margin-left: clamp(-1.04rem, -2.28vw, -1.64rem);
+		margin-left: calc(var(--lcd-px) * -26.24);
 		transform: scale(0.64);
 		transform-origin: bottom right;
 	}
 
 	.live-pressure .segment-digit-text img.dot-glyph {
-		height: clamp(0.56rem, 1.46vw, 1.04rem);
-		margin-bottom: clamp(0.24rem, 0.64vw, 0.46rem);
+		height: calc(var(--lcd-px) * 16.64);
+		margin-bottom: calc(var(--lcd-px) * 7.36);
 	}
 
 	.memory-active .live-memory-rail,
@@ -1512,11 +1538,11 @@
 	}
 
 	.screen-title .glyph-text img {
-		height: clamp(0.7rem, 1.5vw, 1.12rem);
+		height: calc(var(--lcd-px) * 17.92);
 	}
 
 	.screen-title .glyph-space {
-		width: clamp(0.32rem, 0.74vw, 0.56rem);
+		width: calc(var(--lcd-px) * 8.96);
 	}
 
 	.menu-rows {
@@ -1529,7 +1555,7 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: flex-start;
-		gap: clamp(0.01rem, 0.08vw, 0.05rem);
+		gap: calc(var(--lcd-px) * 0.8);
 		min-width: 0;
 	}
 
@@ -1540,10 +1566,10 @@
 
 	.menu-rows button {
 		display: grid;
-		grid-template-columns: clamp(0.32rem, 0.68vw, 0.5rem) minmax(0, 1fr) auto;
+		grid-template-columns: calc(var(--lcd-px) * 8) minmax(0, 1fr) auto;
 		align-items: center;
 		min-width: 0;
-		height: clamp(0.9rem, 2.08vw, 1.5rem);
+		height: calc(var(--lcd-px) * 24);
 		border: 0;
 		background: transparent;
 		padding: 0;
@@ -1551,11 +1577,11 @@
 	}
 
 	.menu-rows button .glyph-text img {
-		height: clamp(0.76rem, 1.66vw, 1.2rem);
+		height: calc(var(--lcd-px) * 19.2);
 	}
 
 	.menu-rows.compact button .glyph-text img {
-		height: clamp(0.66rem, 1.42vw, 1.02rem);
+		height: calc(var(--lcd-px) * 16.32);
 	}
 
 	.mode-values .menu-rows {
@@ -1584,12 +1610,12 @@
 	.selection-dot {
 		display: grid;
 		place-items: center;
-		width: clamp(0.32rem, 0.68vw, 0.5rem);
+		width: calc(var(--lcd-px) * 8);
 	}
 
 	.selection-dot img {
 		display: block;
-		width: clamp(0.18rem, 0.4vw, 0.3rem);
+		width: calc(var(--lcd-px) * 4.8);
 		height: auto;
 		opacity: 0;
 		image-rendering: pixelated;
@@ -1607,7 +1633,7 @@
 	}
 
 	.row-value {
-		padding-left: clamp(0.18rem, 0.48vw, 0.38rem);
+		padding-left: calc(var(--lcd-px) * 6.08);
 		text-align: right;
 	}
 
@@ -1620,7 +1646,7 @@
 	}
 
 	.screen-footer .glyph-text img {
-		height: clamp(0.5rem, 1.02vw, 0.78rem);
+		height: calc(var(--lcd-px) * 12.48);
 	}
 
 	.screen-icon {
@@ -1628,8 +1654,8 @@
 		right: 4.8%;
 		top: 8.4%;
 		z-index: 1;
-		width: clamp(1.2rem, 3vw, 2.25rem);
-		height: clamp(1.2rem, 3vw, 2.25rem);
+		width: calc(var(--lcd-px) * 36);
+		height: calc(var(--lcd-px) * 36);
 		object-fit: contain;
 		image-rendering: pixelated;
 		opacity: 0.95;
@@ -1665,6 +1691,31 @@
 	@media (max-width: 560px) {
 		.controller-wrap {
 			padding-inline: 0.5rem;
+		}
+	}
+
+	@media (max-width: 560px) and (orientation: portrait) {
+		.controller-stage {
+			width: min(
+				calc(1040px * 460 / 1016),
+				calc(100vw - 1rem),
+				calc((100svh - 1rem) * 460 / 1016)
+			);
+			aspect-ratio: 460 / 1016;
+		}
+
+		.controller-shell {
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			width: min(
+				1040px,
+				calc(100svh - 1rem),
+				calc((100vw - 1rem) * 1016 / 460)
+			);
+			height: auto;
+			aspect-ratio: 1016 / 460;
+			transform: translate(-50%, -50%) rotate(90deg);
 		}
 	}
 </style>
