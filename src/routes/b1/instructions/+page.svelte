@@ -1082,13 +1082,17 @@
 		z-index: 4;
 		display: grid;
 		place-items: center;
-		min-height: 100vh;
-		padding: 4vh 4vw;
+		min-height: 100svh;
+		padding: clamp(0.75rem, 4vh, 2.5rem) clamp(0.75rem, 4vw, 2.5rem);
 	}
 
 	.controller-shell {
 		position: relative;
-		width: min(92vw, 1040px);
+		width: min(
+			1040px,
+			calc(100vw - clamp(1.5rem, 8vw, 5rem)),
+			calc((100svh - clamp(1.5rem, 8vh, 5rem)) * 1016 / 460)
+		);
 		aspect-ratio: 1016 / 460;
 	}
 
@@ -1658,22 +1662,9 @@
 		}
 	}
 
-	@media (max-width: 900px) {
-		.controller-wrap {
-			min-height: 100vh;
-			padding: 2rem 0;
-		}
-
-		.controller-shell {
-			width: 142vw;
-			transform: translateX(-15vw);
-		}
-	}
-
 	@media (max-width: 560px) {
-		.controller-shell {
-			width: 190vw;
-			transform: translateX(-32vw);
+		.controller-wrap {
+			padding-inline: 0.5rem;
 		}
 	}
 </style>
