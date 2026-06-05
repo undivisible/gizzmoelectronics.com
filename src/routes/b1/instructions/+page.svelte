@@ -1296,8 +1296,8 @@
 	.segment-digit {
 		position: relative;
 		display: inline-block;
-		width: calc(var(--lcd-px) * 80.32);
-		height: calc(var(--lcd-px) * 99.2);
+		width: calc(var(--lcd-px) * 81);
+		height: calc(var(--lcd-px) * 100);
 		flex: 0 0 auto;
 	}
 
@@ -1331,49 +1331,49 @@
 		right: auto;
 	}
 
-	.segment-top {
-		left: 30%;
+	.segment-digit .segment-top {
+		left: 29.63%;
 		top: 0;
-		width: 64%;
+		width: 69.14%;
 	}
 
-	.segment-middle {
-		left: 21%;
+	.segment-digit .segment-middle {
+		left: 17.28%;
 		top: 43%;
-		width: 60%;
+		width: 65.43%;
 	}
 
-	.segment-bottom {
-		left: 7%;
-		bottom: 0;
-		width: 62%;
+	.segment-digit .segment-bottom {
+		left: 2.47%;
+		top: 88%;
+		width: 67.9%;
 	}
 
-	.segment-topleft,
-	.segment-topright,
-	.segment-botleft,
-	.segment-botright {
+	.segment-digit .segment-topleft,
+	.segment-digit .segment-topright,
+	.segment-digit .segment-botleft,
+	.segment-digit .segment-botright {
 		width: 27.16%;
 	}
 
-	.segment-topleft {
+	.segment-digit .segment-topleft {
+		left: 13.58%;
+		top: 3%;
+	}
+
+	.segment-digit .segment-topright {
+		left: 72.84%;
+		top: 2%;
+	}
+
+	.segment-digit .segment-botleft {
 		left: 0;
-		top: 14%;
+		top: 51%;
 	}
 
-	.segment-topright {
-		left: 75%;
-		top: 14%;
-	}
-
-	.segment-botleft {
-		left: 0;
-		bottom: 14%;
-	}
-
-	.segment-botright {
-		left: 63%;
-		bottom: 14%;
+	.segment-digit .segment-botright {
+		left: 60.49%;
+		top: 51%;
 	}
 
 	.segment-digit-text img.dot-glyph {
