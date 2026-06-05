@@ -1472,7 +1472,7 @@
 
 	.live-memory-rail {
 		position: absolute;
-		right: -20.9%;
+		right: -24.9%;
 		top: 43.1%;
 		z-index: 2;
 		transform: rotate(-90deg);
