@@ -1105,6 +1105,7 @@
 		z-index: 4;
 		display: grid;
 		place-items: center;
+		box-sizing: border-box;
 		min-height: 100svh;
 		padding: clamp(0.75rem, 4vh, 2.5rem) clamp(0.75rem, 4vw, 2.5rem);
 	}
@@ -1710,6 +1711,7 @@
 
 	@media (max-width: 560px) {
 		.controller-wrap {
+			padding-block: 0.5rem;
 			padding-inline: 0.5rem;
 		}
 	}
