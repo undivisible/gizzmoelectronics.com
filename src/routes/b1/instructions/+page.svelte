@@ -18,6 +18,18 @@
 		psi: string;
 		label: string;
 	};
+	type DisplayColumn = {
+		header: string;
+		options: string[];
+	};
+	type DisplayGridCell =
+		| { kind: 'header'; label: string }
+		| { kind: 'option'; label: string; column: 'pressure' | 'vac' }
+		| { kind: 'next' };
+	type DisplayGridRow = {
+		left?: DisplayGridCell;
+		right?: DisplayGridCell;
+	};
 	type ControllerScreen = {
 		id: string;
 		label: string;
@@ -25,11 +37,14 @@
 		mode: ScreenMode;
 		accent: string;
 		rows?: MenuRow[];
+		columns?: DisplayColumn[];
 		live?: LiveState;
 		footer?: string;
 		icon?:
-			| 'gear'
+			| 'display'
 			| 'warning'
+			| 'settings'
+			| 'aux'
 			| 'turbo'
 			| 'reset'
 			| 'plug'
@@ -59,8 +74,33 @@
 	const holdDelayMs = 520;
 	const wheelResetDelayMs = 320;
 	const holdDotCount = 4;
+	const splashDurationMs = 2800;
 
 	const imageBase = '/images/b1/instructions-png/';
+	const menuImageBase = `${imageBase}TheRest/Main%20Menu%20Images/`;
+	const displayGridLayout: DisplayGridRow[] = [
+		{
+			left: { kind: 'header', label: 'PRESSURE' },
+			right: { kind: 'header', label: 'VAC' },
+		},
+		{
+			left: { kind: 'option', label: 'BAR', column: 'pressure' },
+			right: { kind: 'option', label: 'INHG', column: 'vac' },
+		},
+		{
+			left: { kind: 'option', label: 'PSI', column: 'pressure' },
+			right: { kind: 'option', label: 'CMHG', column: 'vac' },
+		},
+		{
+			left: { kind: 'option', label: 'KPA', column: 'pressure' },
+			right: { kind: 'option', label: 'KPA', column: 'vac' },
+		},
+		{ right: { kind: 'option', label: 'PSI', column: 'vac' } },
+		{
+			left: { kind: 'next' },
+			right: { kind: 'option', label: 'BAR', column: 'vac' },
+		},
+	];
 	const segmentPartFiles: Record<SegmentName, string> = {
 		top: 'top',
 		topleft: 'topleft',
@@ -156,18 +196,38 @@
 	}
 
 	function iconSrc(icon: ControllerScreen['icon']): string | undefined {
-		if (icon === 'gear') return `${imageBase}TheRest/gears.png`;
-		if (icon === 'warning')
-			return `${imageBase}TheRest/Main%20Menu%20Images/safety.png`;
+		if (icon === 'display') return `${menuImageBase}displaysetting.png`;
+		if (icon === 'warning') return `${menuImageBase}safety.png`;
+		if (icon === 'settings') return `${menuImageBase}settings.png`;
+		if (icon === 'aux') return `${menuImageBase}InputConfig.png`;
 		if (icon === 'turbo') return `${imageBase}TheRest/Turbo.png`;
 		if (icon === 'reset') return `${imageBase}TheRest/NewResetLARGE.png`;
-		if (icon === 'plug')
-			return `${imageBase}TheRest/Main%20Menu%20Images/InputConfig.png`;
-		if (icon === 'solenoid')
-			return `${imageBase}TheRest/Main%20Menu%20Images/Sol.png`;
+		if (icon === 'plug') return `${menuImageBase}InputConfig.png`;
+		if (icon === 'solenoid') return `${menuImageBase}Sol.png`;
 		if (icon === 'stethoscope')
 			return `${imageBase}TheRest/stethoscopeSMALL.png`;
 		return undefined;
+	}
+
+	const mainMenuImages: Record<string, string> = {
+		DISPLAY: 'displaysetting.png',
+		'ENGINE SAFETY': 'safety.png',
+		SYSTEM: 'settings.png',
+		'AUX IN': 'InputConfig.png',
+		SOLENOID: 'Sol.png',
+	};
+
+	function mainMenuImageSrc(label: string): string | undefined {
+		const file = mainMenuImages[label];
+		return file ? `${menuImageBase}${file}` : undefined;
+	}
+
+	function screenMenuImageSrc(screen: ControllerScreen): string | undefined {
+		if (screen.id === 'main') {
+			const row = screen.rows?.[activeRowIndex];
+			return row ? mainMenuImageSrc(row.label) : undefined;
+		}
+		return iconSrc(screen.icon);
 	}
 
 	const screens: ControllerScreen[] = [
@@ -208,7 +268,6 @@
 				{ label: 'AUX IN', target: 'aux-menu' },
 				{ label: 'SOLENOID', target: 'solenoid-options' },
 			],
-			icon: 'gear',
 			source: 'IMG_2761.jpeg',
 		},
 		{
@@ -217,12 +276,10 @@
 			title: 'DISPLAY VALUES',
 			mode: 'menu',
 			accent: blue,
-			rows: [
-				{ label: 'PRESSURE', selected: true, value: 'BAR', valueTone: 'lime' },
-				{ label: 'PSI', value: 'VAC' },
-				{ label: 'KPA', value: 'IN-HG' },
-				{ label: 'NEXT', value: 'KPA', target: 'display-units' },
-				{ label: 'BAR', value: 'PSI', valueTone: 'lime' },
+			icon: 'display',
+			columns: [
+				{ header: 'PRESSURE', options: ['BAR', 'PSI', 'KPA'] },
+				{ header: 'VAC', options: ['INHG', 'CMHG', 'KPA', 'PSI', 'BAR'] },
 			],
 			source: 'IMG_2763.jpeg',
 		},
@@ -307,7 +364,7 @@
 				{ label: 'HARD RESET', target: 'hard-reset' },
 				{ label: 'DIAGNOSTICS', target: 'diagnostics' },
 			],
-			icon: 'solenoid',
+			icon: 'settings',
 			source: 'IMG_2767.jpeg',
 		},
 		{
@@ -341,8 +398,8 @@
 			mode: 'menu',
 			accent: blue,
 			rows: [
-				{ label: 'WARNING', selected: true, value: '1.24' },
-				{ label: 'BOOST CUT', value: '1.36' },
+				{ label: 'WARNING', selected: true, value: '18.0' },
+				{ label: 'BOOST CUT', value: '20.0' },
 				{ label: 'AUX OPT', value: 'OFF' },
 			],
 			icon: 'warning',
@@ -413,7 +470,7 @@
 				{ label: 'WIDEBAND', target: 'wb-calibration' },
 				{ label: 'KNOCK' },
 			],
-			icon: 'gear',
+			icon: 'aux',
 			source: 'IMG_2768.jpeg',
 		},
 		{
@@ -558,7 +615,9 @@
 		},
 	];
 
-	let activeIndex = $state(1);
+	let activeIndex = $state(0);
+	let displayColIndex = $state(0);
+	let displayRowIndex = $state(0);
 	let knobAngle = $state(18);
 	let booted = $state(false);
 	let memoryIndex = $state(1);
@@ -584,6 +643,7 @@
 			? {
 					...activeScreen.live,
 					memory: String(memoryIndex),
+					label: displaySelectedUnit('pressure'),
 				}
 			: undefined,
 	);
@@ -599,7 +659,117 @@
 		activeIndex = index;
 		editingRow = null;
 		memoryAdjusting = false;
+		displayColIndex = 0;
+		displayRowIndex = 0;
 		knobAngle = index * 31 + 18;
+	}
+
+	function displayCol0Count(): number {
+		return (activeScreen.columns?.[0]?.options.length ?? 0) + 1;
+	}
+
+	function displayCol1Count(): number {
+		return activeScreen.columns?.[1]?.options.length ?? 0;
+	}
+
+	function displayFocusedLabel(): string {
+		if (displayColIndex === 0) {
+			if (displayRowIndex < (activeScreen.columns?.[0]?.options.length ?? 0)) {
+				return activeScreen.columns?.[0]?.options[displayRowIndex] ?? '';
+			}
+			return 'NEXT';
+		}
+		return activeScreen.columns?.[1]?.options[displayRowIndex] ?? '';
+	}
+
+	function displayUnitKey(column: 'pressure' | 'vac'): string {
+		return `display-values:${column}`;
+	}
+
+	function displaySelectedUnit(column: 'pressure' | 'vac'): string {
+		const defaults = { pressure: 'BAR', vac: 'PSI' };
+		return valueOverrides[displayUnitKey(column)] ?? defaults[column];
+	}
+
+	function moveDisplaySelection(direction: number) {
+		if (displayColIndex === 0) {
+			const max = displayCol0Count() - 1;
+			if (direction > 0) {
+				if (displayRowIndex < max) displayRowIndex += 1;
+				else {
+					displayColIndex = 1;
+					displayRowIndex = 0;
+				}
+			} else if (displayRowIndex > 0) {
+				displayRowIndex -= 1;
+			}
+			return;
+		}
+
+		if (direction > 0) {
+			displayRowIndex = Math.min(
+				displayRowIndex + 1,
+				displayCol1Count() - 1,
+			);
+		} else if (displayRowIndex > 0) {
+			displayRowIndex -= 1;
+		} else {
+			displayColIndex = 0;
+			displayRowIndex = displayCol0Count() - 1;
+		}
+	}
+
+	function selectDisplayFocused() {
+		const label = displayFocusedLabel();
+		if (label === 'NEXT') return;
+		if (displayColIndex === 0) {
+			valueOverrides[displayUnitKey('pressure')] = label;
+		} else {
+			valueOverrides[displayUnitKey('vac')] = label;
+		}
+	}
+
+	function displayOptionIndex(
+		column: 'pressure' | 'vac',
+		label: string,
+	): number {
+		const options =
+			column === 'pressure'
+				? (activeScreen.columns?.[0]?.options ?? [])
+				: (activeScreen.columns?.[1]?.options ?? []);
+		return Math.max(0, options.indexOf(label));
+	}
+
+	function displayCellFocused(cell: DisplayGridCell): boolean {
+		if (cell.kind === 'next') {
+			return (
+				displayColIndex === 0 &&
+				displayRowIndex === displayCol0Count() - 1
+			);
+		}
+		if (cell.kind !== 'option') return false;
+		const col = cell.column === 'pressure' ? 0 : 1;
+		return (
+			displayColIndex === col &&
+			displayRowIndex === displayOptionIndex(cell.column, cell.label)
+		);
+	}
+
+	function displayCellChosen(cell: DisplayGridCell): boolean {
+		if (cell.kind !== 'option') return false;
+		return displaySelectedUnit(cell.column) === cell.label;
+	}
+
+	function focusDisplayCell(cell: DisplayGridCell) {
+		if (cell.kind === 'next') {
+			displayColIndex = 0;
+			displayRowIndex = displayCol0Count() - 1;
+			return;
+		}
+		if (cell.kind !== 'option') return;
+		displayColIndex = cell.column === 'pressure' ? 0 : 1;
+		displayRowIndex = displayOptionIndex(cell.column, cell.label);
+		valueOverrides[displayUnitKey(cell.column)] = cell.label;
 	}
 
 	function chooseScreenId(id: string) {
@@ -671,7 +841,15 @@
 			return ['1 SEC', '2 SEC', '4 SEC', '8 SEC', '10 SEC'];
 		if (current.endsWith('KPH')) return ['0KPH', '20KPH', '60KPH', '100KPH'];
 		if (/^\d+\.\d+$/.test(current))
-			return ['0.00', '1.00', '1.24', '1.36', '5.00', '7.35', '22.39'];
+			return [
+				'0.00',
+				'1.00',
+				'5.00',
+				'7.35',
+				'18.0',
+				'20.0',
+				'22.39',
+			];
 		if (/^\d+$/.test(current))
 			return ['0', '30', '60', '1000', '5000', '7000', '10000'];
 		return [current];
@@ -684,6 +862,32 @@
 		return options.some((option) => /\d/.test(option)) ? 'adjust' : 'toggle';
 	}
 
+	function formatAdjustedDecimal(value: number, template: string): string {
+		const fraction = template.split('.')[1] ?? '';
+		if (fraction.length === 1) return value.toFixed(1);
+		if (fraction.length >= 2) return value.toFixed(2);
+		return String(value);
+	}
+
+	function changeIncrementalDecimal(
+		screen: ControllerScreen,
+		rowIndex: number,
+		row: MenuRow,
+		direction: number,
+	) {
+		const template = row.value ?? '0.0';
+		const key = rowKey(screen.id, rowIndex);
+		const current = currentOptionFor(screen.id, rowIndex, row);
+		const step = 0.1;
+		const min = 0;
+		const max = 30;
+		let numeric = Number.parseFloat(current);
+		if (Number.isNaN(numeric)) numeric = Number.parseFloat(template);
+		numeric = Math.round((numeric + direction * step) * 10) / 10;
+		numeric = Math.max(min, Math.min(max, numeric));
+		valueOverrides[key] = formatAdjustedDecimal(numeric, template);
+	}
+
 	function changeRowValue(
 		screen: ControllerScreen,
 		rowIndex: number,
@@ -691,10 +895,18 @@
 	) {
 		const row = screen.rows?.[rowIndex];
 		if (!row) return;
-		const options = valueOptions(row);
-		if (options.length <= 1) return;
 		const key = rowKey(screen.id, rowIndex);
 		const current = currentOptionFor(screen.id, rowIndex, row);
+		if (
+			screen.id === 'engine-safety' &&
+			row.value &&
+			/^\d+\.\d+$/.test(row.value)
+		) {
+			changeIncrementalDecimal(screen, rowIndex, row, direction);
+			return;
+		}
+		const options = valueOptions(row);
+		if (options.length <= 1) return;
 		const currentIndex = Math.max(0, options.indexOf(current));
 		valueOverrides[key] =
 			options[(currentIndex + direction + options.length) % options.length];
@@ -707,6 +919,10 @@
 	}
 
 	function moveSelection(direction: number) {
+		if (activeScreen.id === 'display-values' && activeScreen.columns?.length) {
+			moveDisplaySelection(direction);
+			return;
+		}
 		const rows = activeScreen.rows ?? [];
 		if (!rows.length) {
 			chooseScreen((activeIndex + direction + screens.length) % screens.length);
@@ -740,6 +956,11 @@
 		}
 		if (memoryAdjusting) {
 			memoryAdjusting = false;
+			knobAngle += 18;
+			return;
+		}
+		if (activeScreen.id === 'display-values' && activeScreen.columns?.length) {
+			selectDisplayFocused();
 			knobAngle += 18;
 			return;
 		}
@@ -898,7 +1119,14 @@
 			screens.some((screen) => screen.id === requestedScreen)
 		) {
 			chooseScreenId(requestedScreen);
+			return;
 		}
+		const splashTimer = setTimeout(() => {
+			if (screens[activeIndex]?.id === 'splash') {
+				chooseScreenId('live');
+			}
+		}, splashDurationMs);
+		return () => clearTimeout(splashTimer);
 	});
 
 	onDestroy(() => {
@@ -1077,10 +1305,10 @@
 								<div class="screen-title">
 									{@render glyphText(activeScreen.title, 'cyan')}
 								</div>
-								{#if activeScreen.icon}
+								{#if screenMenuImageSrc(activeScreen)}
 									<img
-										class={`screen-icon ${activeScreen.icon}`}
-										src={iconSrc(activeScreen.icon) ?? ''}
+										class={`screen-icon ${activeScreen.icon ?? 'main-menu'}`}
+										src={screenMenuImageSrc(activeScreen) ?? ''}
 										alt=""
 									/>
 								{/if}
@@ -1089,51 +1317,165 @@
 										{@render bigDigitText(String(memoryIndex))}
 									</div>
 								{/if}
-								<div
-									class="menu-rows"
-									class:compact={(activeScreen.rows?.length ?? 0) > 4}
-								>
-									{#each activeScreen.rows ?? [] as row, index (`${activeScreen.id}-${row.label}-${index}`)}
-										<button
-											type="button"
-											class:selected={index === activeRowIndex}
-											class:clickable={Boolean(
-												row.target || row.value || row.label === 'RETURN',
-											)}
-											class:editing={editingRow?.screenId === activeScreen.id &&
-												editingRow.rowIndex === index}
-											class={`row-tone-${row.tone ?? 'white'} value-tone-${row.valueTone ?? 'white'}`}
-											onpointerdown={(event) => event.stopPropagation()}
-											onpointerup={(event) => event.stopPropagation()}
-											onpointercancel={(event) => event.stopPropagation()}
-											onclick={(event) => {
-												event.stopPropagation();
-												rowClick(row, index);
-											}}
-										>
-											<span class="selection-dot">
-												<img
-													src={`${imageBase}TheRest/BlueBall5px.png`}
-													alt=""
-												/>
-											</span>
-											<span class="row-label"
-												>{@render glyphText(
-													labelFor(activeScreen.id, index, row),
-													row.tone ?? 'white',
-												)}</span
+								{#if activeScreen.id === 'display-values' && activeScreen.columns}
+									<div class="display-grid">
+										{#each displayGridLayout as gridRow, rowIndex (`display-row-${rowIndex}`)}
+											<div class="display-grid-row">
+												<div class="display-grid-cell">
+													{#if gridRow.left}
+														{#if gridRow.left.kind === 'header'}
+															<div class="display-column-header">
+																{@render glyphText(
+																	gridRow.left.label,
+																	'white',
+																)}
+															</div>
+														{:else}
+															<button
+																type="button"
+																class="display-option"
+																class:display-next={gridRow.left.kind ===
+																	'next'}
+																class:focused={displayCellFocused(
+																	gridRow.left,
+																)}
+																class:chosen={displayCellChosen(
+																	gridRow.left,
+																)}
+																onpointerdown={(event) =>
+																	event.stopPropagation()}
+																onpointerup={(event) =>
+																	event.stopPropagation()}
+																onpointercancel={(event) =>
+																	event.stopPropagation()}
+																onclick={(event) => {
+																	event.stopPropagation();
+																	focusDisplayCell(gridRow.left!);
+																}}
+															>
+																<span class="selection-dot">
+																	<img
+																		src={`${imageBase}TheRest/BlueBall5px.png`}
+																		alt=""
+																	/>
+																</span>
+																<span class="row-label">
+																	{#if gridRow.left.kind === 'next'}
+																		{@render glyphText('NEXT', 'cyan')}
+																	{:else}
+																		{@render glyphText(
+																			gridRow.left.label,
+																			displayCellChosen(gridRow.left)
+																				? 'lime'
+																				: 'white',
+																		)}
+																	{/if}
+																</span>
+															</button>
+														{/if}
+													{/if}
+												</div>
+												<div class="display-grid-cell">
+													{#if gridRow.right}
+														{#if gridRow.right.kind === 'header'}
+															<div class="display-column-header">
+																{@render glyphText(
+																	gridRow.right.label,
+																	'white',
+																)}
+															</div>
+														{:else}
+															<button
+																type="button"
+																class="display-option"
+																class:focused={displayCellFocused(
+																	gridRow.right,
+																)}
+																class:chosen={displayCellChosen(
+																	gridRow.right,
+																)}
+																onpointerdown={(event) =>
+																	event.stopPropagation()}
+																onpointerup={(event) =>
+																	event.stopPropagation()}
+																onpointercancel={(event) =>
+																	event.stopPropagation()}
+																onclick={(event) => {
+																	event.stopPropagation();
+																	focusDisplayCell(gridRow.right!);
+																}}
+															>
+																<span class="selection-dot">
+																	<img
+																		src={`${imageBase}TheRest/BlueBall5px.png`}
+																		alt=""
+																	/>
+																</span>
+																<span class="row-label">
+																	{#if gridRow.right.kind === 'option'}
+																		{@render glyphText(
+																			gridRow.right.label,
+																			displayCellChosen(gridRow.right)
+																				? 'lime'
+																				: 'white',
+																		)}
+																	{/if}
+																</span>
+															</button>
+														{/if}
+													{/if}
+												</div>
+											</div>
+										{/each}
+									</div>
+								{:else}
+									<div
+										class="menu-rows"
+										class:compact={(activeScreen.rows?.length ?? 0) > 4}
+									>
+										{#each activeScreen.rows ?? [] as row, index (`${activeScreen.id}-${row.label}-${index}`)}
+											<button
+												type="button"
+												class:selected={index === activeRowIndex}
+												class:clickable={Boolean(
+													row.target || row.value || row.label === 'RETURN',
+												)}
+												class:editing={editingRow?.screenId ===
+													activeScreen.id && editingRow.rowIndex === index}
+												class={`row-tone-${row.tone ?? 'white'} value-tone-${row.valueTone ?? 'white'}`}
+												onpointerdown={(event) => event.stopPropagation()}
+												onpointerup={(event) => event.stopPropagation()}
+												onpointercancel={(event) =>
+													event.stopPropagation()}
+												onclick={(event) => {
+													event.stopPropagation();
+													rowClick(row, index);
+												}}
 											>
-											{#if valueFor(activeScreen.id, index, row)}
-												<span class="row-value"
+												<span class="selection-dot">
+													<img
+														src={`${imageBase}TheRest/BlueBall5px.png`}
+														alt=""
+													/>
+												</span>
+												<span class="row-label"
 													>{@render glyphText(
-														valueFor(activeScreen.id, index, row) ?? '',
-														row.valueTone ?? 'white',
+														labelFor(activeScreen.id, index, row),
+														row.tone ?? 'white',
 													)}</span
 												>
-											{/if}
-										</button>
-									{/each}
-								</div>
+												{#if valueFor(activeScreen.id, index, row)}
+													<span class="row-value"
+														>{@render glyphText(
+															valueFor(activeScreen.id, index, row) ?? '',
+															row.valueTone ?? 'white',
+														)}</span
+													>
+												{/if}
+											</button>
+										{/each}
+									</div>
+								{/if}
 								{#if activeScreen.footer}
 									<div class="screen-footer">
 										{@render glyphText(activeScreen.footer, 'cyan')}
@@ -1256,12 +1598,11 @@
 
 	.hold-progress {
 		position: absolute;
-		left: 50%;
+		right: 6.8%;
 		top: 3.6%;
 		z-index: 20;
 		display: flex;
 		gap: calc(var(--lcd-px) * 4.48);
-		transform: translateX(-50%);
 		pointer-events: none;
 	}
 
@@ -1511,7 +1852,7 @@
 
 	.live-arc {
 		position: absolute;
-		left: -3.8%;
+		left: 0;
 		top: -2.2%;
 		width: auto;
 		height: 104.4%;
@@ -1520,6 +1861,7 @@
 		mix-blend-mode: screen;
 		opacity: 0.94;
 		transform: rotate(-2deg);
+		transform-origin: left center;
 	}
 
 	.live-memory-title {
@@ -1584,7 +1926,7 @@
 
 	.live-unit {
 		position: absolute;
-		left: 7.4%;
+		left: 13.4%;
 		top: 34.8%;
 		z-index: 2;
 	}
@@ -1673,7 +2015,8 @@
 
 	.menu-rows button {
 		display: grid;
-		grid-template-columns: calc(var(--lcd-px) * 8) minmax(0, 1fr) auto;
+		grid-template-columns: calc(var(--lcd-px) * 5.5) minmax(0, 1fr) auto;
+		column-gap: calc(var(--lcd-px) * 5.5);
 		align-items: center;
 		min-width: 0;
 		height: calc(var(--lcd-px) * 24);
@@ -1709,23 +2052,34 @@
 		cursor: pointer;
 	}
 
-	.menu-rows button.editing .row-label,
 	.menu-rows button.editing .row-value {
-		animation: memory-pulse 0.82s steps(2, jump-none) infinite;
+		animation: value-blink 1.15s ease-in-out infinite;
+	}
+
+	.menu-rows button:not(.selected) .row-label,
+	.menu-rows button:not(.selected) .row-value {
+		opacity: 0.5;
 	}
 
 	.selection-dot {
-		display: grid;
-		place-items: center;
-		width: calc(var(--lcd-px) * 8);
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		width: calc(var(--lcd-px) * 5.5);
+		height: 100%;
 	}
 
 	.selection-dot img {
 		display: block;
-		width: calc(var(--lcd-px) * 4.8);
-		height: auto;
+		width: auto;
+		height: calc(var(--lcd-px) * 8);
 		opacity: 0;
 		image-rendering: pixelated;
+	}
+
+	.menu-rows .row-value .glyph-text img.dot-glyph {
+		height: calc(var(--lcd-px) * 5.76);
+		margin-bottom: calc(var(--lcd-px) * 1.6);
 	}
 
 	.menu-rows button.selected .selection-dot img {
@@ -1759,7 +2113,7 @@
 	.screen-icon {
 		position: absolute;
 		right: 4.8%;
-		top: 8.4%;
+		bottom: 5.2%;
 		z-index: 1;
 		width: calc(var(--lcd-px) * 36);
 		height: calc(var(--lcd-px) * 36);
@@ -1768,13 +2122,85 @@
 		opacity: 0.95;
 	}
 
+	.display-grid {
+		position: absolute;
+		left: 4.5%;
+		top: 24.8%;
+		right: 4.4%;
+		bottom: 14%;
+		z-index: 2;
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--lcd-px) * 0.4);
+		min-width: 0;
+	}
+
+	.display-grid-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: calc(var(--lcd-px) * 8);
+		min-height: calc(var(--lcd-px) * 24);
+		min-width: 0;
+	}
+
+	.display-grid-cell {
+		display: flex;
+		align-items: center;
+		min-width: 0;
+		min-height: calc(var(--lcd-px) * 24);
+	}
+
+	.display-column-header {
+		display: flex;
+		align-items: center;
+		min-height: calc(var(--lcd-px) * 24);
+	}
+
+	.display-column-header .glyph-text img {
+		height: calc(var(--lcd-px) * 17.92);
+	}
+
+	.display-option {
+		display: grid;
+		grid-template-columns: calc(var(--lcd-px) * 5.5) minmax(0, 1fr);
+		column-gap: calc(var(--lcd-px) * 5.5);
+		align-items: center;
+		min-width: 0;
+		width: 100%;
+		height: calc(var(--lcd-px) * 24);
+		border: 0;
+		background: transparent;
+		padding: 0;
+		cursor: pointer;
+	}
+
+	.display-option .glyph-text img {
+		height: calc(var(--lcd-px) * 19.2);
+	}
+
+	.display-option:not(.focused) .row-label {
+		opacity: 0.5;
+	}
+
+	.display-option.focused .selection-dot img {
+		opacity: 1;
+	}
+
+	.display-next .row-label {
+		opacity: 1;
+	}
+
+	.display-next:not(.focused) .row-label {
+		opacity: 0.5;
+	}
+
 	.screen-icon.warning {
 		filter: none;
 	}
 
 	.screen-icon.stethoscope {
 		right: 6.4%;
-		top: 9.4%;
+		bottom: 4.8%;
 		width: calc(var(--lcd-px) * 38);
 		height: calc(var(--lcd-px) * 38);
 		filter: none;
@@ -1783,6 +2209,7 @@
 	.screen-set-memory .screen-icon {
 		left: 5.7%;
 		right: auto;
+		bottom: auto;
 		top: 10.8%;
 		width: calc(var(--lcd-px) * 47);
 		height: calc(var(--lcd-px) * 47);
@@ -1825,6 +2252,17 @@
 	@keyframes memory-pulse {
 		50% {
 			opacity: 0.55;
+		}
+	}
+
+	@keyframes value-blink {
+		0%,
+		100% {
+			opacity: 1;
+		}
+
+		50% {
+			opacity: 0.42;
 		}
 	}
 
