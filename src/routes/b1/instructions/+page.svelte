@@ -1489,8 +1489,6 @@
 		align-items: center;
 		justify-content: center;
 		gap: calc(var(--lcd-px) * 1.2);
-		filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.78))
-			drop-shadow(0 0 30px rgba(125, 211, 252, 0.52));
 	}
 
 	.splash-mark img {
@@ -1502,7 +1500,6 @@
 	.splash-screen img:last-child {
 		width: min(38%, 10rem);
 		image-rendering: pixelated;
-		filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.66));
 	}
 
 	.live-screen {
