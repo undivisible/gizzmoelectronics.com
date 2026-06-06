@@ -3,6 +3,7 @@
 
 	type ScreenMode = 'live' | 'menu' | 'values' | 'confirm' | 'splash';
 	type RowTone = 'cyan' | 'white' | 'lime' | 'blue' | 'red';
+	type RowAction = 'navigate' | 'toggle' | 'adjust' | 'none';
 	type MenuRow = {
 		label: string;
 		value?: string;
@@ -596,7 +597,21 @@
 		rowIndex: number,
 		row: MenuRow,
 	): string | undefined {
+		if (row.value === undefined) return undefined;
 		return valueOverrides[rowKey(screenId, rowIndex)] ?? row.value;
+	}
+
+	function labelFor(screenId: string, rowIndex: number, row: MenuRow): string {
+		if (row.value !== undefined) return row.label;
+		return valueOverrides[rowKey(screenId, rowIndex)] ?? row.label;
+	}
+
+	function currentOptionFor(
+		screenId: string,
+		rowIndex: number,
+		row: MenuRow,
+	): string {
+		return valueOverrides[rowKey(screenId, rowIndex)] ?? row.value ?? row.label;
 	}
 
 	function valueOptions(row: MenuRow): string[] {
@@ -617,6 +632,9 @@
 		if (current === 'COMMON' || current === 'CUSTOM')
 			return ['COMMON', 'CUSTOM'];
 		if (current === 'SINGLE' || current === 'MULTI') return ['SINGLE', 'MULTI'];
+		if (current === 'ABOVE' || current === 'BELOW') return ['ABOVE', 'BELOW'];
+		if (current === 'ADD' || current === 'SUBTRACT') return ['ADD', 'SUBTRACT'];
+		if (current === 'LAMBDA' || current === 'NFR') return ['LAMBDA', 'NFR'];
 		if (current === 'DIM' || current === 'BRIGHT')
 			return ['DIM', 'BRIGHT', 'AUTO'];
 		if (current === 'LATCHED' || current === 'MOMENTARY')
@@ -632,17 +650,33 @@
 		return [current];
 	}
 
-	function changeValue(direction: number) {
-		if (!editingRow) return;
-		const screen = screens[indexFor(editingRow.screenId)];
-		const row = screen.rows?.[editingRow.rowIndex];
+	function rowAction(row: MenuRow): RowAction {
+		if (row.target || row.label === 'RETURN') return 'navigate';
+		const options = valueOptions(row);
+		if (options.length <= 1) return 'none';
+		return options.some((option) => /\d/.test(option)) ? 'adjust' : 'toggle';
+	}
+
+	function changeRowValue(
+		screen: ControllerScreen,
+		rowIndex: number,
+		direction: number,
+	) {
+		const row = screen.rows?.[rowIndex];
 		if (!row) return;
 		const options = valueOptions(row);
-		const key = rowKey(screen.id, editingRow.rowIndex);
-		const current = valueFor(screen.id, editingRow.rowIndex, row) ?? options[0];
+		if (options.length <= 1) return;
+		const key = rowKey(screen.id, rowIndex);
+		const current = currentOptionFor(screen.id, rowIndex, row);
 		const currentIndex = Math.max(0, options.indexOf(current));
 		valueOverrides[key] =
 			options[(currentIndex + direction + options.length) % options.length];
+	}
+
+	function changeValue(direction: number) {
+		if (!editingRow) return;
+		const screen = screens[indexFor(editingRow.screenId)];
+		changeRowValue(screen, editingRow.rowIndex, direction);
 	}
 
 	function moveSelection(direction: number) {
@@ -685,14 +719,19 @@
 		const selected = activeScreen.rows?.[activeRowIndex];
 		if (activeScreen.id === 'live' || activeScreen.id === 'splash') {
 			chooseScreenId('main');
-		} else if (selected?.target) {
-			chooseScreenId(selected.target);
-		} else if (selected?.label === 'RETURN') {
-			chooseScreenId('main');
 		} else if (selected) {
-			editingRow = { screenId: activeScreen.id, rowIndex: activeRowIndex };
-		} else {
-			chooseScreenId('main');
+			const action = rowAction(selected);
+			if (selected.target) {
+				chooseScreenId(selected.target);
+			} else if (selected.label === 'RETURN') {
+				chooseScreenId('main');
+			} else if (action === 'toggle') {
+				changeRowValue(activeScreen, activeRowIndex, 1);
+			} else if (action === 'adjust') {
+				editingRow = { screenId: activeScreen.id, rowIndex: activeRowIndex };
+			} else {
+				editingRow = null;
+			}
 		}
 		knobAngle += 18;
 	}
@@ -706,7 +745,7 @@
 		holdTriggered = true;
 		holdProgressDots = holdDotCount;
 		editingRow = null;
-		if (activeScreen.id === 'live' || activeScreen.id === 'main') {
+		if (activeScreen.id === 'live') {
 			chooseScreenId('set-memory');
 			memoryAdjusting = true;
 		} else {
@@ -798,17 +837,25 @@
 	}
 
 	function rowClick(row: MenuRow, index: number) {
-		if (activeRowIndex !== index) {
-			rowSelections[activeScreen.id] = index;
+		if (
+			editingRow?.screenId === activeScreen.id &&
+			editingRow.rowIndex === index
+		) {
 			editingRow = null;
 			return;
 		}
+		rowSelections[activeScreen.id] = index;
 		if (row.target) {
 			chooseScreenId(row.target);
 		} else if (row.label === 'RETURN') {
 			chooseScreenId('main');
-		} else {
+		} else if (rowAction(row) === 'toggle') {
+			editingRow = null;
+			changeRowValue(activeScreen, index, 1);
+		} else if (rowAction(row) === 'adjust') {
 			editingRow = { screenId: activeScreen.id, rowIndex: index };
+		} else {
+			editingRow = null;
 		}
 	}
 
@@ -944,7 +991,7 @@
 					}}
 				>
 					<div
-						class={`screen-ui mode-${activeScreen.mode}`}
+						class={`screen-ui mode-${activeScreen.mode} screen-${activeScreen.id}`}
 						class:memory-active={memoryAdjusting}
 						style={`--accent:${activeScreen.accent};--cyan:${blue};--lime:${lime};--screen-white:${white};--red:${red}`}
 					>
@@ -1007,6 +1054,11 @@
 										alt=""
 									/>
 								{/if}
+								{#if activeScreen.id === 'set-memory'}
+									<div class="set-memory-number">
+										{@render bigDigitText(String(memoryIndex))}
+									</div>
+								{/if}
 								<div
 									class="menu-rows"
 									class:compact={(activeScreen.rows?.length ?? 0) > 4}
@@ -1037,7 +1089,7 @@
 											</span>
 											<span class="row-label"
 												>{@render glyphText(
-													row.label,
+													labelFor(activeScreen.id, index, row),
 													row.tone ?? 'white',
 												)}</span
 											>
@@ -1683,6 +1735,30 @@
 
 	.screen-icon.warning {
 		filter: none;
+	}
+
+	.screen-set-memory .screen-icon {
+		left: 5.7%;
+		right: auto;
+		top: 10.8%;
+		width: calc(var(--lcd-px) * 47);
+		height: calc(var(--lcd-px) * 47);
+	}
+
+	.screen-set-memory .menu-rows {
+		top: 38.2%;
+	}
+
+	.set-memory-number {
+		position: absolute;
+		left: 22.5%;
+		top: 11.8%;
+		z-index: 3;
+	}
+
+	.set-memory-number .big-digit-text img {
+		height: calc(var(--lcd-px) * 68);
+		filter: hue-rotate(-96deg) saturate(2.15) brightness(1.18);
 	}
 
 	.knob {
