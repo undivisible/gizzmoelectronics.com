@@ -1244,13 +1244,13 @@
 		position: relative;
 		width: 100%;
 		height: 100%;
-		background: linear-gradient(180deg, #050b18 0%, #020510 56%, #000 100%);
+		background: #000;
 		box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.36);
 		overflow: hidden;
 	}
 
 	.screen-ui.mode-live {
-		background: linear-gradient(180deg, #01040c 0%, #000 58%, #01030a 100%);
+		background: #000;
 		box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.42);
 	}
 
