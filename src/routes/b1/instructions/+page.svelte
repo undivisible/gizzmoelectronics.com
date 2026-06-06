@@ -27,7 +27,14 @@
 		rows?: MenuRow[];
 		live?: LiveState;
 		footer?: string;
-		icon?: 'gear' | 'warning' | 'turbo' | 'reset' | 'plug' | 'solenoid';
+		icon?:
+			| 'gear'
+			| 'warning'
+			| 'turbo'
+			| 'reset'
+			| 'plug'
+			| 'solenoid'
+			| 'stethoscope';
 		source?: string;
 	};
 	type Glyph = {
@@ -158,6 +165,8 @@
 			return `${imageBase}TheRest/Main%20Menu%20Images/InputConfig.png`;
 		if (icon === 'solenoid')
 			return `${imageBase}TheRest/Main%20Menu%20Images/Sol.png`;
+		if (icon === 'stethoscope')
+			return `${imageBase}TheRest/stethoscopeSMALL.png`;
 		return undefined;
 	}
 
@@ -197,7 +206,7 @@
 				{ label: 'ENGINE SAFETY', selected: true, target: 'engine-safety' },
 				{ label: 'SYSTEM', target: 'system-menu' },
 				{ label: 'AUX IN', target: 'aux-menu' },
-				{ label: 'SOLENOID', target: 'solenoid-frequency' },
+				{ label: 'SOLENOID', target: 'solenoid-options' },
 			],
 			icon: 'gear',
 			source: 'IMG_2761.jpeg',
@@ -302,14 +311,28 @@
 			source: 'IMG_2767.jpeg',
 		},
 		{
-			id: 'solenoid-frequency',
+			id: 'solenoid-options',
 			label: 'Sol',
+			title: 'SOLENOID FREQ',
+			mode: 'values',
+			accent: blue,
+			rows: [
+				{ label: 'FREQUENCY', selected: true, value: 'PWM', valueTone: 'lime' },
+				{ label: 'MODE', value: 'OPEN' },
+				{ label: 'DUTY', value: '30HZ', target: 'solenoid-frequency' },
+			],
+			icon: 'solenoid',
+			source: 'IMG_2765.jpeg',
+		},
+		{
+			id: 'solenoid-frequency',
+			label: 'Sol Hz',
 			title: 'SOLENOID FREQUENCY',
 			mode: 'values',
 			accent: blue,
 			rows: [{ label: '30 HZ', tone: 'white' }],
 			icon: 'solenoid',
-			source: 'IMG_2765.jpeg',
+			source: 'IMG_2769.jpeg',
 		},
 		{
 			id: 'engine-safety',
@@ -421,7 +444,7 @@
 				{ label: 'SHIFT RPM', value: '7000' },
 				{ label: 'LIVE RPM', value: '0', valueTone: 'lime' },
 			],
-			source: 'IMG_2777.jpeg',
+			source: 'IMG_2775.jpeg',
 		},
 		{
 			id: 'speed-cal',
@@ -436,7 +459,7 @@
 				{ label: 'KPH', value: 'MPH', valueTone: 'lime' },
 				{ label: 'LIVE SPEED', value: '0KPH', valueTone: 'lime' },
 			],
-			source: 'IMG_2778.jpeg',
+			source: 'IMG_2776.jpeg',
 		},
 		{
 			id: 'set-memory',
@@ -503,7 +526,7 @@
 				{ label: 'KNOB', value: 'A   B', valueTone: 'lime' },
 				{ label: 'FW 26-MAY-26' },
 			],
-			icon: 'plug',
+			icon: 'stethoscope',
 			source: 'IMG_2781.jpeg',
 		},
 		{
@@ -518,16 +541,20 @@
 				{ label: 'RESET ALL' },
 			],
 			icon: 'reset',
-			source: 'IMG_2783.jpeg',
+			source: 'IMG_2782.jpeg',
 		},
 		{
 			id: 'factory-reset',
 			label: 'Factory',
-			title: 'ENTER TO SET ALL DATA TO FACTORY DEFAULTS',
+			title: 'ENTER TO SET ALL',
 			mode: 'confirm',
 			accent: blue,
-			rows: [{ label: 'ESCAPE TO CANCEL' }],
-			source: 'IMG_2782.jpeg',
+			rows: [
+				{ label: 'DATA TO FACTORY' },
+				{ label: 'DEFAULTS' },
+				{ label: 'ESCAPE TO CANCEL', selected: true },
+			],
+			source: 'IMG_2783.jpeg',
 		},
 	];
 
@@ -1004,7 +1031,10 @@
 						{/if}
 						{#if activeScreen.mode === 'splash'}
 							<div class="splash-screen">
-								<img src={`${imageBase}TheRest/Splash_B.png`} alt="B1" />
+								<div class="splash-mark" aria-label="B1">
+									<img src={`${imageBase}TheRest/Splash_B.png`} alt="" />
+									<img src={`${imageBase}TheRest/Splash_1.png`} alt="" />
+								</div>
 								<img
 									src={`${imageBase}TheRest/Splash_byGizzmo.png`}
 									alt="by Gizzmo"
@@ -1454,11 +1484,19 @@
 		gap: calc(var(--lcd-px) * 8);
 	}
 
-	.splash-screen img:first-child {
-		width: min(42%, 11rem);
-		image-rendering: pixelated;
+	.splash-mark {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: calc(var(--lcd-px) * 1.2);
 		filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.78))
 			drop-shadow(0 0 30px rgba(125, 211, 252, 0.52));
+	}
+
+	.splash-mark img {
+		width: auto;
+		height: calc(var(--lcd-px) * 91);
+		image-rendering: pixelated;
 	}
 
 	.splash-screen img:last-child {
@@ -1734,6 +1772,14 @@
 	}
 
 	.screen-icon.warning {
+		filter: none;
+	}
+
+	.screen-icon.stethoscope {
+		right: 6.4%;
+		top: 9.4%;
+		width: calc(var(--lcd-px) * 38);
+		height: calc(var(--lcd-px) * 38);
 		filter: none;
 	}
 
