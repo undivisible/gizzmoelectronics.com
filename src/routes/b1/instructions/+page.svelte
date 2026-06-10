@@ -249,7 +249,7 @@
 			live: {
 				memory: '1',
 				rpm: '0',
-				psi: '0.0',
+				psi: '0.00',
 				label: 'PSI',
 			},
 			footer: 'RPM 0',
@@ -1163,40 +1163,58 @@
 	</span>
 {/snippet}
 
-{#snippet segmentDigitText(text: string)}
-	<span class="segment-digit-text" aria-label={text}>
-		{#each text.split('') as character, index (`${text}-${index}`)}
-			{@const parts = segmentParts(character)}
-			{#if character === ' '}
-				<span class="big-digit-space"></span>
-			{:else if parts.length}
-				<span
-					class="segment-digit"
-					class:fractional={text.includes('.') && index > text.indexOf('.')}
-				>
-					{#each parts as part (`${character}-${part}`)}
-						<img
-							class={`segment-part segment-${part}`}
-							src={segmentPartSrc(part)}
-							alt=""
-						/>
-					{/each}
-				</span>
-			{:else if character === '.'}
+{#snippet segmentDigitChar(character: string, fractional: boolean)}
+	{@const parts = segmentParts(character)}
+	{#if character === ' '}
+		<span class="big-digit-space"></span>
+	{:else if parts.length}
+		<span class="segment-digit" class:fractional={fractional}>
+			{#each parts as part (`${character}-${part}`)}
 				<img
-					src={segmentDigitSrc(character)}
-					class="dot-glyph fractional-dot"
+					class={`segment-part segment-${part}`}
+					src={segmentPartSrc(part)}
 					alt=""
 				/>
-			{:else}
-				{@const src = segmentDigitSrc(character)}
-				{#if src}
-					<img {src} alt="" />
-				{:else}
-					<span class="big-digit-fallback">{character}</span>
-				{/if}
-			{/if}
-		{/each}
+			{/each}
+		</span>
+	{:else if character === '.'}
+		<img
+			src={segmentDigitSrc(character)}
+			class="dot-glyph fractional-dot"
+			alt=""
+		/>
+	{:else}
+		{@const src = segmentDigitSrc(character)}
+		{#if src}
+			<img {src} alt="" />
+		{:else}
+			<span class="big-digit-fallback">{character}</span>
+		{/if}
+	{/if}
+{/snippet}
+
+{#snippet segmentDigitText(text: string)}
+	{@const dotIndex = text.indexOf('.')}
+	<span class="segment-digit-text" aria-label={text}>
+		{#if dotIndex >= 0}
+			{#each text.slice(0, dotIndex).split('') as character, index (`${text}-pre-${index}`)}
+				{@render segmentDigitChar(character, false)}
+			{/each}
+			<span class="segment-fractional-group">
+				{#each text.slice(dotIndex).split('') as character, index (`${text}-frac-${index}`)}
+					<span
+						class="segment-fractional-slot"
+						class:dot-slot={character === '.'}
+					>
+						{@render segmentDigitChar(character, character !== '.')}
+					</span>
+				{/each}
+			</span>
+		{:else}
+			{#each text.split('') as character, index (`${text}-${index}`)}
+				{@render segmentDigitChar(character, false)}
+			{/each}
+		{/if}
 	</span>
 {/snippet}
 
@@ -1937,26 +1955,80 @@
 
 	.live-pressure {
 		position: absolute;
-		right: 15.8%;
-		bottom: 10.2%;
+		right: 10.5%;
+		bottom: 6%;
 		z-index: 2;
+		display: flex;
+		justify-content: flex-end;
+		align-items: flex-end;
 	}
 
 	.live-pressure .segment-digit-text {
-		gap: calc(var(--lcd-px) * 3.2);
-		transform: scale(1.36);
+		gap: calc(var(--lcd-px) * 1.6);
+		transform: scale(1.48);
 		transform-origin: bottom right;
 	}
 
-	.live-pressure .segment-digit.fractional {
-		margin-left: calc(var(--lcd-px) * -8);
-		transform: scale(0.62);
-		transform-origin: bottom right;
+	.segment-fractional-group {
+		display: inline-flex;
+		align-items: flex-end;
+		gap: calc(var(--lcd-px) * 2.4);
 	}
 
-	.live-pressure .segment-digit-text img.dot-glyph {
-		height: calc(var(--lcd-px) * 16.64);
-		margin-bottom: calc(var(--lcd-px) * 7.36);
+	.live-pressure .segment-fractional-group {
+		height: calc(var(--lcd-px) * 62);
+	}
+
+	.live-pressure .segment-fractional-slot {
+		position: relative;
+		display: block;
+		width: calc(var(--lcd-px) * 52);
+		height: 100%;
+		overflow: visible;
+		flex: 0 0 auto;
+	}
+
+	.live-pressure .segment-fractional-slot.dot-slot {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: calc(var(--lcd-px) * 14);
+	}
+
+	.live-pressure .segment-fractional-slot .segment-digit {
+		position: absolute;
+		left: 50%;
+		bottom: 0;
+		margin: 0;
+		transform: translateX(-50%) scale(0.62);
+		transform-origin: bottom center;
+	}
+
+	.live-pressure .segment-fractional-slot img.fractional-dot {
+		height: calc(var(--lcd-px) * 9.6);
+		margin: 0;
+	}
+
+	.screen-main .menu-rows button {
+		grid-template-columns: calc(var(--lcd-px) * 13) minmax(0, 1fr) auto;
+	}
+
+	.screen-main .menu-rows button .glyph-text img {
+		height: calc(var(--lcd-px) * 24);
+	}
+
+	.screen-main .selection-dot {
+		width: calc(var(--lcd-px) * 13);
+	}
+
+	.screen-main .selection-dot img {
+		width: calc(var(--lcd-px) * 11);
+		height: calc(var(--lcd-px) * 11);
+	}
+
+	.screen-main .screen-icon.main-menu {
+		width: calc(var(--lcd-px) * 50);
+		height: calc(var(--lcd-px) * 50);
 	}
 
 	.memory-active .live-memory-rail,
