@@ -1001,7 +1001,12 @@
 		}
 	}
 
+	function preventImageMenu(event: Event) {
+		event.preventDefault();
+	}
+
 	function startHold(event: PointerEvent) {
+		if (event.pointerType === 'touch') event.preventDefault();
 		holdTriggered = false;
 		dragActive = true;
 		dragMoved = false;
@@ -1057,7 +1062,9 @@
 		}
 		if (Math.abs(stepX) > 18 || Math.abs(movedY) > 18) {
 			const useHorizontal = Math.abs(stepX) > Math.abs(movedY);
-			rotateKnob(useHorizontal ? (stepX > 0 ? 1 : -1) : movedY > 0 ? 1 : -1);
+			rotateKnob(
+				useHorizontal ? (stepX > 0 ? 1 : -1) : movedY > 0 ? -1 : 1,
+			);
 			dragLastX = event.clientX;
 			dragLastY = event.clientY;
 		}
@@ -1073,13 +1080,13 @@
 
 		if (Math.abs(scaledDelta) >= 85) {
 			wheelDeltaBuffer = 0;
-			rotateKnob(scaledDelta > 0 ? 1 : -1);
+			rotateKnob(scaledDelta > 0 ? -1 : 1);
 			return;
 		}
 
 		wheelDeltaBuffer += scaledDelta;
 		if (Math.abs(wheelDeltaBuffer) >= 120) {
-			rotateKnob(wheelDeltaBuffer > 0 ? 1 : -1);
+			rotateKnob(wheelDeltaBuffer > 0 ? -1 : 1);
 			wheelDeltaBuffer = 0;
 		}
 	}
@@ -1234,6 +1241,7 @@
 					class="controller-image"
 					src="/images/b1/b1.png"
 					alt="B1 controller"
+					draggable="false"
 				/>
 
 				<div
@@ -1246,6 +1254,7 @@
 					onpointerup={releaseKnob}
 					onpointerleave={endHold}
 					onpointercancel={cancelInteraction}
+					oncontextmenu={preventImageMenu}
 					onwheel={handleWheel}
 					onkeydown={(event) => {
 						if (event.key === 'Enter' || event.key === ' ') {
@@ -1513,6 +1522,7 @@
 					onpointerup={releaseKnob}
 					onpointerleave={endHold}
 					onpointercancel={cancelInteraction}
+					oncontextmenu={preventImageMenu}
 					onwheel={handleWheel}
 				>
 					<span style={`transform:rotate(${knobAngle}deg)`}></span>
@@ -1575,6 +1585,20 @@
 		height: 100%;
 		object-fit: contain;
 		filter: drop-shadow(0 38px 90px rgba(0, 0, 0, 0.75));
+		pointer-events: none;
+		-webkit-touch-callout: none;
+		user-select: none;
+		-webkit-user-drag: none;
+	}
+
+	.b1-instructions img {
+		-webkit-touch-callout: none;
+		user-select: none;
+		-webkit-user-drag: none;
+	}
+
+	.screen-ui img {
+		pointer-events: none;
 	}
 
 	.controller-screen {
@@ -1591,6 +1615,8 @@
 		cursor: pointer;
 		overflow: hidden;
 		touch-action: none;
+		-webkit-touch-callout: none;
+		user-select: none;
 		container-type: size;
 		--lcd-px: calc(100cqw / 516.88);
 	}
@@ -2315,6 +2341,8 @@
 		background: transparent;
 		cursor: pointer;
 		touch-action: none;
+		-webkit-touch-callout: none;
+		user-select: none;
 	}
 
 	.knob span {
