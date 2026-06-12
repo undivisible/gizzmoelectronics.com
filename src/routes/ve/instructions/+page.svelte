@@ -201,13 +201,13 @@
 
 	.temperature-overlay {
 		position: absolute;
-		left: 37.2%;
-		top: 35.2%;
+		left: 33.7%;
+		top: 31.4%;
 		z-index: 2;
 		display: grid;
 		place-items: center;
-		width: 22.8%;
-		height: 22.6%;
+		width: 26.4%;
+		height: 31.8%;
 		border: 0;
 		border-radius: 999rem;
 		background:
@@ -227,10 +227,10 @@
 	.temperature-value {
 		position: absolute;
 		left: 50%;
-		top: 53%;
+		top: 56%;
 		color: #f9ffff;
 		font:
-			900 clamp(0.96rem, 2.44vw, 2.18rem) 'Arial Rounded MT Bold',
+			900 clamp(1.08rem, 2.86vw, 2.54rem) 'Arial Rounded MT Bold',
 			'Arial Black',
 			Helvetica,
 			sans-serif;
@@ -240,7 +240,7 @@
 			0 0 0.1rem rgba(255, 255, 255, 0.86),
 			0 0 0.2rem rgba(42, 255, 248, 0.24),
 			0.06rem 0.08rem 0 rgba(0, 0, 0, 0.62);
-		transform: translate(-50%, -50%) scaleX(0.9);
+		transform: translate(-50%, -50%) scaleX(0.94);
 	}
 
 	@media (max-width: 760px) {
