@@ -201,25 +201,27 @@
 
 	.temperature-overlay {
 		position: absolute;
-		left: 33.7%;
-		top: 31.4%;
+		left: 36.4%;
+		top: 34.6%;
 		z-index: 2;
 		display: grid;
 		place-items: center;
-		width: 26.4%;
-		height: 31.8%;
+		width: 20%;
+		height: 28.4%;
 		border: 0;
 		border-radius: 999rem;
 		background:
 			radial-gradient(
 				ellipse at 50% 52%,
-				rgba(185, 30, 22, 0.96),
-				rgba(91, 8, 7, 0.92) 58%,
-				rgba(37, 3, 3, 0.38) 82%,
-				rgba(7, 1, 1, 0) 100%
+				rgba(210, 49, 38, 0.98),
+				rgba(165, 18, 15, 1) 54%,
+				rgba(99, 8, 8, 0.88) 78%,
+				rgba(41, 4, 4, 0) 100%
 			),
 			transparent;
-		box-shadow: inset 0 0 0.24rem rgba(255, 230, 219, 0.22);
+		box-shadow:
+			inset 0 0.18rem 0.26rem rgba(255, 196, 176, 0.16),
+			inset 0 -0.16rem 0.22rem rgba(43, 2, 2, 0.42);
 		padding: 0;
 		cursor: pointer;
 	}
@@ -227,20 +229,20 @@
 	.temperature-value {
 		position: absolute;
 		left: 50%;
-		top: 56%;
+		top: 40%;
 		color: #f9ffff;
 		font:
-			900 clamp(1.08rem, 2.86vw, 2.54rem) 'Arial Rounded MT Bold',
+			900 clamp(0.92rem, 2.52vw, 2.28rem) 'Arial Rounded MT Bold',
 			'Arial Black',
 			Helvetica,
 			sans-serif;
-		letter-spacing: -0.08em;
+		letter-spacing: -0.11em;
 		line-height: 0.82;
 		text-shadow:
 			0 0 0.1rem rgba(255, 255, 255, 0.86),
 			0 0 0.2rem rgba(42, 255, 248, 0.24),
 			0.06rem 0.08rem 0 rgba(0, 0, 0, 0.62);
-		transform: translate(-50%, -50%) scaleX(0.94);
+		transform: translate(-51%, -50%) scaleX(0.95);
 	}
 
 	@media (max-width: 760px) {
