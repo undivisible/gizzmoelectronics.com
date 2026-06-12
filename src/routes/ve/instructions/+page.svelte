@@ -24,6 +24,7 @@
 
 	const symbolBase = '/ve/SWC-Symbol-RedNEW/';
 	const symbolEtcBase = `${symbolBase}transparent/SymbolsEtc/`;
+	const fanSegmentBase = `${symbolBase}Fan_Segments/formatted/`;
 	const tempDigitBase = `${symbolBase}transparent/Temp_Digits/`;
 	const renderSrc = '/ve/VE-Cosmetic%20design.1263.jpg';
 	const tempSegmentFiles: Record<TempSegment, string> = {
@@ -127,6 +128,10 @@
 
 	function tempDigits(value: number) {
 		return String(value).padStart(2, '0').split('');
+	}
+
+	function fanSegmentFile(value: number) {
+		return value >= 14 ? `${value}n.bmp` : `${value}.bmp`;
 	}
 
 	function handleRightKnobWheel(event: WheelEvent) {
@@ -261,7 +266,11 @@
 						<img src={`${symbolEtcBase}RecircSymbol.png`} alt="" />
 					</button>
 					<div class="screen-core">
-						<div class="fan-ring" aria-hidden="true"></div>
+						<img
+							class="fan-arc"
+							src={`${fanSegmentBase}${fanSegmentFile(activeScreen.fan)}`}
+							alt=""
+						/>
 						<button
 							type="button"
 							class="temperature-orb"
@@ -321,9 +330,7 @@
 						class="screen-tile fan-step"
 						aria-label="Fan speed"
 						onclick={() => changeFan(1)}
-					>
-						<span class="fan-symbol">✤</span>
-					</button>
+					></button>
 				</div>
 			</div>
 		</div>
@@ -447,19 +454,8 @@
 		position: relative;
 		width: 100%;
 		height: 100%;
-		background:
-			linear-gradient(
-				90deg,
-				rgba(2, 21, 22, 0.98),
-				rgba(12, 86, 87, 0.98) 24%,
-				rgba(10, 56, 58, 0.98) 50%,
-				rgba(9, 73, 74, 0.98) 76%,
-				rgba(2, 22, 23, 0.98)
-			),
-			#041415;
-		box-shadow:
-			inset 0 0 0.55rem rgba(93, 255, 250, 0.34),
-			0 0 0.34rem rgba(35, 255, 248, 0.22);
+		background: transparent;
+		box-shadow: none;
 		clip-path: polygon(2% 2%, 98% 0, 100% 96%, 0 100%);
 		overflow: hidden;
 		text-transform: uppercase;
@@ -467,17 +463,17 @@
 
 	.screen-glow {
 		position: absolute;
-		inset: 12% 16%;
+		inset: 22% 25%;
 		z-index: 2;
 		border-radius: 50%;
 		background: radial-gradient(
 			circle,
-			rgba(79, 255, 249, 0.13),
-			rgba(7, 67, 70, 0.08) 48%,
+			rgba(79, 255, 249, 0.08),
+			rgba(7, 67, 70, 0.05) 48%,
 			transparent 72%
 		);
 		filter: blur(0.28rem);
-		opacity: 1;
+		opacity: 0.48;
 	}
 
 	.screen-grid {
@@ -489,22 +485,22 @@
 	.screen-backdrop {
 		position: absolute;
 		z-index: 0;
-		opacity: 0.72;
+		opacity: 0.5;
 		image-rendering: pixelated;
 		mix-blend-mode: screen;
 		pointer-events: none;
 	}
 
 	.screen-backdrop-low {
-		left: 18%;
-		bottom: 1%;
-		width: 64%;
+		left: 13%;
+		bottom: 3%;
+		width: 74%;
 	}
 
 	.screen-backdrop-high {
-		left: 24%;
-		top: 0;
-		width: 52%;
+		left: 18%;
+		top: 1%;
+		width: 64%;
 	}
 
 	.screen-tile {
@@ -517,91 +513,75 @@
 		border-radius: 0.08rem;
 		background: transparent;
 		box-shadow: none;
-		opacity: 0.36;
+		opacity: 0.24;
 	}
 
 	.screen-tile.active,
 	.screen-tile.fan-step {
-		opacity: 1;
+		opacity: 0.58;
 	}
 
 	.screen-tile img {
-		max-width: 100%;
-		max-height: 100%;
+		max-width: 82%;
+		max-height: 82%;
 		image-rendering: pixelated;
-		filter: drop-shadow(0 0 0.18rem rgba(53, 255, 250, 0.72));
+		filter: drop-shadow(0 0 0.07rem rgba(53, 255, 250, 0.36));
 		mix-blend-mode: screen;
 	}
 
 	.screen-tile.fresh {
-		left: 6%;
-		top: 12%;
+		left: 8%;
+		top: 15%;
 	}
 
 	.screen-tile.front {
-		right: 6%;
-		top: 10%;
+		right: 8%;
+		top: 14%;
 	}
 
 	.screen-tile.recirc {
-		left: 6.2%;
-		bottom: 11%;
+		left: 8.2%;
+		bottom: 15%;
 	}
 
 	.screen-tile.ac {
-		right: 6.4%;
-		top: 41%;
+		right: 8.2%;
+		top: 42%;
 	}
 
 	.screen-tile.rear {
-		right: 5.6%;
-		bottom: 10%;
+		right: 8%;
+		bottom: 14%;
 	}
 
 	.screen-tile.fan-step {
-		left: 7%;
-		top: 41%;
-	}
-
-	.fan-symbol {
-		color: #ebffff;
-		font:
-			900 clamp(0.52rem, 1.6vw, 1.28rem) Helvetica,
-			sans-serif;
-		line-height: 1;
-		text-shadow: 0 0 0.4rem rgba(83, 255, 255, 0.8);
+		left: 8%;
+		top: 42%;
 	}
 
 	.screen-core {
 		position: absolute;
-		left: 29.8%;
-		top: 8.5%;
+		left: 30.3%;
+		top: 9.6%;
 		display: grid;
 		place-items: center;
 		z-index: 4;
-		width: 40.2%;
-		height: 80%;
+		width: 38.4%;
+		height: 76.5%;
 	}
 
-	.fan-ring {
+	.fan-arc {
 		position: absolute;
-		width: 99%;
-		aspect-ratio: 1;
-		border-radius: 50%;
-		opacity: 0.7;
-		background:
-			radial-gradient(
-				circle,
-				transparent 42%,
-				rgba(0, 0, 0, 0.72) 43% 47%,
-				transparent 48%
-			),
-			repeating-conic-gradient(
-				from -6deg,
-				rgba(215, 218, 212, 0.92) 0deg 4.5deg,
-				rgba(35, 38, 38, 0.92) 4.5deg 10deg
-			);
-		filter: drop-shadow(0 0 0.18rem rgba(18, 255, 248, 0.22));
+		left: 50%;
+		top: 50%;
+		z-index: 4;
+		width: 42%;
+		height: auto;
+		image-rendering: pixelated;
+		mix-blend-mode: screen;
+		opacity: 0.36;
+		filter: drop-shadow(0 0 0.08rem rgba(18, 255, 248, 0.16));
+		transform: translate(-50%, -50%) scale(1.22);
 	}
 
 	.temperature-orb {
@@ -609,7 +589,7 @@
 		z-index: 5;
 		display: grid;
 		place-items: center;
-		width: 62%;
+		width: 67%;
 		opacity: 1;
 		aspect-ratio: 1;
 		border: 0.12rem solid rgba(238, 240, 232, 0.96);
@@ -625,20 +605,20 @@
 			),
 			#b9100c;
 		box-shadow:
-			inset 0 0 0.72rem rgba(255, 255, 255, 0.5),
-			0 0 0.86rem rgba(255, 46, 31, 0.82);
+			inset 0 0 0.34rem rgba(255, 255, 255, 0.28),
+			0 0 0.22rem rgba(255, 46, 31, 0.36);
 		color: #fff;
 		text-shadow: 0 0 0.44rem rgba(0, 0, 0, 0.8);
 	}
 
 	.mode-word {
 		position: absolute;
-		top: 17%;
+		top: 15%;
 		width: 38%;
 		height: auto;
 		image-rendering: pixelated;
 		mix-blend-mode: screen;
-		opacity: 1;
+		opacity: 0.82;
 	}
 
 	.temperature-value {
@@ -660,9 +640,9 @@
 	.temperature-digits {
 		position: absolute;
 		left: 50%;
-		top: 55%;
+		top: 57%;
 		display: flex;
-		gap: 0.01rem;
+		gap: 0.02rem;
 		opacity: 1;
 		transform: translate(-50%, -50%);
 	}
@@ -670,14 +650,14 @@
 	.temperature-digit {
 		position: relative;
 		display: block;
-		width: clamp(0.46rem, 1.22vw, 1.1rem);
+		width: clamp(0.6rem, 1.64vw, 1.46rem);
 		aspect-ratio: 22 / 37;
 	}
 
 	.temperature-segment {
 		position: absolute;
 		image-rendering: pixelated;
-		filter: drop-shadow(0 0 0.16rem rgba(255, 255, 255, 0.65));
+		filter: drop-shadow(0 0 0.1rem rgba(255, 255, 255, 0.54));
 	}
 
 	.temperature-segment.top {
@@ -730,7 +710,8 @@
 		aspect-ratio: 1;
 		border: 0.08rem solid #f8ffff;
 		border-radius: 50%;
-		box-shadow: 0 0 0.18rem rgba(255, 255, 255, 0.75);
+		opacity: 0.76;
+		box-shadow: 0 0 0.12rem rgba(255, 255, 255, 0.54);
 	}
 
 	@media (max-width: 760px) {
