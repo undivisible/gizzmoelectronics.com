@@ -449,8 +449,19 @@
 		position: relative;
 		width: 100%;
 		height: 100%;
-		background: #041415;
-		box-shadow: 0 0 0.34rem rgba(35, 255, 248, 0.22);
+		background:
+			linear-gradient(
+				90deg,
+				rgba(2, 21, 22, 0.98),
+				rgba(12, 86, 87, 0.98) 24%,
+				rgba(10, 56, 58, 0.98) 50%,
+				rgba(9, 73, 74, 0.98) 76%,
+				rgba(2, 22, 23, 0.98)
+			),
+			#041415;
+		box-shadow:
+			inset 0 0 0.55rem rgba(93, 255, 250, 0.34),
+			0 0 0.34rem rgba(35, 255, 248, 0.22);
 		overflow: hidden;
 		text-transform: uppercase;
 	}
@@ -462,6 +473,7 @@
 		width: 100%;
 		height: 100%;
 		object-fit: fill;
+		opacity: 1;
 		pointer-events: none;
 		user-select: none;
 		-webkit-user-drag: none;
@@ -469,7 +481,7 @@
 
 	.screen-glow {
 		position: absolute;
-		inset: 18% 24%;
+		inset: 12% 16%;
 		z-index: 2;
 		border-radius: 50%;
 		background: radial-gradient(
@@ -498,15 +510,15 @@
 	}
 
 	.screen-backdrop-low {
-		left: 19%;
-		bottom: 2%;
-		width: 60%;
+		left: 18%;
+		bottom: 1%;
+		width: 64%;
 	}
 
 	.screen-backdrop-high {
 		left: 24%;
-		top: 2%;
-		width: 50%;
+		top: 0;
+		width: 52%;
 	}
 
 	.screen-tile {
@@ -516,9 +528,13 @@
 		z-index: 3;
 		width: 17%;
 		height: 18%;
-		border-radius: 0.04rem;
-		background: transparent;
-		box-shadow: none;
+		border-radius: 0.08rem;
+		background:
+			linear-gradient(180deg, rgba(45, 194, 197, 0.34), rgba(2, 39, 41, 0.82)),
+			rgba(5, 55, 58, 0.68);
+		box-shadow:
+			inset 0 0 0.18rem rgba(84, 255, 250, 0.36),
+			0 0 0.18rem rgba(50, 255, 248, 0.32);
 		opacity: 0;
 	}
 
@@ -536,12 +552,12 @@
 	}
 
 	.screen-tile.fresh {
-		left: 5.6%;
+		left: 6%;
 		top: 12%;
 	}
 
 	.screen-tile.front {
-		right: 5.4%;
+		right: 6%;
 		top: 10%;
 	}
 
@@ -551,7 +567,7 @@
 	}
 
 	.screen-tile.ac {
-		right: 6.6%;
+		right: 6.4%;
 		top: 41%;
 	}
 
@@ -576,53 +592,54 @@
 
 	.screen-core {
 		position: absolute;
-		left: 31.2%;
-		top: 14.5%;
+		left: 30.6%;
+		top: 11%;
 		display: grid;
 		place-items: center;
 		z-index: 4;
-		width: 35.8%;
-		height: 69%;
+		width: 38.2%;
+		height: 76%;
 	}
 
 	.fan-ring {
 		position: absolute;
-		width: 96%;
+		width: 104%;
 		aspect-ratio: 1;
 		border-radius: 50%;
 		opacity: 0;
 		background:
 			radial-gradient(
 				circle,
-				transparent 43%,
-				rgba(0, 0, 0, 0.55) 44% 48%,
-				transparent 49%
+				transparent 42%,
+				rgba(0, 0, 0, 0.72) 43% 47%,
+				transparent 48%
 			),
 			repeating-conic-gradient(
 				from -6deg,
-				rgba(212, 217, 213, 0.74) 0deg 5deg,
-				rgba(23, 27, 27, 0.14) 5deg 13deg
+				rgba(215, 218, 212, 0.92) 0deg 4.5deg,
+				rgba(35, 38, 38, 0.92) 4.5deg 10deg
 			);
 		filter: drop-shadow(0 0 0.18rem rgba(18, 255, 248, 0.22));
 	}
 
 	.temperature-orb {
 		position: relative;
-		z-index: 2;
+		z-index: 5;
 		display: grid;
 		place-items: center;
-		width: 74%;
+		width: 70%;
 		opacity: 1;
 		aspect-ratio: 1;
-		border: 0.12rem solid rgba(226, 230, 224, 0.92);
+		border: 0.12rem solid rgba(238, 240, 232, 0.96);
 		border-radius: 50%;
 		background:
 			radial-gradient(
 				circle at 50% 38%,
-				#fff1eb 0 7%,
-				#ff6d4f 23%,
-				#d5150f 48%,
-				#710302 78%
+				#ffe7dc 0 8%,
+				#ff7b5e 23%,
+				#e22118 46%,
+				#8b0805 74%,
+				#4d0201 100%
 			),
 			#b9100c;
 		box-shadow:
@@ -638,24 +655,22 @@
 		width: 38%;
 		height: auto;
 		image-rendering: pixelated;
-		mix-blend-mode: screen;
+		opacity: 0;
 	}
 
 	.temperature-value {
 		position: absolute;
 		left: 50%;
-		top: 55%;
-		color: #f7f4eb;
+		top: 55.5%;
+		color: transparent;
 		font:
-			900 clamp(1.05rem, 3.1vw, 2.76rem) 'Arial Rounded MT Bold',
+			900 clamp(0.88rem, 2.45vw, 2.16rem) 'Arial Rounded MT Bold',
 			'Arial Black',
 			Helvetica,
 			sans-serif;
-		letter-spacing: -0.05em;
+		letter-spacing: -0.08em;
 		line-height: 0.82;
-		text-shadow:
-			0.03rem 0.03rem 0 rgba(77, 86, 82, 0.9),
-			0 0 0.18rem rgba(255, 255, 255, 0.7);
+		text-shadow: none;
 		transform: translate(-52%, -50%) scaleX(0.92);
 	}
 
@@ -665,7 +680,7 @@
 		top: 54%;
 		display: flex;
 		gap: 0.03rem;
-		opacity: 0;
+		opacity: 1;
 		transform: translate(-50%, -50%);
 	}
 
