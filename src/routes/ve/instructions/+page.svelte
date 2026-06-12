@@ -16,11 +16,6 @@
 
 	const symbolBase = '/ve/SWC-Symbol-RedNEW/';
 	const renderSrc = '/ve/VE-Cosmetic%20design.1263.jpg';
-	const centerBackdrop = `${symbolBase}SymbolsEtc/Formatted/highBackground.bmp`;
-	const fanFrames = Array.from(
-		{ length: 18 },
-		(_, index) => `${symbolBase}Fan_Segments/formatted/${index}.bmp`,
-	);
 	const screens: ClimateScreen[] = [
 		{
 			id: 'auto',
@@ -156,12 +151,11 @@
 
 		<div class="controller-screen" aria-label="Interactive VE screen">
 			<div class="screen-ui" aria-live="polite">
-				<img class="screen-backdrop" src={centerBackdrop} alt="" />
-				<div class="screen-title">{activeScreen.title}</div>
+				<div class="screen-glow"></div>
 				<div class="screen-grid">
 					<button
 						type="button"
-						class="screen-tile"
+						class="screen-tile fresh"
 						class:active={!activeScreen.recirc}
 						aria-label="Fresh air"
 						onclick={() => (activeScreen.recirc = false)}
@@ -173,7 +167,7 @@
 					</button>
 					<button
 						type="button"
-						class="screen-tile"
+						class="screen-tile front"
 						class:active={activeScreen.front}
 						aria-label="Front demist"
 						onclick={() => (activeScreen.front = !activeScreen.front)}
@@ -185,7 +179,7 @@
 					</button>
 					<button
 						type="button"
-						class="screen-tile"
+						class="screen-tile recirc"
 						class:active={activeScreen.recirc}
 						aria-label="Recirculation"
 						onclick={() => (activeScreen.recirc = true)}
@@ -196,7 +190,7 @@
 						/>
 					</button>
 					<div class="screen-core">
-						<img class="fan-frame" src={fanFrames[activeScreen.fan]} alt="" />
+						<div class="fan-ring" aria-hidden="true"></div>
 						<button
 							type="button"
 							class="temperature-orb"
@@ -205,12 +199,12 @@
 						>
 							<span>Auto</span>
 							<strong>{activeScreen.temperature}</strong>
-							<small>°C</small>
+							<small>o</small>
 						</button>
 					</div>
 					<button
 						type="button"
-						class="screen-tile"
+						class="screen-tile ac"
 						class:active={activeScreen.ac}
 						aria-label="Air conditioning"
 						onclick={() => (activeScreen.ac = !activeScreen.ac)}
@@ -222,7 +216,7 @@
 					</button>
 					<button
 						type="button"
-						class="screen-tile"
+						class="screen-tile rear"
 						class:active={activeScreen.rear}
 						aria-label="Rear demist"
 						onclick={() => (activeScreen.rear = !activeScreen.rear)}
@@ -238,9 +232,8 @@
 						aria-label="Fan speed"
 						onclick={() => changeFan(1)}
 					>
-						<span>Fan {activeScreen.fan}</span>
+						<span class="fan-symbol">✤</span>
 					</button>
-					<div class="screen-status">{activeScreen.label}</div>
 				</div>
 			</div>
 		</div>
@@ -310,14 +303,15 @@
 
 	.controller-screen {
 		position: absolute;
-		left: 42.45%;
-		top: 46.95%;
-		width: 18.7%;
-		height: 23.1%;
+		left: 37.25%;
+		top: 43.55%;
+		width: 25.9%;
+		height: 24.8%;
 		z-index: 2;
 		overflow: hidden;
-		border-radius: 0.18rem;
-		background: #020a0c;
+		border-radius: 0.12rem;
+		background: #020606;
+		box-shadow: 0 0 0.7rem rgba(34, 248, 245, 0.16);
 		outline: none;
 	}
 
@@ -332,66 +326,45 @@
 		position: relative;
 		width: 100%;
 		height: 100%;
-		background: #031114;
-		box-shadow:
-			inset 0 0 0.7rem rgba(84, 255, 248, 0.18),
-			0 0 0.9rem rgba(45, 255, 249, 0.22);
+		background:
+			linear-gradient(90deg, rgba(18, 82, 84, 0.98), rgba(6, 31, 34, 0.98)),
+			#020606;
+		box-shadow: inset 0 0 0.5rem rgba(84, 255, 248, 0.24);
 		overflow: hidden;
 		text-transform: uppercase;
 	}
 
-	.screen-backdrop {
+	.screen-glow {
 		position: absolute;
-		inset: 0;
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		opacity: 0.38;
-		image-rendering: pixelated;
-		mix-blend-mode: screen;
-		pointer-events: none;
-	}
-
-	.screen-title {
-		position: absolute;
-		left: 0;
-		right: 0;
-		top: 4.5%;
-		z-index: 2;
-		color: #9afcff;
-		font:
-			700 clamp(0.18rem, 0.58vw, 0.54rem) Eurostile,
-			Bank Gothic,
-			sans-serif;
-		letter-spacing: 0;
-		text-align: center;
-		text-shadow: 0 0 0.8rem rgba(65, 255, 246, 0.85);
+		inset: 9% 15%;
+		border-radius: 50%;
+		background: radial-gradient(
+			circle,
+			rgba(79, 255, 249, 0.26),
+			rgba(7, 67, 70, 0.12) 48%,
+			transparent 72%
+		);
+		filter: blur(0.18rem);
 	}
 
 	.screen-grid {
 		position: absolute;
-		inset: 17% 4.4% 5%;
+		inset: 6% 4%;
 		z-index: 2;
-		display: grid;
-		grid-template-columns: 1fr 1.52fr 1fr;
-		grid-template-rows: 1fr 1fr 0.35fr;
-		align-items: center;
-		gap: 4%;
 	}
 
 	.screen-tile {
-		position: relative;
+		position: absolute;
 		display: grid;
 		place-items: center;
-		justify-items: center;
-		width: 100%;
-		height: 100%;
-		border-radius: 0.12rem;
-		background: rgba(15, 74, 79, 0.46);
-		box-shadow:
-			inset 0 0 0.42rem rgba(70, 255, 248, 0.22),
-			0 0 0.3rem rgba(13, 255, 247, 0.2);
-		opacity: 0.58;
+		width: 21%;
+		height: 26%;
+		border-radius: 0.04rem;
+		background:
+			linear-gradient(180deg, rgba(45, 206, 209, 0.35), rgba(10, 71, 73, 0.88)),
+			rgba(14, 75, 76, 0.9);
+		box-shadow: inset 0 0 0.28rem rgba(70, 255, 248, 0.28);
+		opacity: 0.46;
 	}
 
 	.screen-tile.active,
@@ -400,38 +373,79 @@
 	}
 
 	.screen-tile img {
-		max-width: 64%;
-		max-height: 70%;
+		max-width: 76%;
+		max-height: 78%;
 		image-rendering: pixelated;
-		filter: drop-shadow(0 0 0.35rem rgba(53, 255, 250, 0.82));
+		filter: drop-shadow(0 0 0.28rem rgba(53, 255, 250, 0.82));
 	}
 
-	.fan-step span,
-	.screen-status {
+	.screen-tile.fresh {
+		left: 1%;
+		top: 3%;
+	}
+
+	.screen-tile.front {
+		right: 1%;
+		top: 3%;
+	}
+
+	.screen-tile.recirc {
+		left: 1%;
+		bottom: 3%;
+	}
+
+	.screen-tile.ac {
+		right: 1%;
+		top: 37%;
+	}
+
+	.screen-tile.rear {
+		right: 1%;
+		bottom: 3%;
+	}
+
+	.screen-tile.fan-step {
+		left: 1%;
+		top: 37%;
+	}
+
+	.fan-symbol {
+		color: #ebffff;
 		font:
-			800 clamp(0.16rem, 0.47vw, 0.42rem) Helvetica,
+			900 clamp(0.52rem, 1.6vw, 1.28rem) Helvetica,
 			sans-serif;
-		color: #dfffff;
-		text-shadow: 0 0 0.45rem rgba(83, 255, 255, 0.72);
+		line-height: 1;
+		text-shadow: 0 0 0.4rem rgba(83, 255, 255, 0.8);
 	}
 
 	.screen-core {
-		position: relative;
-		grid-column: 2;
-		grid-row: 1 / 3;
+		position: absolute;
+		left: 25.5%;
+		top: 4%;
 		display: grid;
 		place-items: center;
-		width: 100%;
-		height: 100%;
-		min-height: 0;
+		width: 49%;
+		height: 92%;
 	}
 
-	.fan-frame {
+	.fan-ring {
 		position: absolute;
-		width: 96%;
-		opacity: 0.72;
-		image-rendering: pixelated;
-		filter: drop-shadow(0 0 0.45rem rgba(18, 255, 248, 0.58));
+		width: 92%;
+		aspect-ratio: 1;
+		border-radius: 50%;
+		background:
+			radial-gradient(
+				circle,
+				transparent 43%,
+				rgba(0, 0, 0, 0.55) 44% 48%,
+				transparent 49%
+			),
+			repeating-conic-gradient(
+				from -6deg,
+				rgba(212, 217, 213, 0.96) 0deg 4deg,
+				rgba(23, 27, 27, 0.72) 4deg 9deg
+			);
+		filter: drop-shadow(0 0 0.26rem rgba(18, 255, 248, 0.34));
 	}
 
 	.temperature-orb {
@@ -439,9 +453,9 @@
 		z-index: 2;
 		display: grid;
 		place-items: center;
-		width: 58%;
+		width: 59%;
 		aspect-ratio: 1;
-		border: 0.12rem solid rgba(220, 225, 222, 0.84);
+		border: 0.1rem solid rgba(226, 230, 224, 0.88);
 		border-radius: 50%;
 		background:
 			radial-gradient(
@@ -452,21 +466,21 @@
 			),
 			#b9100c;
 		box-shadow:
-			inset 0 0 0.9rem rgba(255, 255, 255, 0.44),
-			0 0 1.2rem rgba(255, 46, 31, 0.72);
+			inset 0 0 0.64rem rgba(255, 255, 255, 0.44),
+			0 0 0.74rem rgba(255, 46, 31, 0.72);
 		color: #fff;
 		text-shadow: 0 0 0.44rem rgba(0, 0, 0, 0.8);
 	}
 
 	.temperature-orb span {
 		font:
-			700 clamp(0.14rem, 0.42vw, 0.38rem) Helvetica,
+			700 clamp(0.11rem, 0.34vw, 0.3rem) Helvetica,
 			sans-serif;
 	}
 
 	.temperature-orb strong {
 		font:
-			900 clamp(0.6rem, 1.52vw, 1.36rem) Impact,
+			900 clamp(0.5rem, 1.28vw, 1.14rem) Impact,
 			sans-serif;
 		line-height: 0.78;
 		letter-spacing: 0;
@@ -477,13 +491,8 @@
 		right: 19%;
 		top: 32%;
 		font:
-			800 clamp(0.14rem, 0.38vw, 0.34rem) Helvetica,
+			800 clamp(0.1rem, 0.28vw, 0.26rem) Helvetica,
 			sans-serif;
-	}
-
-	.screen-status {
-		grid-column: 2;
-		text-align: center;
 	}
 
 	@media (max-width: 760px) {
