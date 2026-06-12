@@ -15,6 +15,7 @@
 	};
 
 	const symbolBase = '/ve/SWC-Symbol-RedNEW/';
+	const transparentSymbolBase = `${symbolBase}transparent/`;
 	const renderSrc = '/ve/VE-Cosmetic%20design.1263.jpg';
 	const screens: ClimateScreen[] = [
 		{
@@ -160,10 +161,7 @@
 						aria-label="Fresh air"
 						onclick={() => (activeScreen.recirc = false)}
 					>
-						<img
-							src={`${symbolBase}SymbolsEtc/Formatted/FreshSymbol.bmp`}
-							alt=""
-						/>
+						<img src={`${transparentSymbolBase}FreshSymbol.png`} alt="" />
 					</button>
 					<button
 						type="button"
@@ -172,10 +170,7 @@
 						aria-label="Front demist"
 						onclick={() => (activeScreen.front = !activeScreen.front)}
 					>
-						<img
-							src={`${symbolBase}SymbolsEtc/Formatted/Front_Demist_ON.bmp`}
-							alt=""
-						/>
+						<img src={`${transparentSymbolBase}Front_Demist_ON.png`} alt="" />
 					</button>
 					<button
 						type="button"
@@ -184,10 +179,7 @@
 						aria-label="Recirculation"
 						onclick={() => (activeScreen.recirc = true)}
 					>
-						<img
-							src={`${symbolBase}SymbolsEtc/Formatted/RecircSymbol.bmp`}
-							alt=""
-						/>
+						<img src={`${transparentSymbolBase}RecircSymbol.png`} alt="" />
 					</button>
 					<div class="screen-core">
 						<div class="fan-ring" aria-hidden="true"></div>
@@ -210,7 +202,7 @@
 						onclick={() => (activeScreen.ac = !activeScreen.ac)}
 					>
 						<img
-							src={`${symbolBase}${activeScreen.ac ? 'AC-SymbolsNEW.bmp' : 'AC-OFF-SymbolsNEW.bmp'}`}
+							src={`${transparentSymbolBase}${activeScreen.ac ? 'AC-SymbolsNEW.png' : 'AC-OFF-SymbolsNEW.png'}`}
 							alt=""
 						/>
 					</button>
@@ -221,10 +213,7 @@
 						aria-label="Rear demist"
 						onclick={() => (activeScreen.rear = !activeScreen.rear)}
 					>
-						<img
-							src={`${symbolBase}SymbolsEtc/Formatted/Rear_Demist_ON.bmp`}
-							alt=""
-						/>
+						<img src={`${transparentSymbolBase}Rear_Demist_ON.png`} alt="" />
 					</button>
 					<button
 						type="button"
@@ -310,8 +299,8 @@
 		z-index: 2;
 		overflow: hidden;
 		border-radius: 0.12rem;
-		background: #020606;
-		box-shadow: 0 0 0.7rem rgba(34, 248, 245, 0.16);
+		background: transparent;
+		box-shadow: none;
 		outline: none;
 	}
 
@@ -326,25 +315,23 @@
 		position: relative;
 		width: 100%;
 		height: 100%;
-		background:
-			linear-gradient(90deg, rgba(18, 82, 84, 0.98), rgba(6, 31, 34, 0.98)),
-			#020606;
-		box-shadow: inset 0 0 0.5rem rgba(84, 255, 248, 0.24);
+		background: transparent;
+		box-shadow: none;
 		overflow: hidden;
 		text-transform: uppercase;
 	}
 
 	.screen-glow {
 		position: absolute;
-		inset: 9% 15%;
+		inset: 18% 24%;
 		border-radius: 50%;
 		background: radial-gradient(
 			circle,
-			rgba(79, 255, 249, 0.26),
-			rgba(7, 67, 70, 0.12) 48%,
+			rgba(79, 255, 249, 0.13),
+			rgba(7, 67, 70, 0.08) 48%,
 			transparent 72%
 		);
-		filter: blur(0.18rem);
+		filter: blur(0.28rem);
 	}
 
 	.screen-grid {
@@ -357,14 +344,12 @@
 		position: absolute;
 		display: grid;
 		place-items: center;
-		width: 21%;
-		height: 26%;
+		width: 13.5%;
+		height: 18%;
 		border-radius: 0.04rem;
-		background:
-			linear-gradient(180deg, rgba(45, 206, 209, 0.35), rgba(10, 71, 73, 0.88)),
-			rgba(14, 75, 76, 0.9);
-		box-shadow: inset 0 0 0.28rem rgba(70, 255, 248, 0.28);
-		opacity: 0.46;
+		background: transparent;
+		box-shadow: none;
+		opacity: 0.5;
 	}
 
 	.screen-tile.active,
@@ -373,40 +358,41 @@
 	}
 
 	.screen-tile img {
-		max-width: 76%;
-		max-height: 78%;
+		max-width: 100%;
+		max-height: 100%;
 		image-rendering: pixelated;
-		filter: drop-shadow(0 0 0.28rem rgba(53, 255, 250, 0.82));
+		filter: drop-shadow(0 0 0.18rem rgba(53, 255, 250, 0.72));
+		mix-blend-mode: screen;
 	}
 
 	.screen-tile.fresh {
-		left: 1%;
-		top: 3%;
+		left: 6.5%;
+		top: 10%;
 	}
 
 	.screen-tile.front {
-		right: 1%;
-		top: 3%;
+		right: 6.2%;
+		top: 10%;
 	}
 
 	.screen-tile.recirc {
-		left: 1%;
-		bottom: 3%;
+		left: 6.5%;
+		bottom: 10%;
 	}
 
 	.screen-tile.ac {
-		right: 1%;
-		top: 37%;
+		right: 6.2%;
+		top: 41%;
 	}
 
 	.screen-tile.rear {
-		right: 1%;
-		bottom: 3%;
+		right: 6.2%;
+		bottom: 10%;
 	}
 
 	.screen-tile.fan-step {
-		left: 1%;
-		top: 37%;
+		left: 6.5%;
+		top: 41%;
 	}
 
 	.fan-symbol {
@@ -420,19 +406,20 @@
 
 	.screen-core {
 		position: absolute;
-		left: 25.5%;
-		top: 4%;
+		left: 31.2%;
+		top: 14.5%;
 		display: grid;
 		place-items: center;
-		width: 49%;
-		height: 92%;
+		width: 37.5%;
+		height: 71%;
 	}
 
 	.fan-ring {
 		position: absolute;
-		width: 92%;
+		width: 96%;
 		aspect-ratio: 1;
 		border-radius: 50%;
+		opacity: 0.34;
 		background:
 			radial-gradient(
 				circle,
@@ -442,10 +429,10 @@
 			),
 			repeating-conic-gradient(
 				from -6deg,
-				rgba(212, 217, 213, 0.96) 0deg 4deg,
-				rgba(23, 27, 27, 0.72) 4deg 9deg
+				rgba(212, 217, 213, 0.74) 0deg 5deg,
+				rgba(23, 27, 27, 0.14) 5deg 13deg
 			);
-		filter: drop-shadow(0 0 0.26rem rgba(18, 255, 248, 0.34));
+		filter: drop-shadow(0 0 0.18rem rgba(18, 255, 248, 0.22));
 	}
 
 	.temperature-orb {
@@ -453,7 +440,8 @@
 		z-index: 2;
 		display: grid;
 		place-items: center;
-		width: 59%;
+		width: 56%;
+		opacity: 0.42;
 		aspect-ratio: 1;
 		border: 0.1rem solid rgba(226, 230, 224, 0.88);
 		border-radius: 50%;
