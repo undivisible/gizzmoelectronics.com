@@ -1,137 +1,13 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 
-	type ClimateMode = 'auto' | 'manual' | 'demist' | 'recirc';
-	type ClimateScreen = {
-		id: ClimateMode;
-		label: string;
-		title: string;
-		temperature: number;
-		fan: number;
-		ac: boolean;
-		recirc: boolean;
-		front: boolean;
-		rear: boolean;
-	};
-	type TempSegment =
-		| 'top'
-		| 'leftTop'
-		| 'rightTop'
-		| 'middle'
-		| 'leftBottom'
-		| 'rightBottom'
-		| 'bottom';
-
-	const symbolBase = '/ve/SWC-Symbol-RedNEW/';
-	const symbolEtcBase = `${symbolBase}transparent/SymbolsEtc/`;
-	const fanSegmentBase = `${symbolBase}Fan_Segments/formatted/`;
-	const tempDigitBase = `${symbolBase}transparent/Temp_Digits/`;
 	const renderSrc = '/ve/VE-Cosmetic%20design.1263.jpg';
-	const tempSegmentFiles: Record<TempSegment, string> = {
-		top: 'Top.png',
-		leftTop: 'Left_Top.png',
-		rightTop: 'Right_Top.png',
-		middle: 'Middle.png',
-		leftBottom: 'Left_Bottom.png',
-		rightBottom: 'Right_Bottom.png',
-		bottom: 'Bottom.png',
-	};
-	const tempSegmentsByDigit: Record<string, TempSegment[]> = {
-		'0': ['top', 'leftTop', 'rightTop', 'leftBottom', 'rightBottom', 'bottom'],
-		'1': ['rightTop', 'rightBottom'],
-		'2': ['top', 'rightTop', 'middle', 'leftBottom', 'bottom'],
-		'3': ['top', 'rightTop', 'middle', 'rightBottom', 'bottom'],
-		'4': ['leftTop', 'rightTop', 'middle', 'rightBottom'],
-		'5': ['top', 'leftTop', 'middle', 'rightBottom', 'bottom'],
-		'6': ['top', 'leftTop', 'middle', 'leftBottom', 'rightBottom', 'bottom'],
-		'7': ['top', 'rightTop', 'rightBottom'],
-		'8': [
-			'top',
-			'leftTop',
-			'rightTop',
-			'middle',
-			'leftBottom',
-			'rightBottom',
-			'bottom',
-		],
-		'9': ['top', 'leftTop', 'rightTop', 'middle', 'rightBottom', 'bottom'],
-	};
-	let screens = $state<ClimateScreen[]>([
-		{
-			id: 'auto',
-			label: 'Auto',
-			title: 'Automatic climate',
-			temperature: 31,
-			fan: 10,
-			ac: true,
-			recirc: false,
-			front: false,
-			rear: true,
-		},
-		{
-			id: 'manual',
-			label: 'Manual',
-			title: 'Manual fan',
-			temperature: 23,
-			fan: 14,
-			ac: true,
-			recirc: false,
-			front: false,
-			rear: false,
-		},
-		{
-			id: 'demist',
-			label: 'Demist',
-			title: 'Screen clear',
-			temperature: 27,
-			fan: 16,
-			ac: true,
-			recirc: false,
-			front: true,
-			rear: true,
-		},
-		{
-			id: 'recirc',
-			label: 'Recirc',
-			title: 'Cabin loop',
-			temperature: 19,
-			fan: 7,
-			ac: false,
-			recirc: true,
-			front: false,
-			rear: false,
-		},
-	]);
 
-	let activeIndex = $state(0);
+	let temperature = $state(31);
 	let booted = $state(false);
-	let activeScreen = $derived(screens[activeIndex]);
-
-	function chooseScreen(index: number) {
-		activeIndex = (index + screens.length) % screens.length;
-	}
-
-	function nextScreen(direction: number) {
-		chooseScreen(activeIndex + direction);
-	}
 
 	function changeTemperature(direction: number) {
-		activeScreen.temperature = Math.max(
-			16,
-			Math.min(32, activeScreen.temperature + direction),
-		);
-	}
-
-	function changeFan(direction: number) {
-		activeScreen.fan = Math.max(0, Math.min(17, activeScreen.fan + direction));
-	}
-
-	function tempDigits(value: number) {
-		return String(value).padStart(2, '0').split('');
-	}
-
-	function fanSegmentFile(value: number) {
-		return value >= 14 ? `${value}n.bmp` : `${value}.bmp`;
+		temperature = Math.max(16, Math.min(32, temperature + direction));
 	}
 
 	function handleRightKnobWheel(event: WheelEvent) {
@@ -140,47 +16,30 @@
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
-		if (event.key === 'ArrowLeft') {
-			event.preventDefault();
-			nextScreen(-1);
-		} else if (event.key === 'ArrowRight') {
-			event.preventDefault();
-			nextScreen(1);
-		} else if (event.key === 'ArrowUp') {
+		if (event.key === 'ArrowUp' || event.key === 'ArrowRight') {
 			event.preventDefault();
 			changeTemperature(1);
-		} else if (event.key === 'ArrowDown') {
+		} else if (event.key === 'ArrowDown' || event.key === 'ArrowLeft') {
 			event.preventDefault();
 			changeTemperature(-1);
-		} else if (event.key === 'Enter' || event.key === ' ') {
-			event.preventDefault();
-			nextScreen(1);
 		}
 	}
 
 	onMount(() => {
-		const requestedScreen = new URLSearchParams(window.location.search).get(
-			'screen',
-		);
-		if (requestedScreen) {
-			const requestedIndex = screens.findIndex(
-				(screen) => screen.id === requestedScreen,
-			);
-			if (requestedIndex >= 0) chooseScreen(requestedIndex);
+		const requestedTemperatureParam = new URLSearchParams(
+			window.location.search,
+		).get('temp');
+		const requestedTemperature = Number(requestedTemperatureParam);
+		if (
+			requestedTemperatureParam !== null &&
+			Number.isFinite(requestedTemperature)
+		) {
+			temperature = Math.max(16, Math.min(32, requestedTemperature));
 		}
 
 		requestAnimationFrame(() => {
 			booted = true;
 		});
-
-		const fanTimer = setInterval(() => {
-			if (screens[activeIndex]?.id === 'auto') {
-				changeFan(1);
-				if (screens[activeIndex].fan === 17) screens[activeIndex].fan = 8;
-			}
-		}, 1200);
-
-		return () => clearInterval(fanTimer);
 	});
 
 	onDestroy(() => {
@@ -222,117 +81,15 @@
 		</div>
 
 		<div class="controller-screen" aria-label="Interactive VE screen">
-			<div class="screen-ui" aria-live="polite">
-				<div class="screen-glow"></div>
-				<div class="screen-grid">
-					<img
-						class="screen-backdrop screen-backdrop-low"
-						src={`${symbolEtcBase}LowBackground.png`}
-						alt=""
-					/>
-					<img
-						class="screen-backdrop screen-backdrop-high"
-						src={`${symbolEtcBase}highBackground.png`}
-						alt=""
-					/>
-					<button
-						type="button"
-						class="screen-tile fresh"
-						class:active={!activeScreen.recirc}
-						aria-label="Fresh air"
-						onclick={() => (activeScreen.recirc = false)}
-					>
-						<img src={`${symbolEtcBase}FreshSymbol.png`} alt="" />
-					</button>
-					<button
-						type="button"
-						class="screen-tile front"
-						class:active={activeScreen.front}
-						aria-label="Front demist"
-						onclick={() => (activeScreen.front = !activeScreen.front)}
-					>
-						<img
-							src={`${symbolEtcBase}${activeScreen.front ? 'Front_Demist_ON.png' : 'Front_Demist_OFF.png'}`}
-							alt=""
-						/>
-					</button>
-					<button
-						type="button"
-						class="screen-tile recirc"
-						class:active={activeScreen.recirc}
-						aria-label="Recirculation"
-						onclick={() => (activeScreen.recirc = true)}
-					>
-						<img src={`${symbolEtcBase}RecircSymbol.png`} alt="" />
-					</button>
-					<div class="screen-core">
-						<img
-							class="fan-arc"
-							src={`${fanSegmentBase}${fanSegmentFile(activeScreen.fan)}`}
-							alt=""
-						/>
-						<button
-							type="button"
-							class="temperature-orb"
-							aria-label="Temperature"
-							onclick={() => changeTemperature(1)}
-						>
-							<img
-								class="mode-word"
-								src={`${symbolEtcBase}${activeScreen.id === 'manual' ? 'ManualWording.png' : 'AutoWording.png'}`}
-								alt=""
-							/>
-							<strong class="temperature-value">
-								{activeScreen.temperature}
-							</strong>
-							<span class="temperature-digits" aria-hidden="true">
-								{#each tempDigits(activeScreen.temperature) as digit, digitIndex (`${digit}-${digitIndex}`)}
-									<span class="temperature-digit">
-										{#each tempSegmentsByDigit[digit] as segment (segment)}
-											<img
-												class={`temperature-segment ${segment}`}
-												src={`${tempDigitBase}${tempSegmentFiles[segment]}`}
-												alt=""
-											/>
-										{/each}
-									</span>
-								{/each}
-							</span>
-							<span class="temperature-degree"></span>
-						</button>
-					</div>
-					<button
-						type="button"
-						class="screen-tile ac"
-						class:active={activeScreen.ac}
-						aria-label="Air conditioning"
-						onclick={() => (activeScreen.ac = !activeScreen.ac)}
-					>
-						<img
-							src={`${symbolEtcBase}${activeScreen.ac ? 'AC-Symbols.png' : 'AC-OFF-Symbols.png'}`}
-							alt=""
-						/>
-					</button>
-					<button
-						type="button"
-						class="screen-tile rear"
-						class:active={activeScreen.rear}
-						aria-label="Rear demist"
-						onclick={() => (activeScreen.rear = !activeScreen.rear)}
-					>
-						<img
-							src={`${symbolEtcBase}${activeScreen.rear ? 'Rear_Demist_ON.png' : 'Rear_Demist_OFF.png'}`}
-							alt=""
-						/>
-					</button>
-					<button
-						type="button"
-						class="screen-tile fan-step"
-						aria-label="Fan speed"
-						onclick={() => changeFan(1)}
-					></button>
-				</div>
-			</div>
+			<button
+				type="button"
+				class="temperature-overlay"
+				aria-label="Temperature"
+				onclick={() => changeTemperature(1)}
+			>
+				<strong class="temperature-value">{temperature}</strong>
+				<span class="temperature-degree"></span>
+			</button>
 		</div>
 	</div>
 </section>
@@ -443,274 +200,60 @@
 		outline: none;
 	}
 
-	.controller-screen button {
-		border: 0;
-		background: transparent;
-		padding: 0;
-		cursor: pointer;
-	}
-
-	.screen-ui {
-		position: relative;
-		width: 100%;
-		height: 100%;
-		background: transparent;
-		box-shadow: none;
-		clip-path: polygon(2% 2%, 98% 0, 100% 96%, 0 100%);
-		overflow: hidden;
-		text-transform: uppercase;
-	}
-
-	.screen-glow {
+	.temperature-overlay {
 		position: absolute;
-		inset: 22% 25%;
+		left: 35.6%;
+		top: 32.4%;
 		z-index: 2;
-		border-radius: 50%;
-		background: radial-gradient(
-			circle,
-			rgba(79, 255, 249, 0.08),
-			rgba(7, 67, 70, 0.05) 48%,
-			transparent 72%
-		);
-		filter: blur(0.28rem);
-		opacity: 0.48;
-	}
-
-	.screen-grid {
-		position: absolute;
-		inset: 2% 3%;
-		z-index: 3;
-	}
-
-	.screen-backdrop {
-		position: absolute;
-		z-index: 0;
-		opacity: 0.5;
-		image-rendering: pixelated;
-		mix-blend-mode: screen;
-		pointer-events: none;
-	}
-
-	.screen-backdrop-low {
-		left: 13%;
-		bottom: 3%;
-		width: 74%;
-	}
-
-	.screen-backdrop-high {
-		left: 18%;
-		top: 1%;
-		width: 64%;
-	}
-
-	.screen-tile {
-		position: absolute;
 		display: grid;
 		place-items: center;
-		z-index: 3;
-		width: 17%;
-		height: 18%;
-		border-radius: 0.08rem;
-		background: transparent;
-		box-shadow: none;
-		opacity: 0.24;
-	}
-
-	.screen-tile.active,
-	.screen-tile.fan-step {
-		opacity: 0.58;
-	}
-
-	.screen-tile img {
-		max-width: 82%;
-		max-height: 82%;
-		image-rendering: pixelated;
-		filter: drop-shadow(0 0 0.07rem rgba(53, 255, 250, 0.36));
-		mix-blend-mode: screen;
-	}
-
-	.screen-tile.fresh {
-		left: 8%;
-		top: 15%;
-	}
-
-	.screen-tile.front {
-		right: 8%;
-		top: 14%;
-	}
-
-	.screen-tile.recirc {
-		left: 8.2%;
-		bottom: 15%;
-	}
-
-	.screen-tile.ac {
-		right: 8.2%;
-		top: 42%;
-	}
-
-	.screen-tile.rear {
-		right: 8%;
-		bottom: 14%;
-	}
-
-	.screen-tile.fan-step {
-		left: 8%;
-		top: 42%;
-	}
-
-	.screen-core {
-		position: absolute;
-		left: 30.3%;
-		top: 9.6%;
-		display: grid;
-		place-items: center;
-		z-index: 4;
-		width: 38.4%;
-		height: 76.5%;
-	}
-
-	.fan-arc {
-		position: absolute;
-		left: 50%;
-		top: 50%;
-		z-index: 4;
-		width: 42%;
-		height: auto;
-		image-rendering: pixelated;
-		mix-blend-mode: screen;
-		opacity: 0.36;
-		filter: drop-shadow(0 0 0.08rem rgba(18, 255, 248, 0.16));
-		transform: translate(-50%, -50%) scale(1.22);
-	}
-
-	.temperature-orb {
-		position: relative;
-		z-index: 5;
-		display: grid;
-		place-items: center;
-		width: 67%;
-		opacity: 1;
-		aspect-ratio: 1;
-		border: 0.12rem solid rgba(238, 240, 232, 0.96);
-		border-radius: 50%;
+		width: 23.2%;
+		height: 27.4%;
+		border: 0;
+		border-radius: 0.18rem;
 		background:
 			radial-gradient(
-				circle at 50% 38%,
-				#ffe7dc 0 8%,
-				#ff7b5e 23%,
-				#e22118 46%,
-				#8b0805 74%,
-				#4d0201 100%
+				ellipse at 50% 45%,
+				rgba(103, 16, 13, 0.92),
+				rgba(41, 7, 6, 0.9) 62%,
+				rgba(2, 8, 9, 0.42) 100%
 			),
-			#b9100c;
+			rgba(0, 0, 0, 0.42);
 		box-shadow:
-			inset 0 0 0.34rem rgba(255, 255, 255, 0.28),
-			0 0 0.22rem rgba(255, 46, 31, 0.36);
-		color: #fff;
-		text-shadow: 0 0 0.44rem rgba(0, 0, 0, 0.8);
-	}
-
-	.mode-word {
-		position: absolute;
-		top: 15%;
-		width: 38%;
-		height: auto;
-		image-rendering: pixelated;
-		mix-blend-mode: screen;
-		opacity: 0.82;
+			inset 0 0 0.34rem rgba(255, 82, 65, 0.3),
+			0 0 0.2rem rgba(7, 255, 248, 0.18);
+		padding: 0;
+		cursor: pointer;
 	}
 
 	.temperature-value {
 		position: absolute;
 		left: 50%;
-		top: 55.5%;
-		color: transparent;
+		top: 54%;
+		color: #f9ffff;
 		font:
-			900 clamp(0.88rem, 2.45vw, 2.16rem) 'Arial Rounded MT Bold',
+			900 clamp(0.88rem, 2.18vw, 1.96rem) 'Arial Rounded MT Bold',
 			'Arial Black',
 			Helvetica,
 			sans-serif;
 		letter-spacing: -0.08em;
 		line-height: 0.82;
-		text-shadow: none;
-		transform: translate(-52%, -50%) scaleX(0.92);
-	}
-
-	.temperature-digits {
-		position: absolute;
-		left: 50%;
-		top: 57%;
-		display: flex;
-		gap: 0.02rem;
-		opacity: 1;
-		transform: translate(-50%, -50%);
-	}
-
-	.temperature-digit {
-		position: relative;
-		display: block;
-		width: clamp(0.6rem, 1.64vw, 1.46rem);
-		aspect-ratio: 22 / 37;
-	}
-
-	.temperature-segment {
-		position: absolute;
-		image-rendering: pixelated;
-		filter: drop-shadow(0 0 0.1rem rgba(255, 255, 255, 0.54));
-	}
-
-	.temperature-segment.top {
-		left: 11%;
-		top: 0;
-		width: 78%;
-	}
-
-	.temperature-segment.leftTop {
-		left: 0;
-		top: 12%;
-		width: 23%;
-	}
-
-	.temperature-segment.rightTop {
-		right: 0;
-		top: 12%;
-		width: 23%;
-	}
-
-	.temperature-segment.middle {
-		left: 12%;
-		top: 45%;
-		width: 76%;
-	}
-
-	.temperature-segment.leftBottom {
-		left: 0;
-		bottom: 13%;
-		width: 23%;
-	}
-
-	.temperature-segment.rightBottom {
-		right: 0;
-		bottom: 11%;
-		width: 23%;
-	}
-
-	.temperature-segment.bottom {
-		left: 11%;
-		bottom: 0;
-		width: 78%;
+		text-shadow:
+			0 0 0.1rem rgba(255, 255, 255, 0.86),
+			0 0 0.2rem rgba(42, 255, 248, 0.24),
+			0.06rem 0.08rem 0 rgba(0, 0, 0, 0.62);
+		transform: translate(-54%, -50%) scaleX(0.82);
 	}
 
 	.temperature-degree {
 		position: absolute;
-		right: 20.5%;
-		top: 31%;
-		width: 6%;
+		right: 13%;
+		top: 24%;
+		width: 7%;
 		aspect-ratio: 1;
 		border: 0.08rem solid #f8ffff;
 		border-radius: 50%;
-		opacity: 0.76;
+		opacity: 0.68;
 		box-shadow: 0 0 0.12rem rgba(255, 255, 255, 0.54);
 	}
 
