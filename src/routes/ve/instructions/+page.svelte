@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { base } from '$app/paths';
 	import { onDestroy, onMount } from 'svelte';
-	import type { PageData } from './$types';
 
 	type ClimateMode = 'auto' | 'manual' | 'demist' | 'recirc';
 	type ClimateScreen = {
@@ -16,12 +14,9 @@
 		rear: boolean;
 	};
 
-	let { data }: { data: PageData } = $props();
-
 	const symbolBase = '/ve/SWC-Symbol-RedNEW/';
 	const renderSrc = '/ve/VE-Cosmetic%20design.1263.jpg';
-	const manualSrc = '/ve/FP9355_User_Installation_Manual_A5-24072023.pdf';
-	const manualHref = `${base}${manualSrc}`;
+	const centerBackdrop = `${symbolBase}SymbolsEtc/Formatted/highBackground.bmp`;
 	const fanFrames = Array.from(
 		{ length: 18 },
 		(_, index) => `${symbolBase}Fan_Segments/formatted/${index}.bmp`,
@@ -76,7 +71,6 @@
 	let activeIndex = $state(0);
 	let booted = $state(false);
 	let activeScreen = $derived(screens[activeIndex]);
-	let assetCount = $derived(data.assets.length);
 
 	function chooseScreen(index: number) {
 		activeIndex = (index + screens.length) % screens.length;
@@ -160,134 +154,96 @@
 	<div class="controller-stage">
 		<img class="product-render" src={renderSrc} alt="VE climate control unit" />
 
-		<div class="climate-interface" aria-label="Interactive VE climate control">
-			<button
-				type="button"
-				class="side-button recirc-button"
-				class:active={activeScreen.recirc}
-				aria-label="Toggle recirculation"
-				onclick={() => (activeScreen.recirc = !activeScreen.recirc)}
-			>
-				<img
-					src={`${symbolBase}SymbolsEtc/Formatted/RecircSymbol.bmp`}
-					alt=""
-				/>
-			</button>
-
-			<button
-				type="button"
-				class="side-button fresh-button"
-				class:active={!activeScreen.recirc}
-				aria-label="Toggle fresh air"
-				onclick={() => (activeScreen.recirc = !activeScreen.recirc)}
-			>
-				<img src={`${symbolBase}SymbolsEtc/Formatted/FreshSymbol.bmp`} alt="" />
-			</button>
-
-			<button
-				type="button"
-				class="dial left-dial"
-				aria-label="Fan speed"
-				onclick={() => changeFan(1)}
-			></button>
-
-			<div class="lcd-panel" aria-live="polite">
-				<div class="lcd-title">{activeScreen.title}</div>
-				<div class="lcd-layout">
-					<div class="lcd-column">
+		<div class="controller-screen" aria-label="Interactive VE screen">
+			<div class="screen-ui" aria-live="polite">
+				<img class="screen-backdrop" src={centerBackdrop} alt="" />
+				<div class="screen-title">{activeScreen.title}</div>
+				<div class="screen-grid">
+					<button
+						type="button"
+						class="screen-tile"
+						class:active={!activeScreen.recirc}
+						aria-label="Fresh air"
+						onclick={() => (activeScreen.recirc = false)}
+					>
 						<img
-							class="lcd-icon"
-							src={`${symbolBase}${activeScreen.ac ? 'AC-SymbolsNEW.bmp' : 'AC-OFF-SymbolsNEW.bmp'}`}
+							src={`${symbolBase}SymbolsEtc/Formatted/FreshSymbol.bmp`}
 							alt=""
 						/>
-						<span>{activeScreen.ac ? 'AC' : 'AC Off'}</span>
-					</div>
-					<div class="lcd-core">
-						<div class="temperature-orb">
+					</button>
+					<button
+						type="button"
+						class="screen-tile"
+						class:active={activeScreen.front}
+						aria-label="Front demist"
+						onclick={() => (activeScreen.front = !activeScreen.front)}
+					>
+						<img
+							src={`${symbolBase}SymbolsEtc/Formatted/Front_Demist_ON.bmp`}
+							alt=""
+						/>
+					</button>
+					<button
+						type="button"
+						class="screen-tile"
+						class:active={activeScreen.recirc}
+						aria-label="Recirculation"
+						onclick={() => (activeScreen.recirc = true)}
+					>
+						<img
+							src={`${symbolBase}SymbolsEtc/Formatted/RecircSymbol.bmp`}
+							alt=""
+						/>
+					</button>
+					<div class="screen-core">
+						<img class="fan-frame" src={fanFrames[activeScreen.fan]} alt="" />
+						<button
+							type="button"
+							class="temperature-orb"
+							aria-label="Temperature"
+							onclick={() => changeTemperature(1)}
+						>
 							<span>Auto</span>
 							<strong>{activeScreen.temperature}</strong>
 							<small>°C</small>
-						</div>
-						<img class="fan-frame" src={fanFrames[activeScreen.fan]} alt="" />
+						</button>
 					</div>
-					<div class="lcd-column">
-						<img
-							class="lcd-icon"
-							src={`${symbolBase}SymbolsEtc/Formatted/${activeScreen.front ? 'Front_Demist_ON.bmp' : 'Front_Demist_OFF.bmp'}`}
-							alt=""
-						/>
-						<img
-							class="lcd-icon"
-							src={`${symbolBase}SymbolsEtc/Formatted/${activeScreen.rear ? 'Rear_Demist_ON.bmp' : 'Rear_Demist_OFF.bmp'}`}
-							alt=""
-						/>
-					</div>
-				</div>
-				<div class="status-strip">
-					<span>Fan {activeScreen.fan}</span>
-					<span>{activeScreen.recirc ? 'Recirc' : 'Fresh'}</span>
-					<span
-						>{activeScreen.front || activeScreen.rear
-							? 'Demist'
-							: 'Cabin'}</span
+					<button
+						type="button"
+						class="screen-tile"
+						class:active={activeScreen.ac}
+						aria-label="Air conditioning"
+						onclick={() => (activeScreen.ac = !activeScreen.ac)}
 					>
+						<img
+							src={`${symbolBase}${activeScreen.ac ? 'AC-SymbolsNEW.bmp' : 'AC-OFF-SymbolsNEW.bmp'}`}
+							alt=""
+						/>
+					</button>
+					<button
+						type="button"
+						class="screen-tile"
+						class:active={activeScreen.rear}
+						aria-label="Rear demist"
+						onclick={() => (activeScreen.rear = !activeScreen.rear)}
+					>
+						<img
+							src={`${symbolBase}SymbolsEtc/Formatted/Rear_Demist_ON.bmp`}
+							alt=""
+						/>
+					</button>
+					<button
+						type="button"
+						class="screen-tile fan-step"
+						aria-label="Fan speed"
+						onclick={() => changeFan(1)}
+					>
+						<span>Fan {activeScreen.fan}</span>
+					</button>
+					<div class="screen-status">{activeScreen.label}</div>
 				</div>
 			</div>
-
-			<button
-				type="button"
-				class="dial right-dial"
-				aria-label="Temperature"
-				onclick={() => changeTemperature(1)}
-			></button>
-
-			<button
-				type="button"
-				class="side-button front-button"
-				class:active={activeScreen.front}
-				aria-label="Toggle front demist"
-				onclick={() => (activeScreen.front = !activeScreen.front)}
-			>
-				<img
-					src={`${symbolBase}SymbolsEtc/Formatted/Front_Demist_ON.bmp`}
-					alt=""
-				/>
-			</button>
-
-			<button
-				type="button"
-				class="side-button rear-button"
-				class:active={activeScreen.rear}
-				aria-label="Toggle rear demist"
-				onclick={() => (activeScreen.rear = !activeScreen.rear)}
-			>
-				<img
-					src={`${symbolBase}SymbolsEtc/Formatted/Rear_Demist_ON.bmp`}
-					alt=""
-				/>
-			</button>
 		</div>
-
-		<nav class="screen-nav" aria-label="VE screen presets">
-			{#each screens as screen, index (screen.id)}
-				<button
-					type="button"
-					class:active={index === activeIndex}
-					onclick={() => chooseScreen(index)}
-				>
-					{screen.label}
-				</button>
-			{/each}
-		</nav>
-
-		<button
-			type="button"
-			class="manual-link"
-			onclick={() => {
-				window.location.href = manualHref;
-			}}>Manual</button
-		>
-		<div class="asset-count">{assetCount} source assets</div>
 	</div>
 </section>
 
@@ -314,7 +270,7 @@
 
 	.controller-stage {
 		position: relative;
-		width: min(100vw, calc(100svh * 2438 / 1371));
+		width: min(100%, calc(100svh * 2438 / 1371));
 		aspect-ratio: 2438 / 1371;
 		overflow: hidden;
 		background: #000;
@@ -352,74 +308,59 @@
 		-webkit-user-drag: none;
 	}
 
-	.climate-interface {
+	.controller-screen {
 		position: absolute;
-		left: 14.2%;
-		top: 36.2%;
-		display: grid;
-		grid-template-columns: 8.2% 23.4% 31.8% 23.4% 8.2%;
-		grid-template-rows: 1fr 1fr;
-		align-items: center;
-		gap: 0.7%;
-		width: 72%;
-		height: 35.8%;
+		left: 42.45%;
+		top: 46.95%;
+		width: 18.7%;
+		height: 23.1%;
 		z-index: 2;
+		overflow: hidden;
+		border-radius: 0.18rem;
+		background: #020a0c;
 		outline: none;
 	}
 
-	.climate-interface {
-		border: 0;
-		background: transparent;
-		padding: 0;
-	}
-
-	.climate-interface button {
+	.controller-screen button {
 		border: 0;
 		background: transparent;
 		padding: 0;
 		cursor: pointer;
 	}
 
-	.dial {
+	.screen-ui {
 		position: relative;
-		grid-row: 1 / 3;
 		width: 100%;
-		aspect-ratio: 1;
-	}
-
-	.left-dial {
-		grid-column: 2;
-	}
-
-	.right-dial {
-		grid-column: 4;
-	}
-
-	.lcd-panel {
-		position: relative;
-		grid-column: 3;
-		grid-row: 1 / 3;
-		display: grid;
-		grid-template-rows: auto 1fr auto;
-		box-sizing: border-box;
-		width: 100%;
-		height: 55%;
-		padding: 3.2% 4.6%;
-		border: 1px solid rgba(104, 250, 255, 0.44);
-		border-radius: 0.28rem;
-		background:
-			linear-gradient(90deg, rgba(11, 32, 38, 0.86), rgba(24, 60, 64, 0.72)),
-			#071215;
+		height: 100%;
+		background: #031114;
 		box-shadow:
-			0 0 1rem rgba(45, 255, 249, 0.28),
-			inset 0 0 1.2rem rgba(45, 255, 249, 0.18);
+			inset 0 0 0.7rem rgba(84, 255, 248, 0.18),
+			0 0 0.9rem rgba(45, 255, 249, 0.22);
+		overflow: hidden;
 		text-transform: uppercase;
 	}
 
-	.lcd-title {
+	.screen-backdrop {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		opacity: 0.38;
+		image-rendering: pixelated;
+		mix-blend-mode: screen;
+		pointer-events: none;
+	}
+
+	.screen-title {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 4.5%;
+		z-index: 2;
 		color: #9afcff;
 		font:
-			700 clamp(0.42rem, 1.1vw, 0.92rem) Eurostile,
+			700 clamp(0.18rem, 0.58vw, 0.54rem) Eurostile,
 			Bank Gothic,
 			sans-serif;
 		letter-spacing: 0;
@@ -427,39 +368,67 @@
 		text-shadow: 0 0 0.8rem rgba(65, 255, 246, 0.85);
 	}
 
-	.lcd-layout {
+	.screen-grid {
+		position: absolute;
+		inset: 17% 4.4% 5%;
+		z-index: 2;
 		display: grid;
-		grid-template-columns: 1fr 1.8fr 1fr;
+		grid-template-columns: 1fr 1.52fr 1fr;
+		grid-template-rows: 1fr 1fr 0.35fr;
 		align-items: center;
-		min-height: 0;
+		gap: 4%;
 	}
 
-	.lcd-column {
-		display: grid;
-		justify-items: center;
-		gap: 0.16rem;
-		color: #85f8ff;
-		font:
-			700 clamp(0.32rem, 0.74vw, 0.62rem) Helvetica,
-			sans-serif;
-	}
-
-	.lcd-icon {
-		width: min(42%, 2rem);
-		image-rendering: pixelated;
-		filter: drop-shadow(0 0 0.4rem rgba(53, 255, 250, 0.9));
-	}
-
-	.lcd-core {
+	.screen-tile {
 		position: relative;
 		display: grid;
 		place-items: center;
+		justify-items: center;
+		width: 100%;
+		height: 100%;
+		border-radius: 0.12rem;
+		background: rgba(15, 74, 79, 0.46);
+		box-shadow:
+			inset 0 0 0.42rem rgba(70, 255, 248, 0.22),
+			0 0 0.3rem rgba(13, 255, 247, 0.2);
+		opacity: 0.58;
+	}
+
+	.screen-tile.active,
+	.screen-tile.fan-step {
+		opacity: 1;
+	}
+
+	.screen-tile img {
+		max-width: 64%;
+		max-height: 70%;
+		image-rendering: pixelated;
+		filter: drop-shadow(0 0 0.35rem rgba(53, 255, 250, 0.82));
+	}
+
+	.fan-step span,
+	.screen-status {
+		font:
+			800 clamp(0.16rem, 0.47vw, 0.42rem) Helvetica,
+			sans-serif;
+		color: #dfffff;
+		text-shadow: 0 0 0.45rem rgba(83, 255, 255, 0.72);
+	}
+
+	.screen-core {
+		position: relative;
+		grid-column: 2;
+		grid-row: 1 / 3;
+		display: grid;
+		place-items: center;
+		width: 100%;
+		height: 100%;
 		min-height: 0;
 	}
 
 	.fan-frame {
 		position: absolute;
-		width: 78%;
+		width: 96%;
 		opacity: 0.72;
 		image-rendering: pixelated;
 		filter: drop-shadow(0 0 0.45rem rgba(18, 255, 248, 0.58));
@@ -470,9 +439,9 @@
 		z-index: 2;
 		display: grid;
 		place-items: center;
-		width: 43%;
+		width: 58%;
 		aspect-ratio: 1;
-		border: 0.22rem solid rgba(220, 225, 222, 0.84);
+		border: 0.12rem solid rgba(220, 225, 222, 0.84);
 		border-radius: 50%;
 		background:
 			radial-gradient(
@@ -491,13 +460,13 @@
 
 	.temperature-orb span {
 		font:
-			700 clamp(0.28rem, 0.62vw, 0.52rem) Helvetica,
+			700 clamp(0.14rem, 0.42vw, 0.38rem) Helvetica,
 			sans-serif;
 	}
 
 	.temperature-orb strong {
 		font:
-			900 clamp(1rem, 3vw, 2.8rem) Impact,
+			900 clamp(0.6rem, 1.52vw, 1.36rem) Impact,
 			sans-serif;
 		line-height: 0.78;
 		letter-spacing: 0;
@@ -508,133 +477,19 @@
 		right: 19%;
 		top: 32%;
 		font:
-			800 clamp(0.26rem, 0.62vw, 0.54rem) Helvetica,
+			800 clamp(0.14rem, 0.38vw, 0.34rem) Helvetica,
 			sans-serif;
 	}
 
-	.status-strip {
-		display: flex;
-		justify-content: space-between;
-		gap: 0.2rem;
-		color: #e8ffff;
-		font:
-			700 clamp(0.27rem, 0.67vw, 0.56rem) Helvetica,
-			sans-serif;
-		text-shadow: 0 0 0.6rem rgba(83, 255, 255, 0.72);
-	}
-
-	.side-button {
-		display: grid;
-		place-items: center;
-		width: 100%;
-		aspect-ratio: 1.1;
-		border-radius: 0.56rem;
-		background: rgba(0, 0, 0, 0.24);
-		box-shadow: inset 0 0 0.8rem rgba(0, 0, 0, 0.6);
-		opacity: 0.54;
-		transition:
-			opacity 0.2s ease,
-			filter 0.2s ease;
-	}
-
-	.side-button.active {
-		opacity: 1;
-		filter: drop-shadow(0 0 0.42rem rgba(70, 255, 248, 0.94));
-	}
-
-	.side-button img {
-		max-width: 46%;
-		max-height: 54%;
-		image-rendering: pixelated;
-	}
-
-	.recirc-button {
-		grid-column: 1;
-		grid-row: 1;
-	}
-
-	.fresh-button {
-		grid-column: 1;
-		grid-row: 2;
-	}
-
-	.front-button {
-		grid-column: 5;
-		grid-row: 1;
-	}
-
-	.rear-button {
-		grid-column: 5;
-		grid-row: 2;
-	}
-
-	.screen-nav {
-		position: absolute;
-		left: 50%;
-		bottom: 4.8%;
-		z-index: 3;
-		display: flex;
-		gap: 0.4rem;
-		transform: translateX(-50%);
-	}
-
-	.screen-nav button,
-	.manual-link,
-	.asset-count {
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 999px;
-		background: rgba(11, 12, 12, 0.66);
-		color: #f6ffff;
-		backdrop-filter: blur(8px);
-		font:
-			700 clamp(0.58rem, 1vw, 0.78rem) Helvetica,
-			sans-serif;
-		text-decoration: none;
-	}
-
-	.screen-nav button,
-	.manual-link {
-		padding: 0.5rem 0.78rem;
-		cursor: pointer;
-	}
-
-	.screen-nav button.active {
-		border-color: rgba(90, 255, 247, 0.82);
-		background: rgba(11, 45, 48, 0.82);
-		box-shadow: 0 0 1rem rgba(60, 255, 248, 0.28);
-	}
-
-	.manual-link {
-		position: absolute;
-		right: 5%;
-		bottom: 4.8%;
-		z-index: 3;
-	}
-
-	.asset-count {
-		position: absolute;
-		left: 5%;
-		bottom: 4.8%;
-		z-index: 3;
-		padding: 0.5rem 0.78rem;
+	.screen-status {
+		grid-column: 2;
+		text-align: center;
 	}
 
 	@media (max-width: 760px) {
 		.controller-stage {
 			width: 150vw;
 			transform: translateX(-10%);
-		}
-
-		.screen-nav {
-			bottom: 2.4%;
-			max-width: 64vw;
-			overflow-x: auto;
-			padding-bottom: 0.18rem;
-		}
-
-		.manual-link,
-		.asset-count {
-			display: none;
 		}
 	}
 </style>
