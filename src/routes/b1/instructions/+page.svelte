@@ -707,10 +707,7 @@
 		}
 
 		if (direction > 0) {
-			displayRowIndex = Math.min(
-				displayRowIndex + 1,
-				displayCol1Count() - 1,
-			);
+			displayRowIndex = Math.min(displayRowIndex + 1, displayCol1Count() - 1);
 		} else if (displayRowIndex > 0) {
 			displayRowIndex -= 1;
 		} else {
@@ -743,8 +740,7 @@
 	function displayCellFocused(cell: DisplayGridCell): boolean {
 		if (cell.kind === 'next') {
 			return (
-				displayColIndex === 0 &&
-				displayRowIndex === displayCol0Count() - 1
+				displayColIndex === 0 && displayRowIndex === displayCol0Count() - 1
 			);
 		}
 		if (cell.kind !== 'option') return false;
@@ -841,15 +837,7 @@
 			return ['1 SEC', '2 SEC', '4 SEC', '8 SEC', '10 SEC'];
 		if (current.endsWith('KPH')) return ['0KPH', '20KPH', '60KPH', '100KPH'];
 		if (/^\d+\.\d+$/.test(current))
-			return [
-				'0.00',
-				'1.00',
-				'5.00',
-				'7.35',
-				'18.0',
-				'20.0',
-				'22.39',
-			];
+			return ['0.00', '1.00', '5.00', '7.35', '18.0', '20.0', '22.39'];
 		if (/^\d+$/.test(current))
 			return ['0', '30', '60', '1000', '5000', '7000', '10000'];
 		return [current];
@@ -1062,9 +1050,7 @@
 		}
 		if (Math.abs(stepX) > 18 || Math.abs(movedY) > 18) {
 			const useHorizontal = Math.abs(stepX) > Math.abs(movedY);
-			rotateKnob(
-				useHorizontal ? (stepX > 0 ? 1 : -1) : movedY > 0 ? -1 : 1,
-			);
+			rotateKnob(useHorizontal ? (stepX > 0 ? 1 : -1) : movedY > 0 ? -1 : 1);
 			dragLastX = event.clientX;
 			dragLastY = event.clientY;
 		}
@@ -1175,7 +1161,7 @@
 	{#if character === ' '}
 		<span class="big-digit-space"></span>
 	{:else if parts.length}
-		<span class="segment-digit" class:fractional={fractional}>
+		<span class="segment-digit" class:fractional>
 			{#each parts as part (`${character}-${part}`)}
 				<img
 					class={`segment-part segment-${part}`}
@@ -1204,11 +1190,15 @@
 	{@const dotIndex = text.indexOf('.')}
 	<span class="segment-digit-text" aria-label={text}>
 		{#if dotIndex >= 0}
-			{#each text.slice(0, dotIndex).split('') as character, index (`${text}-pre-${index}`)}
+			{#each text
+				.slice(0, dotIndex)
+				.split('') as character, index (`${text}-pre-${index}`)}
 				{@render segmentDigitChar(character, false)}
 			{/each}
 			<span class="segment-fractional-group">
-				{#each text.slice(dotIndex).split('') as character, index (`${text}-frac-${index}`)}
+				{#each text
+					.slice(dotIndex)
+					.split('') as character, index (`${text}-frac-${index}`)}
 					<span
 						class="segment-fractional-slot"
 						class:dot-slot={character === '.'}
@@ -1352,10 +1342,7 @@
 													{#if gridRow.left}
 														{#if gridRow.left.kind === 'header'}
 															<div class="display-column-header">
-																{@render glyphText(
-																	gridRow.left.label,
-																	'white',
-																)}
+																{@render glyphText(gridRow.left.label, 'white')}
 															</div>
 														{:else}
 															<button
@@ -1363,16 +1350,11 @@
 																class="display-option"
 																class:display-next={gridRow.left.kind ===
 																	'next'}
-																class:focused={displayCellFocused(
-																	gridRow.left,
-																)}
-																class:chosen={displayCellChosen(
-																	gridRow.left,
-																)}
+																class:focused={displayCellFocused(gridRow.left)}
+																class:chosen={displayCellChosen(gridRow.left)}
 																onpointerdown={(event) =>
 																	event.stopPropagation()}
-																onpointerup={(event) =>
-																	event.stopPropagation()}
+																onpointerup={(event) => event.stopPropagation()}
 																onpointercancel={(event) =>
 																	event.stopPropagation()}
 																onclick={(event) => {
@@ -1418,13 +1400,10 @@
 																class:focused={displayCellFocused(
 																	gridRow.right,
 																)}
-																class:chosen={displayCellChosen(
-																	gridRow.right,
-																)}
+																class:chosen={displayCellChosen(gridRow.right)}
 																onpointerdown={(event) =>
 																	event.stopPropagation()}
-																onpointerup={(event) =>
-																	event.stopPropagation()}
+																onpointerup={(event) => event.stopPropagation()}
 																onpointercancel={(event) =>
 																	event.stopPropagation()}
 																onclick={(event) => {
@@ -1472,8 +1451,7 @@
 												class={`row-tone-${row.tone ?? 'white'} value-tone-${row.valueTone ?? 'white'}`}
 												onpointerdown={(event) => event.stopPropagation()}
 												onpointerup={(event) => event.stopPropagation()}
-												onpointercancel={(event) =>
-													event.stopPropagation()}
+												onpointercancel={(event) => event.stopPropagation()}
 												onclick={(event) => {
 													event.stopPropagation();
 													rowClick(row, index);
