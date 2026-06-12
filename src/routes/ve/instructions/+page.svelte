@@ -88,7 +88,6 @@
 				onclick={() => changeTemperature(1)}
 			>
 				<strong class="temperature-value">{temperature}</strong>
-				<span class="temperature-degree"></span>
 			</button>
 		</div>
 	</div>
@@ -202,26 +201,25 @@
 
 	.temperature-overlay {
 		position: absolute;
-		left: 35.6%;
-		top: 32.4%;
+		left: 37.2%;
+		top: 35.2%;
 		z-index: 2;
 		display: grid;
 		place-items: center;
-		width: 23.2%;
-		height: 27.4%;
+		width: 22.8%;
+		height: 22.6%;
 		border: 0;
-		border-radius: 0.18rem;
+		border-radius: 999rem;
 		background:
 			radial-gradient(
-				ellipse at 50% 45%,
-				rgba(103, 16, 13, 0.92),
-				rgba(41, 7, 6, 0.9) 62%,
-				rgba(2, 8, 9, 0.42) 100%
+				ellipse at 50% 52%,
+				rgba(185, 30, 22, 0.96),
+				rgba(91, 8, 7, 0.92) 58%,
+				rgba(37, 3, 3, 0.38) 82%,
+				rgba(7, 1, 1, 0) 100%
 			),
-			rgba(0, 0, 0, 0.42);
-		box-shadow:
-			inset 0 0 0.34rem rgba(255, 82, 65, 0.3),
-			0 0 0.2rem rgba(7, 255, 248, 0.18);
+			transparent;
+		box-shadow: inset 0 0 0.24rem rgba(255, 230, 219, 0.22);
 		padding: 0;
 		cursor: pointer;
 	}
@@ -229,10 +227,10 @@
 	.temperature-value {
 		position: absolute;
 		left: 50%;
-		top: 54%;
+		top: 53%;
 		color: #f9ffff;
 		font:
-			900 clamp(0.88rem, 2.18vw, 1.96rem) 'Arial Rounded MT Bold',
+			900 clamp(0.96rem, 2.44vw, 2.18rem) 'Arial Rounded MT Bold',
 			'Arial Black',
 			Helvetica,
 			sans-serif;
@@ -242,19 +240,7 @@
 			0 0 0.1rem rgba(255, 255, 255, 0.86),
 			0 0 0.2rem rgba(42, 255, 248, 0.24),
 			0.06rem 0.08rem 0 rgba(0, 0, 0, 0.62);
-		transform: translate(-54%, -50%) scaleX(0.82);
-	}
-
-	.temperature-degree {
-		position: absolute;
-		right: 13%;
-		top: 24%;
-		width: 7%;
-		aspect-ratio: 1;
-		border: 0.08rem solid #f8ffff;
-		border-radius: 50%;
-		opacity: 0.68;
-		box-shadow: 0 0 0.12rem rgba(255, 255, 255, 0.54);
+		transform: translate(-50%, -50%) scaleX(0.9);
 	}
 
 	@media (max-width: 760px) {
