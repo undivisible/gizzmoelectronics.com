@@ -318,13 +318,7 @@
 		place-items: center;
 		min-height: 100svh;
 		overflow: hidden;
-		background:
-			radial-gradient(
-				circle at 50% 84%,
-				rgba(255, 255, 255, 0.3),
-				transparent 18rem
-			),
-			linear-gradient(180deg, #f6f7f7 0%, #e5e6e6 54%, #c9cccc 100%);
+		background: #000;
 		color: #f8fbff;
 		opacity: 0;
 		transform: scale(1.012);
@@ -343,11 +337,33 @@
 		width: min(100vw, calc(100svh * 2438 / 1371));
 		aspect-ratio: 2438 / 1371;
 		overflow: hidden;
+		background: #000;
+	}
+
+	.controller-stage::before,
+	.controller-stage::after {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		z-index: 1;
+		width: 10%;
+		background: #000;
+		content: '';
+		pointer-events: none;
+	}
+
+	.controller-stage::before {
+		left: 0;
+	}
+
+	.controller-stage::after {
+		right: 0;
 	}
 
 	.product-render {
 		position: absolute;
 		inset: 0;
+		z-index: 0;
 		width: 100%;
 		height: 100%;
 		object-fit: contain;
@@ -367,6 +383,7 @@
 		gap: 0.7%;
 		width: 72%;
 		height: 35.8%;
+		z-index: 2;
 		outline: none;
 	}
 
@@ -595,6 +612,7 @@
 		position: absolute;
 		left: 50%;
 		bottom: 4.8%;
+		z-index: 3;
 		display: flex;
 		gap: 0.4rem;
 		transform: translateX(-50%);
@@ -630,12 +648,14 @@
 		position: absolute;
 		right: 5%;
 		bottom: 4.8%;
+		z-index: 3;
 	}
 
 	.asset-count {
 		position: absolute;
 		left: 5%;
 		bottom: 4.8%;
+		z-index: 3;
 		padding: 0.5rem 0.78rem;
 	}
 
