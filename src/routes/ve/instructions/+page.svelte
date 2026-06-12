@@ -56,7 +56,7 @@
 		],
 		'9': ['top', 'leftTop', 'rightTop', 'middle', 'rightBottom', 'bottom'],
 	};
-	const screens: ClimateScreen[] = [
+	let screens = $state<ClimateScreen[]>([
 		{
 			id: 'auto',
 			label: 'Auto',
@@ -101,7 +101,7 @@
 			front: false,
 			rear: false,
 		},
-	];
+	]);
 
 	let activeIndex = $state(0);
 	let booted = $state(false);
@@ -128,6 +128,11 @@
 
 	function tempDigits(value: number) {
 		return String(value).padStart(2, '0').split('');
+	}
+
+	function handleRightKnobWheel(event: WheelEvent) {
+		event.preventDefault();
+		changeTemperature(event.deltaY < 0 ? 1 : -1);
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
@@ -192,6 +197,25 @@
 <section class="ve-instructions" class:booted>
 	<div class="controller-stage">
 		<img class="product-render" src={renderSrc} alt="VE climate control unit" />
+		<div
+			class="right-knob-control"
+			role="group"
+			aria-label="Right temperature knob"
+			onwheel={handleRightKnobWheel}
+		>
+			<button
+				type="button"
+				class="knob-half knob-up"
+				aria-label="Increase temperature"
+				onclick={() => changeTemperature(1)}
+			></button>
+			<button
+				type="button"
+				class="knob-half knob-down"
+				aria-label="Decrease temperature"
+				onclick={() => changeTemperature(-1)}
+			></button>
+		</div>
 
 		<div class="controller-screen" aria-label="Interactive VE screen">
 			<div class="screen-ui" aria-live="polite">
@@ -251,6 +275,9 @@
 								src={`${symbolEtcBase}${activeScreen.id === 'manual' ? 'ManualWording.png' : 'AutoWording.png'}`}
 								alt=""
 							/>
+							<strong class="temperature-value">
+								{activeScreen.temperature}
+							</strong>
 							<span class="temperature-digits" aria-hidden="true">
 								{#each tempDigits(activeScreen.temperature) as digit, digitIndex (`${digit}-${digitIndex}`)}
 									<span class="temperature-digit">
@@ -364,6 +391,37 @@
 		pointer-events: none;
 		user-select: none;
 		-webkit-user-drag: none;
+	}
+
+	.right-knob-control {
+		position: absolute;
+		left: 63.8%;
+		top: 41.4%;
+		z-index: 3;
+		width: 18.4%;
+		height: 30.2%;
+		border-radius: 50%;
+	}
+
+	.knob-half {
+		position: absolute;
+		left: 0;
+		width: 100%;
+		height: 50%;
+		border: 0;
+		background: transparent;
+		padding: 0;
+		cursor: ns-resize;
+	}
+
+	.knob-up {
+		top: 0;
+		border-radius: 999rem 999rem 0 0;
+	}
+
+	.knob-down {
+		bottom: 0;
+		border-radius: 0 0 999rem 999rem;
 	}
 
 	.controller-screen {
@@ -518,13 +576,13 @@
 
 	.screen-core {
 		position: absolute;
-		left: 31.4%;
-		top: 11.8%;
+		left: 31.2%;
+		top: 14.5%;
 		display: grid;
 		place-items: center;
-		z-index: 2;
-		width: 36%;
-		height: 75%;
+		z-index: 4;
+		width: 35.8%;
+		height: 69%;
 	}
 
 	.fan-ring {
@@ -553,8 +611,8 @@
 		z-index: 2;
 		display: grid;
 		place-items: center;
-		width: 72%;
-		opacity: 0;
+		width: 74%;
+		opacity: 1;
 		aspect-ratio: 1;
 		border: 0.12rem solid rgba(226, 230, 224, 0.92);
 		border-radius: 50%;
@@ -576,19 +634,38 @@
 
 	.mode-word {
 		position: absolute;
-		top: 18%;
-		width: 39%;
+		top: 17%;
+		width: 38%;
 		height: auto;
 		image-rendering: pixelated;
 		mix-blend-mode: screen;
 	}
 
+	.temperature-value {
+		position: absolute;
+		left: 50%;
+		top: 55%;
+		color: #f7f4eb;
+		font:
+			900 clamp(1.05rem, 3.1vw, 2.76rem) 'Arial Rounded MT Bold',
+			'Arial Black',
+			Helvetica,
+			sans-serif;
+		letter-spacing: -0.05em;
+		line-height: 0.82;
+		text-shadow:
+			0.03rem 0.03rem 0 rgba(77, 86, 82, 0.9),
+			0 0 0.18rem rgba(255, 255, 255, 0.7);
+		transform: translate(-52%, -50%) scaleX(0.92);
+	}
+
 	.temperature-digits {
 		position: absolute;
 		left: 50%;
-		top: 52%;
+		top: 54%;
 		display: flex;
 		gap: 0.03rem;
+		opacity: 0;
 		transform: translate(-50%, -50%);
 	}
 
@@ -649,9 +726,9 @@
 
 	.temperature-degree {
 		position: absolute;
-		right: 20%;
-		top: 32%;
-		width: 7%;
+		right: 20.5%;
+		top: 31%;
+		width: 6%;
 		aspect-ratio: 1;
 		border: 0.08rem solid #f8ffff;
 		border-radius: 50%;
