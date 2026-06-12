@@ -14,7 +14,6 @@
 		recirc: boolean;
 		front: boolean;
 		rear: boolean;
-		dial: 'active' | 'idle';
 	};
 
 	let { data }: { data: PageData } = $props();
@@ -38,7 +37,6 @@
 			recirc: false,
 			front: false,
 			rear: true,
-			dial: 'active',
 		},
 		{
 			id: 'manual',
@@ -50,7 +48,6 @@
 			recirc: false,
 			front: false,
 			rear: false,
-			dial: 'idle',
 		},
 		{
 			id: 'demist',
@@ -62,7 +59,6 @@
 			recirc: false,
 			front: true,
 			rear: true,
-			dial: 'active',
 		},
 		{
 			id: 'recirc',
@@ -74,21 +70,16 @@
 			recirc: true,
 			front: false,
 			rear: false,
-			dial: 'active',
 		},
 	];
 
 	let activeIndex = $state(0);
 	let booted = $state(false);
-	let leftAngle = $state(-16);
-	let rightAngle = $state(18);
 	let activeScreen = $derived(screens[activeIndex]);
 	let assetCount = $derived(data.assets.length);
 
 	function chooseScreen(index: number) {
 		activeIndex = (index + screens.length) % screens.length;
-		leftAngle = activeIndex * 32 - 16;
-		rightAngle = activeIndex * -28 + 18;
 	}
 
 	function nextScreen(direction: number) {
@@ -100,12 +91,10 @@
 			16,
 			Math.min(32, activeScreen.temperature + direction),
 		);
-		rightAngle += direction * 12;
 	}
 
 	function changeFan(direction: number) {
 		activeScreen.fan = Math.max(0, Math.min(17, activeScreen.fan + direction));
-		leftAngle += direction * 12;
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
@@ -200,13 +189,7 @@
 				class="dial left-dial"
 				aria-label="Fan speed"
 				onclick={() => changeFan(1)}
-			>
-				<img
-					src={`${symbolBase}${activeScreen.dial === 'active' ? 'StartwithRicons.bmp' : 'StartwithGicons.bmp'}`}
-					alt=""
-				/>
-				<span style={`transform: rotate(${leftAngle}deg)`}></span>
-			</button>
+			></button>
 
 			<div class="lcd-panel" aria-live="polite">
 				<div class="lcd-title">{activeScreen.title}</div>
@@ -256,10 +239,7 @@
 				class="dial right-dial"
 				aria-label="Temperature"
 				onclick={() => changeTemperature(1)}
-			>
-				<img src={`${symbolBase}Right_Blank.bmp`} alt="" />
-				<span style={`transform: rotate(${rightAngle}deg)`}></span>
-			</button>
+			></button>
 
 			<button
 				type="button"
@@ -405,26 +385,6 @@
 		grid-row: 1 / 3;
 		width: 100%;
 		aspect-ratio: 1;
-		filter: drop-shadow(0 1.2rem 1rem rgba(0, 0, 0, 0.35));
-	}
-
-	.dial img {
-		display: block;
-		width: 100%;
-		height: 100%;
-		object-fit: contain;
-	}
-
-	.dial span {
-		position: absolute;
-		left: 49%;
-		top: 49%;
-		width: 41%;
-		height: 41%;
-		border-top: 0.16rem solid rgba(255, 255, 255, 0.86);
-		border-radius: 50%;
-		transform-origin: center;
-		transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
 	.left-dial {
