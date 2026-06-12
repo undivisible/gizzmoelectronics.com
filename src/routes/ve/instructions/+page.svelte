@@ -13,10 +13,48 @@
 		front: boolean;
 		rear: boolean;
 	};
+	type TempSegment =
+		| 'top'
+		| 'leftTop'
+		| 'rightTop'
+		| 'middle'
+		| 'leftBottom'
+		| 'rightBottom'
+		| 'bottom';
 
 	const symbolBase = '/ve/SWC-Symbol-RedNEW/';
-	const transparentSymbolBase = `${symbolBase}transparent/`;
+	const symbolEtcBase = `${symbolBase}transparent/SymbolsEtc/`;
+	const tempDigitBase = `${symbolBase}transparent/Temp_Digits/`;
 	const renderSrc = '/ve/VE-Cosmetic%20design.1263.jpg';
+	const tempSegmentFiles: Record<TempSegment, string> = {
+		top: 'Top.png',
+		leftTop: 'Left_Top.png',
+		rightTop: 'Right_Top.png',
+		middle: 'Middle.png',
+		leftBottom: 'Left_Bottom.png',
+		rightBottom: 'Right_Bottom.png',
+		bottom: 'Bottom.png',
+	};
+	const tempSegmentsByDigit: Record<string, TempSegment[]> = {
+		'0': ['top', 'leftTop', 'rightTop', 'leftBottom', 'rightBottom', 'bottom'],
+		'1': ['rightTop', 'rightBottom'],
+		'2': ['top', 'rightTop', 'middle', 'leftBottom', 'bottom'],
+		'3': ['top', 'rightTop', 'middle', 'rightBottom', 'bottom'],
+		'4': ['leftTop', 'rightTop', 'middle', 'rightBottom'],
+		'5': ['top', 'leftTop', 'middle', 'rightBottom', 'bottom'],
+		'6': ['top', 'leftTop', 'middle', 'leftBottom', 'rightBottom', 'bottom'],
+		'7': ['top', 'rightTop', 'rightBottom'],
+		'8': [
+			'top',
+			'leftTop',
+			'rightTop',
+			'middle',
+			'leftBottom',
+			'rightBottom',
+			'bottom',
+		],
+		'9': ['top', 'leftTop', 'rightTop', 'middle', 'rightBottom', 'bottom'],
+	};
 	const screens: ClimateScreen[] = [
 		{
 			id: 'auto',
@@ -87,6 +125,10 @@
 		activeScreen.fan = Math.max(0, Math.min(17, activeScreen.fan + direction));
 	}
 
+	function tempDigits(value: number) {
+		return String(value).padStart(2, '0').split('');
+	}
+
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'ArrowLeft') {
 			event.preventDefault();
@@ -154,6 +196,16 @@
 			<div class="screen-ui" aria-live="polite">
 				<div class="screen-glow"></div>
 				<div class="screen-grid">
+					<img
+						class="screen-backdrop screen-backdrop-low"
+						src={`${symbolEtcBase}LowBackground.png`}
+						alt=""
+					/>
+					<img
+						class="screen-backdrop screen-backdrop-high"
+						src={`${symbolEtcBase}highBackground.png`}
+						alt=""
+					/>
 					<button
 						type="button"
 						class="screen-tile fresh"
@@ -161,7 +213,7 @@
 						aria-label="Fresh air"
 						onclick={() => (activeScreen.recirc = false)}
 					>
-						<img src={`${transparentSymbolBase}FreshSymbol.png`} alt="" />
+						<img src={`${symbolEtcBase}FreshSymbol.png`} alt="" />
 					</button>
 					<button
 						type="button"
@@ -170,7 +222,10 @@
 						aria-label="Front demist"
 						onclick={() => (activeScreen.front = !activeScreen.front)}
 					>
-						<img src={`${transparentSymbolBase}Front_Demist_ON.png`} alt="" />
+						<img
+							src={`${symbolEtcBase}${activeScreen.front ? 'Front_Demist_ON.png' : 'Front_Demist_OFF.png'}`}
+							alt=""
+						/>
 					</button>
 					<button
 						type="button"
@@ -179,7 +234,7 @@
 						aria-label="Recirculation"
 						onclick={() => (activeScreen.recirc = true)}
 					>
-						<img src={`${transparentSymbolBase}RecircSymbol.png`} alt="" />
+						<img src={`${symbolEtcBase}RecircSymbol.png`} alt="" />
 					</button>
 					<div class="screen-core">
 						<div class="fan-ring" aria-hidden="true"></div>
@@ -189,9 +244,25 @@
 							aria-label="Temperature"
 							onclick={() => changeTemperature(1)}
 						>
-							<span>Auto</span>
-							<strong>{activeScreen.temperature}</strong>
-							<small>o</small>
+							<img
+								class="mode-word"
+								src={`${symbolEtcBase}${activeScreen.id === 'manual' ? 'ManualWording.png' : 'AutoWording.png'}`}
+								alt=""
+							/>
+							<span class="temperature-digits" aria-hidden="true">
+								{#each tempDigits(activeScreen.temperature) as digit, digitIndex (`${digit}-${digitIndex}`)}
+									<span class="temperature-digit">
+										{#each tempSegmentsByDigit[digit] as segment (segment)}
+											<img
+												class={`temperature-segment ${segment}`}
+												src={`${tempDigitBase}${tempSegmentFiles[segment]}`}
+												alt=""
+											/>
+										{/each}
+									</span>
+								{/each}
+							</span>
+							<span class="temperature-degree"></span>
 						</button>
 					</div>
 					<button
@@ -202,7 +273,7 @@
 						onclick={() => (activeScreen.ac = !activeScreen.ac)}
 					>
 						<img
-							src={`${transparentSymbolBase}${activeScreen.ac ? 'AC-SymbolsNEW.png' : 'AC-OFF-SymbolsNEW.png'}`}
+							src={`${symbolEtcBase}${activeScreen.ac ? 'AC-Symbols.png' : 'AC-OFF-Symbols.png'}`}
 							alt=""
 						/>
 					</button>
@@ -213,7 +284,10 @@
 						aria-label="Rear demist"
 						onclick={() => (activeScreen.rear = !activeScreen.rear)}
 					>
-						<img src={`${transparentSymbolBase}Rear_Demist_ON.png`} alt="" />
+						<img
+							src={`${symbolEtcBase}${activeScreen.rear ? 'Rear_Demist_ON.png' : 'Rear_Demist_OFF.png'}`}
+							alt=""
+						/>
 					</button>
 					<button
 						type="button"
@@ -292,10 +366,10 @@
 
 	.controller-screen {
 		position: absolute;
-		left: 37.25%;
-		top: 43.55%;
-		width: 25.9%;
-		height: 24.8%;
+		left: 39.7%;
+		top: 43.35%;
+		width: 20.8%;
+		height: 23.8%;
 		z-index: 2;
 		overflow: hidden;
 		border-radius: 0.12rem;
@@ -315,8 +389,17 @@
 		position: relative;
 		width: 100%;
 		height: 100%;
-		background: transparent;
-		box-shadow: none;
+		background:
+			radial-gradient(
+				circle at 50% 50%,
+				rgba(35, 117, 119, 0.9),
+				rgba(10, 54, 57, 0.98) 48%,
+				#041415 84%
+			),
+			#041415;
+		box-shadow:
+			inset 0 0 0.62rem rgba(99, 255, 250, 0.26),
+			0 0 0.34rem rgba(35, 255, 248, 0.22);
 		overflow: hidden;
 		text-transform: uppercase;
 	}
@@ -336,20 +419,42 @@
 
 	.screen-grid {
 		position: absolute;
-		inset: 6% 4%;
+		inset: 2% 3%;
 		z-index: 2;
+	}
+
+	.screen-backdrop {
+		position: absolute;
+		z-index: 0;
+		opacity: 0.92;
+		image-rendering: pixelated;
+		mix-blend-mode: screen;
+		pointer-events: none;
+	}
+
+	.screen-backdrop-low {
+		left: 19%;
+		bottom: 2%;
+		width: 60%;
+	}
+
+	.screen-backdrop-high {
+		left: 24%;
+		top: 2%;
+		width: 50%;
 	}
 
 	.screen-tile {
 		position: absolute;
 		display: grid;
 		place-items: center;
-		width: 13.5%;
+		z-index: 3;
+		width: 17%;
 		height: 18%;
 		border-radius: 0.04rem;
 		background: transparent;
 		box-shadow: none;
-		opacity: 0.5;
+		opacity: 0.42;
 	}
 
 	.screen-tile.active,
@@ -366,32 +471,32 @@
 	}
 
 	.screen-tile.fresh {
-		left: 6.5%;
-		top: 10%;
+		left: 5.6%;
+		top: 12%;
 	}
 
 	.screen-tile.front {
-		right: 6.2%;
+		right: 5.4%;
 		top: 10%;
 	}
 
 	.screen-tile.recirc {
-		left: 6.5%;
-		bottom: 10%;
+		left: 6.2%;
+		bottom: 11%;
 	}
 
 	.screen-tile.ac {
-		right: 6.2%;
+		right: 6.6%;
 		top: 41%;
 	}
 
 	.screen-tile.rear {
-		right: 6.2%;
+		right: 5.6%;
 		bottom: 10%;
 	}
 
 	.screen-tile.fan-step {
-		left: 6.5%;
+		left: 7%;
 		top: 41%;
 	}
 
@@ -406,12 +511,13 @@
 
 	.screen-core {
 		position: absolute;
-		left: 31.2%;
-		top: 14.5%;
+		left: 31.4%;
+		top: 11.8%;
 		display: grid;
 		place-items: center;
-		width: 37.5%;
-		height: 71%;
+		z-index: 2;
+		width: 36%;
+		height: 75%;
 	}
 
 	.fan-ring {
@@ -419,7 +525,7 @@
 		width: 96%;
 		aspect-ratio: 1;
 		border-radius: 50%;
-		opacity: 0.34;
+		opacity: 0.86;
 		background:
 			radial-gradient(
 				circle,
@@ -440,47 +546,108 @@
 		z-index: 2;
 		display: grid;
 		place-items: center;
-		width: 56%;
-		opacity: 0.42;
+		width: 72%;
 		aspect-ratio: 1;
-		border: 0.1rem solid rgba(226, 230, 224, 0.88);
+		border: 0.12rem solid rgba(226, 230, 224, 0.92);
 		border-radius: 50%;
 		background:
 			radial-gradient(
 				circle at 50% 38%,
-				#ffdad2 0 8%,
-				#f44931 34%,
-				#8d0705 72%
+				#fff1eb 0 7%,
+				#ff6d4f 23%,
+				#d5150f 48%,
+				#710302 78%
 			),
 			#b9100c;
 		box-shadow:
-			inset 0 0 0.64rem rgba(255, 255, 255, 0.44),
-			0 0 0.74rem rgba(255, 46, 31, 0.72);
+			inset 0 0 0.72rem rgba(255, 255, 255, 0.5),
+			0 0 0.86rem rgba(255, 46, 31, 0.82);
 		color: #fff;
 		text-shadow: 0 0 0.44rem rgba(0, 0, 0, 0.8);
 	}
 
-	.temperature-orb span {
-		font:
-			700 clamp(0.11rem, 0.34vw, 0.3rem) Helvetica,
-			sans-serif;
-	}
-
-	.temperature-orb strong {
-		font:
-			900 clamp(0.5rem, 1.28vw, 1.14rem) Impact,
-			sans-serif;
-		line-height: 0.78;
-		letter-spacing: 0;
-	}
-
-	.temperature-orb small {
+	.mode-word {
 		position: absolute;
-		right: 19%;
+		top: 18%;
+		width: 39%;
+		height: auto;
+		image-rendering: pixelated;
+		mix-blend-mode: screen;
+	}
+
+	.temperature-digits {
+		position: absolute;
+		left: 50%;
+		top: 52%;
+		display: flex;
+		gap: 0.03rem;
+		transform: translate(-50%, -50%);
+	}
+
+	.temperature-digit {
+		position: relative;
+		display: block;
+		width: clamp(0.54rem, 1.45vw, 1.3rem);
+		aspect-ratio: 22 / 37;
+	}
+
+	.temperature-segment {
+		position: absolute;
+		image-rendering: pixelated;
+		filter: drop-shadow(0 0 0.16rem rgba(255, 255, 255, 0.65));
+	}
+
+	.temperature-segment.top {
+		left: 11%;
+		top: 0;
+		width: 78%;
+	}
+
+	.temperature-segment.leftTop {
+		left: 0;
+		top: 12%;
+		width: 23%;
+	}
+
+	.temperature-segment.rightTop {
+		right: 0;
+		top: 12%;
+		width: 23%;
+	}
+
+	.temperature-segment.middle {
+		left: 12%;
+		top: 45%;
+		width: 76%;
+	}
+
+	.temperature-segment.leftBottom {
+		left: 0;
+		bottom: 13%;
+		width: 23%;
+	}
+
+	.temperature-segment.rightBottom {
+		right: 0;
+		bottom: 11%;
+		width: 23%;
+	}
+
+	.temperature-segment.bottom {
+		left: 11%;
+		bottom: 0;
+		width: 78%;
+	}
+
+	.temperature-degree {
+		position: absolute;
+		right: 20%;
 		top: 32%;
-		font:
-			800 clamp(0.1rem, 0.28vw, 0.26rem) Helvetica,
-			sans-serif;
+		width: 7%;
+		aspect-ratio: 1;
+		border: 0.08rem solid #f8ffff;
+		border-radius: 50%;
+		box-shadow: 0 0 0.18rem rgba(255, 255, 255, 0.75);
 	}
 
 	@media (max-width: 760px) {
