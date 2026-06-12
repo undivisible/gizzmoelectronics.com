@@ -26,7 +26,6 @@
 	const symbolEtcBase = `${symbolBase}transparent/SymbolsEtc/`;
 	const tempDigitBase = `${symbolBase}transparent/Temp_Digits/`;
 	const renderSrc = '/ve/VE-Cosmetic%20design.1263.jpg';
-	const lcdOverlaySrc = '/ve/generated/lcd-overlay.png';
 	const tempSegmentFiles: Record<TempSegment, string> = {
 		top: 'Top.png',
 		leftTop: 'Left_Top.png',
@@ -219,7 +218,6 @@
 
 		<div class="controller-screen" aria-label="Interactive VE screen">
 			<div class="screen-ui" aria-live="polite">
-				<img class="lcd-art" src={lcdOverlaySrc} alt="" />
 				<div class="screen-glow"></div>
 				<div class="screen-grid">
 					<img
@@ -462,21 +460,9 @@
 		box-shadow:
 			inset 0 0 0.55rem rgba(93, 255, 250, 0.34),
 			0 0 0.34rem rgba(35, 255, 248, 0.22);
+		clip-path: polygon(2% 2%, 98% 0, 100% 96%, 0 100%);
 		overflow: hidden;
 		text-transform: uppercase;
-	}
-
-	.lcd-art {
-		position: absolute;
-		inset: 0;
-		z-index: 1;
-		width: 100%;
-		height: 100%;
-		object-fit: fill;
-		opacity: 1;
-		pointer-events: none;
-		user-select: none;
-		-webkit-user-drag: none;
 	}
 
 	.screen-glow {
@@ -491,7 +477,7 @@
 			transparent 72%
 		);
 		filter: blur(0.28rem);
-		opacity: 0;
+		opacity: 1;
 	}
 
 	.screen-grid {
@@ -503,7 +489,7 @@
 	.screen-backdrop {
 		position: absolute;
 		z-index: 0;
-		opacity: 0;
+		opacity: 0.72;
 		image-rendering: pixelated;
 		mix-blend-mode: screen;
 		pointer-events: none;
@@ -529,18 +515,14 @@
 		width: 17%;
 		height: 18%;
 		border-radius: 0.08rem;
-		background:
-			linear-gradient(180deg, rgba(45, 194, 197, 0.34), rgba(2, 39, 41, 0.82)),
-			rgba(5, 55, 58, 0.68);
-		box-shadow:
-			inset 0 0 0.18rem rgba(84, 255, 250, 0.36),
-			0 0 0.18rem rgba(50, 255, 248, 0.32);
-		opacity: 0;
+		background: transparent;
+		box-shadow: none;
+		opacity: 0.36;
 	}
 
 	.screen-tile.active,
 	.screen-tile.fan-step {
-		opacity: 0;
+		opacity: 1;
 	}
 
 	.screen-tile img {
@@ -592,21 +574,21 @@
 
 	.screen-core {
 		position: absolute;
-		left: 30.6%;
-		top: 11%;
+		left: 29.8%;
+		top: 8.5%;
 		display: grid;
 		place-items: center;
 		z-index: 4;
-		width: 38.2%;
-		height: 76%;
+		width: 40.2%;
+		height: 80%;
 	}
 
 	.fan-ring {
 		position: absolute;
-		width: 104%;
+		width: 99%;
 		aspect-ratio: 1;
 		border-radius: 50%;
-		opacity: 0;
+		opacity: 0.7;
 		background:
 			radial-gradient(
 				circle,
@@ -627,7 +609,7 @@
 		z-index: 5;
 		display: grid;
 		place-items: center;
-		width: 70%;
+		width: 62%;
 		opacity: 1;
 		aspect-ratio: 1;
 		border: 0.12rem solid rgba(238, 240, 232, 0.96);
@@ -655,7 +637,8 @@
 		width: 38%;
 		height: auto;
 		image-rendering: pixelated;
-		opacity: 0;
+		mix-blend-mode: screen;
+		opacity: 1;
 	}
 
 	.temperature-value {
@@ -677,9 +660,9 @@
 	.temperature-digits {
 		position: absolute;
 		left: 50%;
-		top: 54%;
+		top: 55%;
 		display: flex;
-		gap: 0.03rem;
+		gap: 0.01rem;
 		opacity: 1;
 		transform: translate(-50%, -50%);
 	}
@@ -687,7 +670,7 @@
 	.temperature-digit {
 		position: relative;
 		display: block;
-		width: clamp(0.54rem, 1.45vw, 1.3rem);
+		width: clamp(0.46rem, 1.22vw, 1.1rem);
 		aspect-ratio: 22 / 37;
 	}
 
