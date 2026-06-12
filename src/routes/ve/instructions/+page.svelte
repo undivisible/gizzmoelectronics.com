@@ -201,8 +201,8 @@
 
 	.temperature-overlay {
 		position: absolute;
-		left: 36.4%;
-		top: 34.6%;
+		left: 38%;
+		top: 33.2%;
 		z-index: 2;
 		display: grid;
 		place-items: center;
