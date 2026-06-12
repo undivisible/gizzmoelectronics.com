@@ -26,6 +26,7 @@
 	const symbolEtcBase = `${symbolBase}transparent/SymbolsEtc/`;
 	const tempDigitBase = `${symbolBase}transparent/Temp_Digits/`;
 	const renderSrc = '/ve/VE-Cosmetic%20design.1263.jpg';
+	const lcdOverlaySrc = '/ve/generated/lcd-overlay.png';
 	const tempSegmentFiles: Record<TempSegment, string> = {
 		top: 'Top.png',
 		leftTop: 'Left_Top.png',
@@ -194,6 +195,7 @@
 
 		<div class="controller-screen" aria-label="Interactive VE screen">
 			<div class="screen-ui" aria-live="polite">
+				<img class="lcd-art" src={lcdOverlaySrc} alt="" />
 				<div class="screen-glow"></div>
 				<div class="screen-grid">
 					<img
@@ -389,24 +391,28 @@
 		position: relative;
 		width: 100%;
 		height: 100%;
-		background:
-			radial-gradient(
-				circle at 50% 50%,
-				rgba(35, 117, 119, 0.9),
-				rgba(10, 54, 57, 0.98) 48%,
-				#041415 84%
-			),
-			#041415;
-		box-shadow:
-			inset 0 0 0.62rem rgba(99, 255, 250, 0.26),
-			0 0 0.34rem rgba(35, 255, 248, 0.22);
+		background: #041415;
+		box-shadow: 0 0 0.34rem rgba(35, 255, 248, 0.22);
 		overflow: hidden;
 		text-transform: uppercase;
+	}
+
+	.lcd-art {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		width: 100%;
+		height: 100%;
+		object-fit: fill;
+		pointer-events: none;
+		user-select: none;
+		-webkit-user-drag: none;
 	}
 
 	.screen-glow {
 		position: absolute;
 		inset: 18% 24%;
+		z-index: 2;
 		border-radius: 50%;
 		background: radial-gradient(
 			circle,
@@ -415,18 +421,19 @@
 			transparent 72%
 		);
 		filter: blur(0.28rem);
+		opacity: 0;
 	}
 
 	.screen-grid {
 		position: absolute;
 		inset: 2% 3%;
-		z-index: 2;
+		z-index: 3;
 	}
 
 	.screen-backdrop {
 		position: absolute;
 		z-index: 0;
-		opacity: 0.92;
+		opacity: 0;
 		image-rendering: pixelated;
 		mix-blend-mode: screen;
 		pointer-events: none;
@@ -454,12 +461,12 @@
 		border-radius: 0.04rem;
 		background: transparent;
 		box-shadow: none;
-		opacity: 0.42;
+		opacity: 0;
 	}
 
 	.screen-tile.active,
 	.screen-tile.fan-step {
-		opacity: 1;
+		opacity: 0;
 	}
 
 	.screen-tile img {
@@ -525,7 +532,7 @@
 		width: 96%;
 		aspect-ratio: 1;
 		border-radius: 50%;
-		opacity: 0.86;
+		opacity: 0;
 		background:
 			radial-gradient(
 				circle,
@@ -547,6 +554,7 @@
 		display: grid;
 		place-items: center;
 		width: 72%;
+		opacity: 0;
 		aspect-ratio: 1;
 		border: 0.12rem solid rgba(226, 230, 224, 0.92);
 		border-radius: 50%;
