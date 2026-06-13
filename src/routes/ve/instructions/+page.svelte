@@ -2,9 +2,23 @@
 	import { onDestroy, onMount } from 'svelte';
 
 	const renderSrc = '/ve/VE-Cosmetic%20design.1263.jpg';
+	const screenSrc = '/ve/SWC-Symbol-RedNEW/StartwithGicons.bmp';
+	const digitSegments: Record<string, string[]> = {
+		'0': ['a', 'b', 'c', 'd', 'e', 'f'],
+		'1': ['b', 'c'],
+		'2': ['a', 'b', 'g', 'e', 'd'],
+		'3': ['a', 'b', 'c', 'd', 'g'],
+		'4': ['f', 'g', 'b', 'c'],
+		'5': ['a', 'f', 'g', 'c', 'd'],
+		'6': ['a', 'f', 'e', 'd', 'c', 'g'],
+		'7': ['a', 'b', 'c'],
+		'8': ['a', 'b', 'c', 'd', 'e', 'f', 'g'],
+		'9': ['a', 'b', 'c', 'd', 'f', 'g'],
+	};
 
 	let temperature = $state(31);
 	let booted = $state(false);
+	let temperatureDigits = $derived(String(temperature).padStart(2, '0'));
 
 	function changeTemperature(direction: number) {
 		temperature = Math.max(16, Math.min(32, temperature + direction));
@@ -81,13 +95,26 @@
 		</div>
 
 		<div class="controller-screen" aria-label="Interactive VE screen">
+			<img class="screen-render" src={screenSrc} alt="" aria-hidden="true" />
 			<button
 				type="button"
 				class="temperature-overlay"
 				aria-label="Temperature"
 				onclick={() => changeTemperature(1)}
 			>
-				<strong class="temperature-value">{temperature}</strong>
+				<strong class="temperature-value">
+					{#each temperatureDigits as digit, digitIndex (`${digit}-${digitIndex}`)}
+						<span class="digit" aria-hidden="true">
+							{#each ['a', 'b', 'c', 'd', 'e', 'f', 'g'] as segment (segment)}
+								<span
+									class:lit={digitSegments[digit]?.includes(segment)}
+									class={`segment segment-${segment}`}
+								></span>
+							{/each}
+						</span>
+					{/each}
+					<span class="sr-only">{temperature}</span>
+				</strong>
 			</button>
 		</div>
 	</div>
@@ -199,6 +226,17 @@
 		outline: none;
 	}
 
+	.screen-render {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: fill;
+		pointer-events: none;
+		user-select: none;
+		-webkit-user-drag: none;
+	}
+
 	.temperature-overlay {
 		position: absolute;
 		left: 35.3%;
@@ -209,19 +247,8 @@
 		width: 20%;
 		height: 28.4%;
 		border: 0;
-		border-radius: 999rem;
-		background:
-			radial-gradient(
-				ellipse at 50% 52%,
-				rgba(210, 49, 38, 0.98),
-				rgba(165, 18, 15, 1) 54%,
-				rgba(99, 8, 8, 0.88) 78%,
-				rgba(41, 4, 4, 0) 100%
-			),
-			transparent;
-		box-shadow:
-			inset 0 0.18rem 0.26rem rgba(255, 196, 176, 0.16),
-			inset 0 -0.16rem 0.22rem rgba(43, 2, 2, 0.42);
+		background: transparent;
+		box-shadow: none;
 		padding: 0;
 		cursor: pointer;
 	}
@@ -230,19 +257,92 @@
 		position: absolute;
 		left: 50%;
 		top: 50%;
-		color: #f9ffff;
-		font:
-			900 clamp(0.92rem, 2.52vw, 2.28rem) 'Arial Rounded MT Bold',
-			'Arial Black',
-			Helvetica,
-			sans-serif;
-		letter-spacing: -0.11em;
-		line-height: 0.82;
-		text-shadow:
-			0 0 0.1rem rgba(255, 255, 255, 0.86),
-			0 0 0.2rem rgba(42, 255, 248, 0.24),
-			0.06rem 0.08rem 0 rgba(0, 0, 0, 0.62);
-		transform: translate(-50%, -50%) scaleX(0.95);
+		display: flex;
+		gap: 8%;
+		width: 82%;
+		height: 82%;
+		transform: translate(-50%, -50%);
+	}
+
+	.digit {
+		position: relative;
+		flex: 1 1 0;
+		height: 100%;
+	}
+
+	.segment {
+		position: absolute;
+		display: block;
+		background: rgba(87, 23, 18, 0.18);
+		opacity: 0;
+		filter: drop-shadow(0 0 0.03rem rgba(0, 0, 0, 0.42));
+	}
+
+	.segment.lit {
+		background: #faffff;
+		opacity: 1;
+		box-shadow:
+			0 0 0.08rem rgba(255, 255, 255, 0.8),
+			0 0 0.16rem rgba(58, 255, 248, 0.32);
+	}
+
+	.segment-a,
+	.segment-d,
+	.segment-g {
+		left: 17%;
+		width: 66%;
+		height: 10%;
+		clip-path: polygon(11% 0, 89% 0, 100% 50%, 89% 100%, 11% 100%, 0 50%);
+	}
+
+	.segment-a {
+		top: 0;
+	}
+
+	.segment-g {
+		top: 45%;
+	}
+
+	.segment-d {
+		bottom: 0;
+	}
+
+	.segment-b,
+	.segment-c,
+	.segment-e,
+	.segment-f {
+		width: 17%;
+		height: 42%;
+		clip-path: polygon(50% 0, 100% 10%, 100% 90%, 50% 100%, 0 90%, 0 10%);
+	}
+
+	.segment-b,
+	.segment-c {
+		right: 0;
+	}
+
+	.segment-e,
+	.segment-f {
+		left: 0;
+	}
+
+	.segment-b,
+	.segment-f {
+		top: 4%;
+	}
+
+	.segment-c,
+	.segment-e {
+		bottom: 4%;
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
 	}
 
 	@media (max-width: 760px) {
