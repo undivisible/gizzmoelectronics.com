@@ -230,11 +230,11 @@
 		position: absolute;
 		left: 50%;
 		top: 50%;
-		width: 70%;
-		height: 138%;
+		width: 66%;
+		height: 130%;
 		object-fit: fill;
 		pointer-events: none;
-		transform: translate(-50%, -49%) rotate(90deg);
+		transform: translate(-50%, -53%) rotate(90deg);
 		user-select: none;
 		-webkit-user-drag: none;
 	}
@@ -242,7 +242,7 @@
 	.temperature-overlay {
 		position: absolute;
 		left: 39.8%;
-		top: 25%;
+		top: 23.6%;
 		z-index: 2;
 		display: grid;
 		place-items: center;
