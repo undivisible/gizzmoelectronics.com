@@ -215,9 +215,9 @@
 	.controller-screen {
 		position: absolute;
 		left: 39.7%;
-		top: 43.35%;
-		width: 20.8%;
-		height: 23.8%;
+		top: 37%;
+		width: 18.6%;
+		height: 29.8%;
 		z-index: 2;
 		overflow: hidden;
 		border-radius: 0.12rem;
