@@ -228,11 +228,13 @@
 
 	.screen-render {
 		position: absolute;
-		inset: 0;
-		width: 100%;
-		height: 100%;
+		left: 50%;
+		top: 50%;
+		width: 72%;
+		height: 143%;
 		object-fit: fill;
 		pointer-events: none;
+		transform: translate(-50%, -47%) rotate(90deg);
 		user-select: none;
 		-webkit-user-drag: none;
 	}
