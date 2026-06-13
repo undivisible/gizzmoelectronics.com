@@ -221,7 +221,7 @@
 		z-index: 2;
 		overflow: hidden;
 		border-radius: 0.12rem;
-		background: #000;
+		background: transparent;
 		box-shadow: none;
 		outline: none;
 	}
@@ -230,19 +230,19 @@
 		position: absolute;
 		left: 50%;
 		top: 50%;
-		width: 50%;
-		height: 100%;
+		width: 64.4%;
+		height: 155.5%;
 		object-fit: fill;
 		pointer-events: none;
-		transform: translate(-50%, -68%) rotate(90deg);
+		transform: translate(-50%, -50%) rotate(90deg);
 		user-select: none;
 		-webkit-user-drag: none;
 	}
 
 	.temperature-overlay {
 		position: absolute;
-		left: 40.4%;
-		top: 19.9%;
+		left: 40%;
+		top: 26.6%;
 		z-index: 2;
 		display: grid;
 		place-items: center;
