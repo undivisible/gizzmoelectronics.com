@@ -1,0 +1,278 @@
+0 splash B
+23C0 splash 1
+4440 splash by gizzmo
+
+1B8D0 large blue ball
+1BAF0 small blue ball 8pix
+1BC50 Red OFF icon
+1C070 Green ON icon
+1C490 Small Black warning
+1DF70 Big Black warning
+22960 small red warning
+24430 Big red warning
+
+28DF0 All Bars
+344A0 51 lowest bar
+34940 52-1 d
+34DF0 53-2 d
+352E0 54-3 d
+357B0 55-4 d
+35C10 56-5 d
+36090 57-6 d
+364C0 58-7 d
+36890 59-8 d
+36D00 60-9 d
+37110 61-10 d
+374F0 62-11 d
+378A0 63-12 d
+37BE0 64-13 d
+37EF0 65-14 d
+381D0 66-15 d
+384A0 67-16 d 
+38740 68-17 d
+38A10 69-18 d
+38C90 70-19 d
+38FA0 71-20 d
+39280 72-21 d
+39600 73-22 d
+399B0 74-23 d 
+39D90 75-24 d
+3A170 76-25 d
+3A540 77-26 d
+3A940 78-27 d
+3AD40 79-28 d
+3B1A0 80-29 d
+3B630 81-30 d
+3BA70 82-31 d
+3BEB0 83-32 d
+3C2F0 84-33 d
+3C730 85-34 d
+3CB90 86-35 d 
+3CFD0 87-36 d
+3D3E0 88-37 d
+3D7F0 89-38 d
+558F0 90-38 d
+
+3DE90 15 pix 0
+3E150 15 pix 1
+3E310 15 pix 2
+3E5D0 15 pix 3
+3E880 15 pix 4
+3EBC0 15 pix 5
+3EE90 15 pix 6
+3F190 15 pix 7
+3F4C0 15 pix 8
+3F7D0 15 pix 9
+3FAC0 15 pix %
+3FD40 15 pix .
+
+3FE30 29pix 0
+406F0 29pix 1
+40B30 29pix 2
+413D0 29pix 3
+41C80 29pix 4
+42530 29pix 5
+42DE0 29pix 6
+436B0 29pix 7
+43F60 29pix 8
+44810 29pix 9
+450C0 29pix .
+
+//15 pix
+451E0 A
+45530 B
+45820 C
+45B20 D
+45E60 E
+46120 F
+463E0 G
+466F0 H
+46A40 I
+46BE0 J
+46E10 K
+47130 L
+47410 M
+477E0 N
+47B50 O
+47E90 P
+481B0 Q
+48570 R
+48890 S
+48BF0 T
+48F50 U
+492B0 V
+49630 W
+49A70 X
+49DC0 Y
+4A160 Z
+
+4A4D0 80pix 7 seg top left
+4AAF0 80pix 7 seg bottom left
+4B100 80pix 7 seg top right
+4B750 80pix 7 seg bottom right
+4BCD0 80pix 7 seg top
+4C140 80pix 7 seg middle
+4C580 80pix 7 seg bottom
+
+4C980 15pix +
+4CB10 15pix -
+
+4CC40 Gears
+4DB30 Trims
+4E830 Input config
+4FB80 Table icon
+50C50 BT icon
+51050 Datalog icon
+
+521A0 60pix 7 seg top left
+525C0 60pix 7 seg bot left
+529E0 60pix 7 seg top right
+52E10 60pix 7 seg bot right
+53220 60pix 7 seg top
+53510 60pix 7 seg middle
+53800 60pix 7 seg bottom
+53AB0 60pix 7 seg dot
+
+53D40 colon :
+
+53EA0 New OFF icon
+54490 New ON icon
+
+0x54A80 10pix 0
+0x54BE0 10pix 1
+0x54D20 10pix 2
+0x54E70 10pix 3
+0x54FC0 10pix 4
+0x55130 10pix 5
+0x55290 10pix 6
+0x553E0 10pix 7
+0x55540 10pix 8
+0x556A0 10pix 9
+0x55800 10pix dot
+
+0x558F0 90-38 d
+
+0x55CB0 Turbo icon
+0x56DF0 10px ball
+0x56FF0 5px ball
+
+0x57120 vertical memory
+0x58210 vertical 0
+0x584B0 vertical 1
+0x58650 vertical 2
+0x58910 vertical 3
+0x58BE0 vertical 4
+0x58F20 vertical 5
+0x591E0 vertical 6
+0x594E0 vertical 7
+0x598E0 vertical 8
+0x59AE0 vertical 9
+
+0x59E00 Solenoid
+0x5B150 Display Settings
+0x5C450 Safety
+0x5D7D0 Settings
+
+0x5EBC0 New input icon
+0x5FEF0 map sensor 1
+0x60A30 map sensor 2
+0x61AA0 hard reset
+0x63000 stethoscope
+0x63E40 bosch076
+0x64BF0 bosch119
+
+0x65800 lambda
+
+0x65B00 40pix 7 seg top left
+0x65D60 40pix 7 seg bot left
+0x65FD0 40pix 7 seg top right
+0x66240 40pix 7 seg bot right
+0x664A0 40pix 7 seg top
+0x66660 40pix 7 seg middle
+0x66860 40pix 7 seg bottom
+ 
+0x66A10 100pix 7 seg top left
+0x672F0 100pix 7 seg bot left
+0x67C10 100pix 7 seg top right
+0x68540 100pix 7 seg bot right
+0x68E60 100pix 7 seg top
+0x69530 100pix 7 seg middle
+0x69C30 100pix 7 seg bottom
+
+0x6A260 10pix volts
+0x6A6A0 10pix rpm
+0x6A9C0 10pix speed
+0x6AE40 10pix sol%
+0x6B210 10pix trim
+0x6B580 10pix zone
+
+0x6B930 orange 12pix ball
+0x6BB00 red 12pix ball
+0x6BD00 yellow 12pix ball
+0x6BEE0 pink 12pix ball
+0x6C0D0 green 12pix ball
+
+0x6C2B0 green 5pix ball
+0x6C3B0 orange 5pix ball
+0x6C4B0 yellow 5pix ball
+0x6C5B0 red 5pix ball
+0x6C6B0 pink 5pix ball
+
+0x6C7B0 10pix afr
+0x6CAB0 10pix lambda
+0x6CC50 10pix press
+0x6D090 10pix knock
+0x6D500 10pix %
+0x6D6C0 10pix duty
+0x6DA40 10pix Msec
+0x6DD90 10pix sol
+0x6E070 10pix time
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

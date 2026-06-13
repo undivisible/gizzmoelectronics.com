@@ -40,7 +40,9 @@
 	},
 	"dependencies": {
 		"@icons-pack/svelte-simple-icons": "^5.0.0",
+		"baseline-browser-mapping": "^2.10.33",
 		"browserify-fs": "^1.0.0",
+		"caniuse-lite": "^1.0.30001793",
 		"lucide-svelte": "^0.511.0",
 		"path-browserify": "^1.0.1",
 		"stripe": "^18.1.0",
