@@ -200,8 +200,8 @@
 
 	.right-knob-control {
 		position: absolute;
-		left: 63.8%;
-		top: 41.4%;
+		left: 61.3%;
+		top: 38.6%;
 		z-index: 3;
 		width: 18.4%;
 		height: 30.2%;
@@ -314,10 +314,10 @@
 
 	.controller-screen {
 		position: absolute;
-		left: 39.7%;
-		top: 37%;
-		width: 18.6%;
-		height: 29.8%;
+		left: 38.5%;
+		top: 35%;
+		width: 22%;
+		height: 32%;
 		z-index: 2;
 		overflow: hidden;
 		border-radius: 0.12rem;
