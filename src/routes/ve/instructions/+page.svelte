@@ -80,6 +80,23 @@
 			aria-label="Right temperature knob"
 			onwheel={handleRightKnobWheel}
 		>
+			<div class="knob-hover-guide" aria-hidden="true">
+				<svg viewBox="0 0 200 200">
+					<path id="scroll-copy-arc" d="M 37 156 A 81 81 0 0 1 163 44" />
+					<text>
+						<textPath
+							href="#scroll-copy-arc"
+							startOffset="50%"
+							text-anchor="middle"
+						>
+							scroll to change number
+						</textPath>
+					</text>
+				</svg>
+				<span class="knob-divider"></span>
+				<span class="knob-symbol knob-plus">+</span>
+				<span class="knob-symbol knob-minus">-</span>
+			</div>
 			<button
 				type="button"
 				class="knob-half knob-up"
@@ -191,6 +208,89 @@
 		border-radius: 50%;
 	}
 
+	.knob-hover-guide {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		place-items: center;
+		border-radius: 50%;
+		color: rgba(255, 255, 255, 0.95);
+		opacity: 0;
+		pointer-events: none;
+		transform: scale(0.96);
+		transition:
+			opacity 0.18s ease,
+			transform 0.18s ease;
+	}
+
+	.right-knob-control:hover .knob-hover-guide,
+	.right-knob-control:focus-within .knob-hover-guide {
+		opacity: 1;
+		transform: scale(1);
+	}
+
+	.knob-hover-guide svg {
+		position: absolute;
+		inset: -8%;
+		width: 116%;
+		height: 116%;
+		overflow: visible;
+	}
+
+	.knob-hover-guide path {
+		fill: none;
+		stroke: none;
+	}
+
+	.knob-hover-guide text {
+		fill: currentColor;
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: 0;
+		text-transform: uppercase;
+		text-shadow:
+			0 0 0.24rem rgba(0, 0, 0, 0.88),
+			0 0 0.4rem rgba(0, 0, 0, 0.72);
+	}
+
+	.knob-divider {
+		position: absolute;
+		left: 26%;
+		top: 50%;
+		width: 48%;
+		height: 2px;
+		background: rgba(255, 255, 255, 0.92);
+		box-shadow:
+			0 0 0.24rem rgba(0, 0, 0, 0.9),
+			0 0 0.34rem rgba(255, 255, 255, 0.34);
+		transform: translateY(-50%);
+	}
+
+	.knob-symbol {
+		position: absolute;
+		left: 50%;
+		display: grid;
+		place-items: center;
+		width: 20%;
+		height: 20%;
+		color: rgba(255, 255, 255, 0.95);
+		font-size: clamp(0.78rem, 1.55vw, 1.9rem);
+		font-weight: 700;
+		line-height: 1;
+		text-shadow:
+			0 0 0.24rem rgba(0, 0, 0, 0.9),
+			0 0 0.34rem rgba(255, 255, 255, 0.32);
+		transform: translateX(-50%);
+	}
+
+	.knob-plus {
+		top: 25%;
+	}
+
+	.knob-minus {
+		bottom: 25%;
+	}
+
 	.knob-half {
 		position: absolute;
 		left: 0;
@@ -230,9 +330,9 @@
 		position: absolute;
 		left: 50%;
 		top: 50%;
-		width: 64.4%;
-		height: 155.5%;
-		object-fit: fill;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
 		pointer-events: none;
 		transform: translate(-50%, -50%) rotate(90deg);
 		user-select: none;
@@ -241,18 +341,19 @@
 
 	.temperature-overlay {
 		position: absolute;
-		left: 40%;
-		top: 26.6%;
+		left: 50%;
+		top: 50%;
 		z-index: 2;
 		display: grid;
 		place-items: center;
-		width: 20%;
-		height: 28.4%;
+		width: 19.4%;
+		height: 25.6%;
 		border: 0;
 		background: transparent;
 		box-shadow: none;
 		padding: 0;
 		cursor: pointer;
+		transform: translate(-50%, -50%);
 	}
 
 	.temperature-value {
@@ -260,9 +361,11 @@
 		left: 50%;
 		top: 50%;
 		display: flex;
-		gap: 8%;
-		width: 82%;
-		height: 82%;
+		align-items: center;
+		justify-content: center;
+		gap: 9%;
+		width: 78%;
+		height: 78%;
 		transform: translate(-50%, -50%);
 	}
 
