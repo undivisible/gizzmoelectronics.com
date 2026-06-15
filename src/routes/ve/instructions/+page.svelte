@@ -101,14 +101,12 @@
 				type="button"
 				class="knob-half knob-up"
 				aria-label="Increase temperature"
-				onmousedown={(e) => e.currentTarget.blur()}
 				onclick={() => changeTemperature(1)}
 			></button>
 			<button
 				type="button"
 				class="knob-half knob-down"
 				aria-label="Decrease temperature"
-				onmousedown={(e) => e.currentTarget.blur()}
 				onclick={() => changeTemperature(-1)}
 			></button>
 		</div>
@@ -225,8 +223,7 @@
 			transform 0.18s ease;
 	}
 
-	.right-knob-control:hover .knob-hover-guide,
-	.right-knob-control:focus-within .knob-hover-guide {
+	.right-knob-control:hover .knob-hover-guide {
 		opacity: 1;
 		transform: scale(1);
 	}
