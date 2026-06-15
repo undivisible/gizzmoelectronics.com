@@ -101,12 +101,14 @@
 				type="button"
 				class="knob-half knob-up"
 				aria-label="Increase temperature"
+				onmousedown={(e) => e.currentTarget.blur()}
 				onclick={() => changeTemperature(1)}
 			></button>
 			<button
 				type="button"
 				class="knob-half knob-down"
 				aria-label="Decrease temperature"
+				onmousedown={(e) => e.currentTarget.blur()}
 				onclick={() => changeTemperature(-1)}
 			></button>
 		</div>
