@@ -82,14 +82,14 @@
 		>
 			<div class="knob-hover-guide" aria-hidden="true">
 				<svg viewBox="0 0 200 200">
-					<path id="scroll-copy-arc" d="M 37 156 A 81 81 0 0 1 163 44" />
+					<path id="scroll-copy-arc" d="M 100 179 A 79 79 0 0 1 100 21" />
 					<text>
 						<textPath
 							href="#scroll-copy-arc"
 							startOffset="50%"
 							text-anchor="middle"
 						>
-							scroll to change number
+							scroll to change temperature
 						</textPath>
 					</text>
 				</svg>
