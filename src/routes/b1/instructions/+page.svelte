@@ -647,6 +647,9 @@
 				}
 			: undefined,
 	);
+	let activeInstructionText = $derived(
+		`Placeholder instructions for the ${activeScreen.title.toLowerCase()} screen. Add example setup notes, expected values, and what each highlighted option changes here.`,
+	);
 
 	function indexFor(id: string): number {
 		return Math.max(
@@ -1225,6 +1228,9 @@
 
 <section class="b1-instructions" class:booted>
 	<div class="controller-wrap">
+		<aside class="instruction-copy" aria-live="polite">
+			<p>{activeInstructionText}</p>
+		</aside>
 		<div class="controller-stage">
 			<div class="controller-shell" aria-label="Interactive B1 controller">
 				<img
@@ -1534,17 +1540,33 @@
 		position: relative;
 		z-index: 4;
 		display: grid;
-		place-items: center;
+		grid-template-columns: minmax(16rem, 24rem) minmax(0, 1040px);
+		align-items: center;
+		justify-content: center;
+		gap: clamp(1rem, 4vw, 3.5rem);
 		box-sizing: border-box;
 		min-height: 100svh;
 		padding: clamp(0.75rem, 4vh, 2.5rem) clamp(0.75rem, 4vw, 2.5rem);
+	}
+
+	.instruction-copy {
+		max-width: 24rem;
+		font:
+			500 clamp(1rem, 1.5vw, 1.35rem) / 1.45 Inter,
+			system-ui,
+			sans-serif;
+		color: rgba(255, 255, 255, 0.82);
+	}
+
+	.instruction-copy p {
+		margin: 0;
 	}
 
 	.controller-stage {
 		position: relative;
 		width: min(
 			1040px,
-			calc(100vw - clamp(1.5rem, 8vw, 5rem)),
+			calc(100vw - clamp(1.5rem, 8vw, 5rem) - 28rem),
 			calc((100svh - clamp(1.5rem, 8vh, 5rem)) * 1016 / 460)
 		);
 		aspect-ratio: 1016 / 460;
@@ -2346,8 +2368,23 @@
 
 	@media (max-width: 560px) {
 		.controller-wrap {
+			grid-template-columns: 1fr;
+			gap: 0.75rem;
 			padding-block: 0.5rem;
 			padding-inline: 0.5rem;
+		}
+
+		.instruction-copy {
+			max-width: none;
+			font-size: 0.95rem;
+		}
+
+		.controller-stage {
+			width: min(
+				1040px,
+				calc(100vw - 1rem),
+				calc((100svh - 5rem) * 1016 / 460)
+			);
 		}
 	}
 
