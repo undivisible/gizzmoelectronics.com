@@ -1,4 +1,5 @@
 <script lang="ts">
+	import instructionCopy from '$lib/data/b1InstructionCopy.json';
 	import { onDestroy, onMount } from 'svelte';
 
 	type ScreenMode = 'live' | 'menu' | 'values' | 'confirm' | 'splash';
@@ -647,9 +648,8 @@
 				}
 			: undefined,
 	);
-	let activeInstructionText = $derived(
-		`Placeholder instructions for the ${activeScreen.title.toLowerCase()} screen. Add example setup notes, expected values, and what each highlighted option changes here.`,
-	);
+	const copyByScreen = instructionCopy as Record<string, string>;
+	let activeInstructionText = $derived(copyByScreen[activeScreen.id] ?? '');
 
 	function indexFor(id: string): number {
 		return Math.max(
