@@ -99,6 +99,14 @@ const manuals: Manual[] = [
       instructions: '/manuals/boost_controllers/MSIBC/instructions.pdf'
     }
   },
+  {
+    id: 'boost_controllers-b1',
+    title: 'B1',
+    category: 'Boost Controllers',
+    files: {
+      instructions: '/manuals/boost_controllers/b1/instructions.pdf'
+    }
+  },
   // Shiftlight
   {
     id: 'shiftlight-CB1S',
