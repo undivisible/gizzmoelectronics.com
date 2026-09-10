@@ -1,16 +1,24 @@
-<claude-mem-context>
-# Memory Context
+# Gizzmo Electronics site
 
-# claude-mem status
+SvelteKit 2 + Svelte 5, Bun for all JS/TS, Netlify adapter. Do not use npm, yarn, or pnpm.
 
-This project has no memory yet. The current session will seed it; subsequent sessions will receive auto-injected context for relevant past work.
+## Commands
 
-Memory injection starts on your second session in a project.
+- `bun install`
+- `bun run dev`
+- `bun run check`
+- `bun test`
+- `bun run format`
+- `bun run build`
+- `bun run test` — check + unit tests + build
 
-`/learn-codebase` is available if the user wants to front-load the entire repo into memory in a single pass (~5 minutes on a typical repo, optional). Otherwise memory builds passively as work happens.
+## Constraints
 
-Live activity: http://localhost:37701
-How it works: `/how-it-works`
+- Do not commit secrets or real Stripe keys.
+- Do not make risky deploy-config changes (`netlify.toml`, adapter, redirects) unless asked.
+- Do not invent product specs or replace B1 instruction placeholders without source copy.
+- Keep existing comments verbatim.
 
-This message disappears once the first observation lands.
-</claude-mem-context>
+## Layout
+
+Home is the B1 landing at `/`. `/b1` redirects there. Checkout needs `STRIPE_SECRET_KEY` plus a public base URL (`PUBLIC_BASE_URL` locally; Netlify `URL` in production).

@@ -65,7 +65,7 @@
 		{
 			title: 'Billet Alloy Brains',
 			description:
-				'Crafted from anodized billet alloy for durability and a premium look that stands up to real-world conditions.',
+				'Crafted from anodised billet alloy for durability and a premium look that stands up to real-world conditions.',
 			image: '/images/b1/billet.jpeg',
 			color: '#a855f7',
 			features: [
@@ -710,7 +710,7 @@
 						<div class="text-5xl font-bold text-blue-400 mb-4">65K</div>
 						<div class="text-xl font-semibold text-white mb-2">TFT Display</div>
 						<div class="text-sm text-white/60">
-							High-resolution color display with vivid, real-time data
+							High-resolution colour display with vivid, real-time data
 							visualization
 						</div>
 					</div>
@@ -755,7 +755,7 @@
 							Billet Alloy
 						</div>
 						<div class="text-sm text-white/60">
-							Premium machined construction with anodized finish
+							Premium machined construction with anodised finish
 						</div>
 					</div>
 

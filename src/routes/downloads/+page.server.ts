@@ -163,6 +163,14 @@ const manuals: Manual[] = [
     files: {
       instructions: '/manuals/shiftlight/original_shiftlight/instructions.pdf'
     }
+  },
+  {
+    id: 've-fp9355',
+    title: 'VE Climate Control',
+    category: 'Climate',
+    files: {
+      instructions: '/ve/FP9355_User_Installation_Manual_A5-24072023.pdf'
+    }
   }
 ];
 

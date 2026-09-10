@@ -10,6 +10,7 @@
 	const ROUTE_TITLES: Record<string, string> = {
 		'/': 'B1 Boost Controller | Gizzmo Electronics',
 		'/b1/instructions': 'B1 Interface | Gizzmo Electronics',
+		'/ve/instructions': 'VE Interface | Gizzmo Electronics',
 		'/downloads': 'Downloads | Gizzmo Electronics',
 		'/support': 'Support | Gizzmo Electronics',
 		'/store': 'Store | Gizzmo Electronics',
