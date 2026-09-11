@@ -61,6 +61,7 @@
               type="text"
               placeholder="search"
               bind:value={searchQuery}
+              aria-label="Search manuals"
               class="w-full px-4 py-2 rounded-full bg-transparent border border-neutral-700 focus:border-white outline-none text-sm"
             />
           </div>
