@@ -62,7 +62,7 @@
 </script>
 
 <svelte:head>
-	<title>VE Instructions | Gizzmo Electronics</title>
+	<title>VE Interface | Gizzmo Electronics</title>
 	<meta
 		name="description"
 		content="Interactive VE climate interface guide using the original Gizzmo Electronics control artwork."
