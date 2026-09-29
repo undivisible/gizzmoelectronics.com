@@ -59,6 +59,7 @@
           <div class="relative flex-grow max-w-xs">
             <input
               type="text"
+              aria-label="Search manuals"
               placeholder="search"
               bind:value={searchQuery}
               class="w-full px-4 py-2 rounded-full bg-transparent border border-neutral-700 focus:border-white outline-none text-sm"

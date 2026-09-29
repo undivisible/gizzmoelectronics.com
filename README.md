@@ -44,6 +44,12 @@ Checkout stays hidden until `STRIPE_SECRET_KEY` and a public site origin are set
 - `/store` — V4+ catalog
 - `/checkout/success`, `/checkout/cancel`
 
+API endpoints:
+
+- `/api/checkout-available` — GET; reports whether checkout is configured
+- `/api/create-checkout-session` — POST; creates a Stripe Checkout session
+- `/api/webhook/stripe` — POST; Stripe webhook handler (requires `STRIPE_WEBHOOK_SECRET`)
+
 B1 on-screen instruction copy in `src/lib/data/b1InstructionCopy.json` is still placeholder text.
 
 ## License

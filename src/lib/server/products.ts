@@ -29,7 +29,7 @@ const CATALOG: Record<CatalogProductId, CatalogProduct> = {
 	},
 	loom: {
 		id: 'loom',
-		name: 'v4 wiring loom',
+		name: 'V4 Wiring Loom',
 		description: '',
 		priceCents: 3000,
 		currency: 'usd',
@@ -37,7 +37,7 @@ const CATALOG: Record<CatalogProductId, CatalogProduct> = {
 	},
 	solenoid: {
 		id: 'solenoid',
-		name: 'plugged MAC solenoid with tails',
+		name: 'Plugged MAC Solenoid with Tails',
 		description: '',
 		priceCents: 8000,
 		currency: 'usd',

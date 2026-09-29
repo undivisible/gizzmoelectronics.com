@@ -17,13 +17,13 @@
   let additionalProducts: Product[] = [
     {
       id: 2,
-      name: 'v4 wiring loom',
+      name: 'V4 Wiring Loom',
       price: 30,
       image: '/images/loom.png'
     },
     {
       id: 3,
-      name: 'plugged MAC solenoid with tails',
+      name: 'Plugged MAC Solenoid with Tails',
       price: 80,
       image: '/images/solenoid.png'
     }
