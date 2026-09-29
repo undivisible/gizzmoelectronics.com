@@ -13,7 +13,6 @@
 		'/ve/instructions': 'VE Interface | Gizzmo Electronics',
 		'/downloads': 'Downloads | Gizzmo Electronics',
 		'/support': 'Support | Gizzmo Electronics',
-		'/store': 'Store | Gizzmo Electronics',
 		'/checkout/success': 'Order Confirmed | Gizzmo Electronics',
 		'/checkout/cancel': 'Checkout Cancelled | Gizzmo Electronics',
 	};
@@ -70,11 +69,9 @@
 
 <svelte:head>
 	<title>{pageTitle}</title>
-	<link
-		rel="icon"
-		type="image/x-icon"
-		href="https://upload.wikimedia.org/wikipedia/commons/5/59/Empty.png"
-	/>
+	<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+	<link rel="icon" type="image/png" href="/favicon.png" />
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 </svelte:head>
 
 <div

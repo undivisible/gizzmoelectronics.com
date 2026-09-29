@@ -832,7 +832,7 @@
 								<div>
 									<div class="text-lg font-semibold text-white">MAP Sensor</div>
 									<div class="text-sm text-white/60">
-										4 bar manifold absolute pressure sensor
+										3 bar manifold absolute pressure sensor
 									</div>
 								</div>
 							</li>
